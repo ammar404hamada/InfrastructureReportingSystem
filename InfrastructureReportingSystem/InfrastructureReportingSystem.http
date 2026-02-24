@@ -1,0 +1,6 @@
+@InfrastructureReportingSystem_HostAddress = http://localhost:5121
+
+GET {{InfrastructureReportingSystem_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
