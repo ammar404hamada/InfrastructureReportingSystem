@@ -1,9 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37012.4 d17.14
+VisualStudioVersion = 17.14.37012.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfrastructureReportingSystem", "InfrastructureReportingSystem\InfrastructureReportingSystem.csproj", "{F6913293-58A8-4C62-B7D0-3FF7CA09F8ED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApplicationCoreLayer", "ApplicationCoreLayer", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InfrastructureLayer", "InfrastructureLayer", "{80AC7ACB-A7CF-492B-89B5-388F382998F3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PresentationLayer", "PresentationLayer", "{08CCE6DE-2910-44B8-98BD-30C304426C27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfraReportingSystem.Domain", "InfraReportingSystem.Domain\InfraReportingSystem.Domain.csproj", "{5510471C-C594-4762-A841-84237E7C9A5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfraReportingSystem.ServiceAbstractions", "InfraReportingSystem.ServiceAbstractions\InfraReportingSystem.ServiceAbstractions.csproj", "{642532D6-91C2-4F56-91A0-9A803D4BA8B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfraReportingSystem.Services", "InfraReportingSystem.Services\InfraReportingSystem.Services.csproj", "{9981E1B3-FB5E-4C5B-B752-BB0C84ABB1A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfraReportingSystem.Persistence", "InfraReportingSystem.Persistence\InfraReportingSystem.Persistence.csproj", "{23804356-95D2-4B08-B63A-6F839A2F04AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfraReportingSystem.Presentation", "InfraReportingSystem.Presentation\InfraReportingSystem.Presentation.csproj", "{99089AE3-8FDB-4EF0-86E8-12FD2CC39CDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfraReportingSystem.Shared", "InfraReportingSystem.Shared\InfraReportingSystem.Shared.csproj", "{16C22418-0252-4C17-ACB9-A42F42554F8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +33,41 @@ Global
 		{F6913293-58A8-4C62-B7D0-3FF7CA09F8ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6913293-58A8-4C62-B7D0-3FF7CA09F8ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6913293-58A8-4C62-B7D0-3FF7CA09F8ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5510471C-C594-4762-A841-84237E7C9A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5510471C-C594-4762-A841-84237E7C9A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5510471C-C594-4762-A841-84237E7C9A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5510471C-C594-4762-A841-84237E7C9A5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{642532D6-91C2-4F56-91A0-9A803D4BA8B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{642532D6-91C2-4F56-91A0-9A803D4BA8B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{642532D6-91C2-4F56-91A0-9A803D4BA8B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{642532D6-91C2-4F56-91A0-9A803D4BA8B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9981E1B3-FB5E-4C5B-B752-BB0C84ABB1A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9981E1B3-FB5E-4C5B-B752-BB0C84ABB1A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9981E1B3-FB5E-4C5B-B752-BB0C84ABB1A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9981E1B3-FB5E-4C5B-B752-BB0C84ABB1A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23804356-95D2-4B08-B63A-6F839A2F04AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23804356-95D2-4B08-B63A-6F839A2F04AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23804356-95D2-4B08-B63A-6F839A2F04AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23804356-95D2-4B08-B63A-6F839A2F04AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99089AE3-8FDB-4EF0-86E8-12FD2CC39CDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99089AE3-8FDB-4EF0-86E8-12FD2CC39CDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99089AE3-8FDB-4EF0-86E8-12FD2CC39CDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99089AE3-8FDB-4EF0-86E8-12FD2CC39CDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16C22418-0252-4C17-ACB9-A42F42554F8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16C22418-0252-4C17-ACB9-A42F42554F8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16C22418-0252-4C17-ACB9-A42F42554F8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16C22418-0252-4C17-ACB9-A42F42554F8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F6913293-58A8-4C62-B7D0-3FF7CA09F8ED} = {08CCE6DE-2910-44B8-98BD-30C304426C27}
+		{5510471C-C594-4762-A841-84237E7C9A5A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{642532D6-91C2-4F56-91A0-9A803D4BA8B3} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9981E1B3-FB5E-4C5B-B752-BB0C84ABB1A9} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{23804356-95D2-4B08-B63A-6F839A2F04AC} = {80AC7ACB-A7CF-492B-89B5-388F382998F3}
+		{99089AE3-8FDB-4EF0-86E8-12FD2CC39CDC} = {08CCE6DE-2910-44B8-98BD-30C304426C27}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EA787DA5-CBC5-4B88-B703-AE5AD5212AE4}

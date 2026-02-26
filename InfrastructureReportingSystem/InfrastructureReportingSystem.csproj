@@ -10,4 +10,13 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InfraReportingSystem.Persistence\InfraReportingSystem.Persistence.csproj" />
+    <ProjectReference Include="..\InfraReportingSystem.Presentation\InfraReportingSystem.Presentation.csproj" />
+  </ItemGroup>
+
 </Project>
