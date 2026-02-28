@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 
 namespace InfraReportingSystem.Domain.Enums { 
 
-    public class ReportStatus
+    public enum ReportStatus
     {
-        public enum Status
-        {
-            Pending = 0,
-            InProgress = 1,
-            Resolved = 2,
-            Rejected = 3
-        }
+        Pending = 0,
+        InProgress = 1,
+        Resolved = 2,
+        Rejected = 3
     }
 }
