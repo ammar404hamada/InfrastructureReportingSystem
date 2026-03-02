@@ -18,5 +18,11 @@ namespace InfraReportingSystem.Domain.Entities
         public bool IsUsed { get; set; } = false;
 
 
+        // Foreign Key
+        public int UserId { get; set; }
+
+        // Navigation
+        public User User { get; set; } = null!;
+
     }
 }
