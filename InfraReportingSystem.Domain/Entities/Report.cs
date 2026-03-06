@@ -21,10 +21,10 @@ namespace InfraReportingSystem.Domain.Entities {
         public Category Category { get; set; }
 
         public ICollection<ReportPic> ReportPics { get; set; } = new List<ReportPic>();
-        public int WorkerId { get; set; }
-        public Worker Worker { get; set; }
+        public string? WorkerId { get; set; }
+        public Worker? Worker { get; set; }
 
-        public int? AuthorityId { get; set; }
+        public string? AuthorityId { get; set; }
         public Authority? Authority { get; set; }
     }
 
