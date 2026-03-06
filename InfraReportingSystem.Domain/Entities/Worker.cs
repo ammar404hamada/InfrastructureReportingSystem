@@ -13,6 +13,6 @@ namespace InfraReportingSystem.Domain.Entities
         public string Specialization { get; set; }
 
 
-        public ICollection<Report> AssignedReports { get; set; }
+        public ICollection<Report> AssignedReports { get; set; } = new List<Report>();
     }
 }

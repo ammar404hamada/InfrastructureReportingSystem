@@ -29,6 +29,10 @@ namespace InfraReportingSystem.Persistence.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+            modelBuilder.Entity<Report>()
+                .Property(r => r.Status)
+                .HasConversion<string>();
         }
     }
 }
