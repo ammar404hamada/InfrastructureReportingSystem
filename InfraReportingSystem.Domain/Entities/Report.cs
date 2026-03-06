@@ -12,7 +12,7 @@ namespace InfraReportingSystem.Domain.Entities {
     {
         public int Id { get; set; }
         public string Description { get; set; }
-        public ReportStatus Status { get; set; } = ReportStatus.Pending;
+        public ReportStatus Status { get; set; } = ReportStatus.Submitted;
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
