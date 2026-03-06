@@ -1,3 +1,4 @@
+using InfraReportingSystem.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,13 @@ namespace InfraReportingSystem.Domain.Entities
 {
     public class User : IdentityUser
     {
-        public string Name { get; set; }
-        public string Status { get; set; }
-        public string Pic_url { get; set; }
+        public string Name { get; set; } = null!;
+
+        public string? Pic_url { get; set; }
+
+        public UserStatus Status { get; set; } = UserStatus.Inactive;
 
 
-        public int? RoleId { get; set; }
-        public Role Role { get; set; }
-        public ICollection<Report> SubmittedReports { get; set; }
+        public ICollection<Report> SubmittedReports { get; set; } = new List<Report>();
     }
 }
