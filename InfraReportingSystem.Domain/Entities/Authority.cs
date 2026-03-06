@@ -10,7 +10,7 @@ namespace InfraReportingSystem.Domain.Entities
     
     public class Authority : User
     {
-        
-        public ICollection<Report> ReportsAssignedByMe { get; set; }
+
+        public ICollection<Report> ReportsAssignedByMe { get; set; } = new List<Report>();
     }
 }
