@@ -35,18 +35,15 @@ namespace InfraReportingSystem.Domain.Entities {
         public Category Category { get; set; } = null!;
 
 
-        public int SubmittedById { get; set; }
+        public string SubmittedById { get; set; } = null!;
         public User SubmittedBy { get; set; } = null!;
 
+        public string? AssignedWorkerId { get; set; }
+        public Worker? AssignedWorker { get; set; }
 
-        public string? WorkerId { get; set; }
-        
-        public Worker? Worker { get; set; }
+        public string? AssignedByAuthorityId { get; set; }
+        public Authority? AssignedByAuthority { get; set; }
 
-
-        public string? AuthorityId { get; set; }
-        public Authority? Authority { get; set; }
-        
         public ICollection<ReportPic> ReportPics { get; set; } = new List<ReportPic>();
 
     }

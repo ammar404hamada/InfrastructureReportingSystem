@@ -10,8 +10,7 @@ namespace InfraReportingSystem.Domain.Entities
     
     public class Worker : User
     {
-        public string Specialization { get; set; }
-
+        public string? Specialization { get; set; }
 
         public ICollection<Report> AssignedReports { get; set; } = new List<Report>();
     }

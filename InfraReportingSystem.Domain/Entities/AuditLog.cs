@@ -14,7 +14,7 @@ namespace InfraReportingSystem.Domain.Entities
 
         // The user who performed the action
         // Nullable because failed login attempts may not belong to a valid user
-        public int? UserId { get; set; }
+        public string? UserId { get; set; }
         public User? User { get; set; }
 
         // The type of action performed in the system
@@ -24,7 +24,7 @@ namespace InfraReportingSystem.Domain.Entities
         public string? EntityName { get; set; }
 
         // The ID of the affected entity
-        public int? EntityId { get; set; }
+        public string? EntityId { get; set; }
 
         // Detailed description of the action
         public string Details { get; set; } = null!;

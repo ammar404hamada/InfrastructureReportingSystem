@@ -17,7 +17,6 @@ namespace InfraReportingSystem.Persistence.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Worker> Workers { get; set; }
         public DbSet<Authority> Authorities { get; set; }
-        public DbSet<Role> Roles { get; set; }
 
         public DbSet<Report> Reports { get; set; }
         public DbSet<Category> Categories { get; set; }
