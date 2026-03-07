@@ -10,8 +10,7 @@ namespace InfraReportingSystem.Domain.Entities {
     {
 
         public int Id { get; set; }
-        public string Name { get; set; }
-
+        public string Name { get; set; } = null!;
         public ICollection<Report> Reports { get; set; } = new List<Report>();
     }
 }

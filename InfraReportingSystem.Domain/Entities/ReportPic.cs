@@ -11,7 +11,7 @@ namespace InfraReportingSystem.Domain.Entities {
     {
 
         public int PicId { get; set; }
-        public string PicUrl { get; set; } = string.Empty; 
+        public string PicUrl { get; set; } = null!; 
         public int ReportId { get; set; }
         public Report Report { get; set; } = null!;
     }
