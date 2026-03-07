@@ -10,22 +10,45 @@ namespace InfraReportingSystem.Domain.Entities {
 
     public class Report
     {
+        
         public int Id { get; set; }
-        public string Description { get; set; }
+        
+        public string Description { get; set; } = null!;
+        
         public ReportStatus Status { get; set; } = ReportStatus.Submitted;
+        
         public double Latitude { get; set; }
+        
         public double Longitude { get; set; }
+        
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
 
-        public int CategoryId { get; set; }
-        public Category Category { get; set; }
+        public DateTime? AssignedAt { get; set; }
 
-        public ICollection<ReportPic> ReportPics { get; set; } = new List<ReportPic>();
+        public string? RejectionReason { get; set; }
+
+
+        // --- Foreign Keys & Navigation Properties ---
+
+        public int CategoryId { get; set; }
+
+        public Category Category { get; set; } = null!;
+
+
+        public int SubmittedById { get; set; }
+        public User SubmittedBy { get; set; } = null!;
+
+
         public string? WorkerId { get; set; }
+        
         public Worker? Worker { get; set; }
+
 
         public string? AuthorityId { get; set; }
         public Authority? Authority { get; set; }
+        
+        public ICollection<ReportPic> ReportPics { get; set; } = new List<ReportPic>();
+
     }
 
 }
