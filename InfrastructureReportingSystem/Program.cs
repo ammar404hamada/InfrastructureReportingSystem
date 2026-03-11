@@ -18,8 +18,17 @@ namespace InfrastructureReportingSystem
 
             builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            var app = builder.Build();
 
+            builder.Services.AddScoped<DataSeeder>();
+            
+            var app = builder.Build();
+           
+            using (var scope = app.Services.CreateScope())
+            {
+                var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+                await seeder.SeedAsync();
+            }
+           
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -34,6 +43,8 @@ namespace InfrastructureReportingSystem
             app.MapControllers();
 
             app.Run();
+
+
         }
     }
 }
