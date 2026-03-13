@@ -54,28 +54,33 @@ namespace InfraReportingSystem.Services.Auth {
             if (user == null)
                 return new LoginResponseDto
                 {
+                    Success = false,
                     Message = "User Does Not Exsit"
                 };
 
             if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
                 return new LoginResponseDto
                 {
+                    Success = false,
                     Message = "Invalide Password"
                 };
 
             if (user.Status == UserStatus.Inactive)
                 return new LoginResponseDto
                 {
+                    Success = false,
                     Message = "Please confirm your email first"
                 };
             if (user.Status == UserStatus.Suspended)
                 return new LoginResponseDto
                 {
+                    Success = false,
                     Message = "Your account has been suspended"
                 };
             if (user.Status == UserStatus.Locked)
                 return new LoginResponseDto
                 {
+                    Success = false,
                     Message = "Your account is locked"
                 };
 
@@ -85,6 +90,7 @@ namespace InfraReportingSystem.Services.Auth {
 
                 return new LoginResponseDto
                 {
+                    Success = true,
                     Message = "Login Successful",
                     User = new UserDto
                     {
@@ -101,6 +107,7 @@ namespace InfraReportingSystem.Services.Auth {
             if (await _userManager.FindByEmailAsync(registerDto.Email) != null)
                 return new RegisterResponseDto
                 {
+                    Success = false,
                     Message = "Email Already exists"
                 };
 
@@ -119,6 +126,7 @@ namespace InfraReportingSystem.Services.Auth {
             if (!result.Succeeded)
                 return new RegisterResponseDto
                 {
+                    Success = false,
                     Message = string.Join(", ", result.Errors.Select(e => e.Description))
                 };
             await _userManager.AddToRoleAsync(user, "Public user");
@@ -128,6 +136,7 @@ namespace InfraReportingSystem.Services.Auth {
 
             return new RegisterResponseDto
             {
+                Success = true,
                 Message = "Registeration Successful, Please confirm your Email",
                 User = new UserDto
                 {
