@@ -1,8 +1,10 @@
 ﻿using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Auth;
+using InfraReportingSystem.ServiceAbstractions.Email;
 using InfraReportingSystem.Shared.DTOs.Auth;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
@@ -14,6 +16,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace InfraReportingSystem.Services.Auth {
 
     public class AuthService : IAuthService
@@ -21,26 +24,31 @@ namespace InfraReportingSystem.Services.Auth {
         private readonly IConfiguration _configuration;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailService _emailService;
 
         public AuthService(
             UserManager<User> userManager, 
             RoleManager<IdentityRole> roleManager,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IEmailService emailService
+            )
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _emailService = emailService;
         }
         public async Task<bool> ConfirmEmailAsync(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
             
-            if (user == null)
-                return false;
+            if (user == null) return false;
 
-            var result = await _userManager.ConfirmEmailAsync(user, token);
-            if (!result.Succeeded) 
-                return false;
+            var decodeToken = Uri.UnescapeDataString(token);
+
+
+            var result = await _userManager.ConfirmEmailAsync(user, decodeToken);
+            if (!result.Succeeded) return false;
 
             user.Status = UserStatus.Active;
             await _userManager.UpdateAsync(user);
@@ -131,8 +139,22 @@ namespace InfraReportingSystem.Services.Auth {
                 };
             await _userManager.AddToRoleAsync(user, "Public user");
 
-            // TODO: send confirmation email with this token
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedToken = Uri.EscapeDataString(token);
+            var confirmationLink = $"{_configuration["AppUrl"]}/api/auth/confirm-email?userId={user.Id}&token={encodedToken}";
+            
+            var emailBody = $@"
+                <h2>Welcome to Infrastructure Reporting System!</h2>
+                <p>Hi {user.Name},</p>
+                <p>Please confirm your email by clicking the link below:</p>
+                <a href='{confirmationLink}' 
+                   style='background:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
+                   Confirm Email
+                </a>
+                <p>If you didn't register, ignore this email.</p>
+            ";
+
+            await _emailService.SendEmailAsync(user.Email, "Confirm your Email", emailBody);
 
             return new RegisterResponseDto
             {

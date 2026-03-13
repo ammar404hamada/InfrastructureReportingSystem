@@ -3,7 +3,9 @@ using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.Persistence.Seed;
 using InfraReportingSystem.ServiceAbstractions.Auth;
+using InfraReportingSystem.ServiceAbstractions.Email;
 using InfraReportingSystem.Services.Auth;
+using InfraReportingSystem.Services.Email;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +33,7 @@ namespace InfrastructureReportingSystem
             {
                 options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = false;
-                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedEmail = true;
             })
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
@@ -58,7 +60,7 @@ namespace InfrastructureReportingSystem
             });
 
             builder.Services.AddScoped<IAuthService, AuthService>();
-
+            builder.Services.AddScoped<IEmailService, EmailService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

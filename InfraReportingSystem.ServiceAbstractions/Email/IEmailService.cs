@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InfraReportingSystem.ServiceAbstractions.Email;
+namespace InfraReportingSystem.ServiceAbstractions.Email { 
 
-internal interface IEmail
-{
+    public interface IEmailService
+    {
+        Task SendEmailAsync(string to, string subject, string body);
+    }
 }
