@@ -21,7 +21,7 @@ namespace InfraReportingSystem.Persistence.Data
         public DbSet<Report> Reports { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ReportPic> ReportPics { get; set; }
-
+        public DbSet<AuditLog> AuditLog { get; set; }
         public DbSet<OtpVerification> OtpVerifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
