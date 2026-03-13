@@ -33,14 +33,19 @@ namespace InfraReportingSystem.Persistence.Data.Configurations {
                 .HasForeignKey(rp => rp.ReportId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(r => r.Worker)
-                .WithMany(w => w.AssignedReports)
-                .HasForeignKey(r => r.WorkerId)
+            builder.HasOne(r => r.SubmittedBy)
+                .WithMany(u => u.SubmittedReports)
+                .HasForeignKey(r => r.SubmittedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(r => r.Authority)
+            builder.HasOne(r => r.AssignedWorker)
+                .WithMany(w => w.AssignedReports)
+                .HasForeignKey(r => r.AssignedWorkerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(r => r.AssignedByAuthority)
                 .WithMany(a => a.ReportsAssignedByMe)
-                .HasForeignKey(r => r.AuthorityId)
+                .HasForeignKey(r => r.AssignedByAuthorityId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
