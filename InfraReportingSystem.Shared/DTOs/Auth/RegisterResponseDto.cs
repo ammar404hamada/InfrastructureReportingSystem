@@ -9,7 +9,7 @@ namespace InfraReportingSystem.Shared.DTOs.Auth {
     public class RegisterResponseDto
     {
         public bool Success { get; set; }
-        public string Message { get; set; }
+        public string Message { get; set; } = null!;
         public UserDto User { get; set; }
     }
 }
