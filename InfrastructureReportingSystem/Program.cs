@@ -1,12 +1,14 @@
 
 using InfraReportingSystem.Persistence.Data;
+using InfraReportingSystem.Persistence.Seed;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace InfrastructureReportingSystem
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,14 @@ namespace InfrastructureReportingSystem
 
 
             app.MapControllers();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManger = scope.ServiceProvider
+                    .GetRequiredService<RoleManager<IdentityRole>>();
+
+                await RoleSeeder.SeedRolesAsync(roleManger);
+            }
 
             app.Run();
         }
