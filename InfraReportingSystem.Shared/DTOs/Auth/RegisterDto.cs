@@ -19,7 +19,6 @@ namespace InfraReportingSystem.Shared.DTOs.Auth {
         public string Phone { get; set; }
         [Required]
         [MinLength(8)]
-        [MaxLength(16)]
         public string Password { get; set; }
         [Required]
         [Compare("Password", ErrorMessage = "Password does not match")]

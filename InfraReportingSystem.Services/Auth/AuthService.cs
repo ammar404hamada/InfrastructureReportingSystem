@@ -55,6 +55,31 @@ namespace InfraReportingSystem.Services.Auth {
             return true;
         }
 
+        public async Task ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto)
+        {
+            var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
+            if (user == null) return;
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = Uri.EscapeDataString(token);
+            var resetLink = $"{_configuration["FrontendUrl"]}/reset-password?userId={user.Id}&token={encodedToken}";
+
+            var emailBody = $@"
+                <h2>Welcome to Infrastructure Reporting System!</h2>
+                <p>Hi {user.Name},</p>
+                <p>We received a request to reset your password. Click the link below:</p>
+                <a href='{resetLink}' 
+                   style='background:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
+                   Reset Password
+                </a>
+                <p>If you didn't forget your password, ignore this email.</p>
+            ";
+
+            await _emailService.SendEmailAsync(user.Email!, "Reset your password", emailBody);
+
+
+        }
+
         public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto)
         {
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
@@ -167,6 +192,20 @@ namespace InfraReportingSystem.Services.Auth {
                     Role = "Public User"
                 }
             };
+        }
+
+        public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        {
+            var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+
+            if (user == null) return false;
+
+            var decodedToken = Uri.UnescapeDataString(resetPasswordDto.Token);
+
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, resetPasswordDto.NewPassword);
+            if (!result.Succeeded)
+                return false;
+            return true;
         }
 
         private string GenerateJwtToken(User user, IList<string> roles)
