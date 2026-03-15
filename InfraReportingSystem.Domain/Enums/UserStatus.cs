@@ -10,19 +10,19 @@ namespace InfraReportingSystem.Domain.Enums
     {
 
         // Account created but not yet verified via OTP
-        Inactive = 1,
+        Inactive = 0,
 
         // OTP verification completed and the user can log in normally
-        Active = 2,
+        Active = 1,
 
         // Account temporarily locked due to multiple failed login attempts
-        Locked = 3,
+        Locked = 2,
 
         // Account manually disabled by an Admin (fraud, abuse, etc.)
-        Suspended = 4,
+        Suspended = 3,
 
         // Account was deleted by the user or an admin (soft delete)
-        Deleted = 5
+        Deleted = 4
 
     }
 }

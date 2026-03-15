@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InfraReportingSystem.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260313213552_AddIdentityTables")]
-    partial class AddIdentityTables
+    [Migration("20260315015613_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,23 +38,35 @@ namespace InfraReportingSystem.Persistence.Migrations
 
                     b.Property<string>("Details")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("EntityId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("EntityName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("Timestamp")
+                        .HasDatabaseName("IX_AuditLog_Timestamp");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_AuditLog_UserId");
+
+                    b.HasIndex("ActionType", "Timestamp")
+                        .HasDatabaseName("IX_AuditLog_ActionType_Timestamp");
 
                     b.ToTable("AuditLog");
                 });
@@ -74,7 +86,10 @@ namespace InfraReportingSystem.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.OtpVerification", b =>
@@ -89,11 +104,14 @@ namespace InfraReportingSystem.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("OtpCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -101,7 +119,11 @@ namespace InfraReportingSystem.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_OtpVerification_UserId");
+
+                    b.HasIndex("UserId", "IsUsed", "ExpiresAt")
+                        .HasDatabaseName("IX_OtpVerification_UserId_IsUsed_ExpiresAt");
 
                     b.ToTable("OtpVerifications");
                 });
@@ -109,7 +131,10 @@ namespace InfraReportingSystem.Persistence.Migrations
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.Report", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("AssignedAt")
                         .HasColumnType("datetime2");
@@ -135,18 +160,20 @@ namespace InfraReportingSystem.Persistence.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("RejectionReason")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("SubmittedById")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.HasKey("Id");
 
@@ -154,27 +181,49 @@ namespace InfraReportingSystem.Persistence.Migrations
 
                     b.HasIndex("AssignedWorkerId");
 
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("Status");
+
                     b.HasIndex("SubmittedById");
 
-                    b.ToTable("Reports", (string)null);
+                    b.HasIndex("UploadedAt");
+
+                    b.HasIndex("AssignedWorkerId", "Status")
+                        .HasDatabaseName("IX_Report_AssignedWorkerId_Status");
+
+                    b.HasIndex("SubmittedById", "Status")
+                        .HasDatabaseName("IX_Report_SubmittedById_Status");
+
+                    b.ToTable("Reports", t =>
+                        {
+                            t.HasCheckConstraint("CK_Report_Latitude", "[Latitude] >= -90.0 AND [Latitude] <= 90.0");
+
+                            t.HasCheckConstraint("CK_Report_Longitude", "[Longitude] >= -180.0 AND [Longitude] <= 180.0");
+                        });
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.ReportPic", b =>
                 {
-                    b.Property<int>("ReportId")
+                    b.Property<int>("PicId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("PicId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PicId"));
 
                     b.Property<string>("PicUrl")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
-                    b.HasKey("ReportId");
+                    b.Property<int>("ReportId")
+                        .HasColumnType("int");
 
-                    b.ToTable("ReportPics", (string)null);
+                    b.HasKey("PicId");
+
+                    b.HasIndex("ReportId");
+
+                    b.ToTable("ReportPics");
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.User", b =>
@@ -189,14 +238,9 @@ namespace InfraReportingSystem.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
-
                     b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -209,7 +253,8 @@ namespace InfraReportingSystem.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -229,13 +274,16 @@ namespace InfraReportingSystem.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ProfilePictureUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -243,6 +291,11 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
 
                     b.HasKey("Id");
 
@@ -256,7 +309,7 @@ namespace InfraReportingSystem.Persistence.Migrations
 
                     b.ToTable("AspNetUsers", (string)null);
 
-                    b.HasDiscriminator().HasValue("User");
+                    b.HasDiscriminator<string>("UserType").HasValue("User");
 
                     b.UseTphMappingStrategy();
                 });
@@ -406,7 +459,8 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.HasBaseType("InfraReportingSystem.Domain.Entities.User");
 
                     b.Property<string>("Specialization")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasDiscriminator().HasValue("Worker");
                 });
@@ -415,7 +469,8 @@ namespace InfraReportingSystem.Persistence.Migrations
                 {
                     b.HasOne("InfraReportingSystem.Domain.Entities.User", "User")
                         .WithMany("AuditLogs")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
                 });
@@ -436,16 +491,16 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.HasOne("InfraReportingSystem.Domain.Entities.Authority", "AssignedByAuthority")
                         .WithMany("ReportsAssignedByMe")
                         .HasForeignKey("AssignedByAuthorityId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("InfraReportingSystem.Domain.Entities.Worker", "AssignedWorker")
                         .WithMany("AssignedReports")
                         .HasForeignKey("AssignedWorkerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("InfraReportingSystem.Domain.Entities.Category", "Category")
                         .WithMany("Reports")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

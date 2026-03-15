@@ -13,11 +13,20 @@ namespace InfraReportingSystem.Persistence.Data.Configurations {
     {
         public void Configure(EntityTypeBuilder<ReportPic> builder)
         {
-            builder.ToTable("ReportPics");
-            builder.HasKey(rp => rp.ReportId);
-            builder.Property(rp => rp.PicUrl)
-                .IsRequired()
-                .HasMaxLength(200);
+            // Set PicId as the primary key
+            builder.HasKey(p => p.PicId);
+
+            // Picture URL is required and limited to 2048 characters
+            builder.Property(p => p.PicUrl)
+                   .IsRequired()
+                   .HasMaxLength(2048);
+
+            // Each picture belongs to one report
+            // When a report is deleted, its pictures are also deleted
+            builder.HasOne(p => p.Report)
+                   .WithMany(r => r.ReportPics)
+                   .HasForeignKey(p => p.ReportId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

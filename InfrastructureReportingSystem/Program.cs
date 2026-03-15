@@ -39,6 +39,11 @@ namespace InfrastructureReportingSystem
                 .AddDefaultTokenProviders();
             
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+
+            // Added validation to ensure the JWT key exists in configuration
+            var key = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key missing");
+
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -79,10 +84,15 @@ namespace InfrastructureReportingSystem
 
             using (var scope = app.Services.CreateScope())
             {
-                var roleManger = scope.ServiceProvider
-                    .GetRequiredService<RoleManager<IdentityRole>>();
+                // Apply pending EF Core migrations automatically at startup
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                await context.Database.MigrateAsync();
 
-                await RoleSeeder.SeedRolesAsync(roleManger);
+                var roleManager = scope.ServiceProvider
+                    .GetRequiredService<RoleManager<IdentityRole>>(); // renamed variable for clarity
+
+
+                await RoleSeeder.SeedRolesAsync(roleManager);
             }
 
             app.Run();
