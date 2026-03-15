@@ -48,5 +48,24 @@ namespace InfrastructureReportingSystem.Controllers {
             return BadRequest("Invalid or expired token");
         }
 
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(
+            [FromBody]  ForgotPasswordDto forgotPasswordDto)
+        {
+            await _authService.ForgotPasswordAsync(forgotPasswordDto);
+            return Ok("If this email exists, you'll receive a reset link");
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(
+            [FromBody]  ResetPasswordDto resetPasswordDto)
+        {
+            var response = await _authService.ResetPasswordAsync(resetPasswordDto);
+
+            if (response)
+                return Ok("Password reset successfully");
+            return BadRequest("Invalid or expired token");
+        }
+
     }
 }
