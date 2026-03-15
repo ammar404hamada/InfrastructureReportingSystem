@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace InfraReportingSystem.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class AddIdentityForUsers : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,6 +26,36 @@ namespace InfraReportingSystem.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ProfilePictureUrl = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    UserType = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
+                    Specialization = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -36,19 +66,6 @@ namespace InfraReportingSystem.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Roles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,42 +87,6 @@ namespace InfraReportingSystem.Persistence.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Pic_url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: true),
-                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
-                    Specialization = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Roles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "Roles",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -194,65 +175,95 @@ namespace InfraReportingSystem.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AuditLog",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ActionType = table.Column<int>(type: "int", nullable: false),
+                    EntityName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    EntityId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
+                    Details = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLog", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AuditLog_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OtpVerifications",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    OtpCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OtpCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    UserId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OtpVerifications", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OtpVerifications_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_OtpVerifications_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Reports",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     Latitude = table.Column<double>(type: "float", nullable: false),
                     Longitude = table.Column<double>(type: "float", nullable: false),
-                    UploadedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UploadedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RejectionReason = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
-                    WorkerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    AuthorityId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    SubmittedById = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AssignedWorkerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AssignedByAuthorityId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reports", x => x.Id);
+                    table.CheckConstraint("CK_Report_Latitude", "[Latitude] >= -90.0 AND [Latitude] <= 90.0");
+                    table.CheckConstraint("CK_Report_Longitude", "[Longitude] >= -180.0 AND [Longitude] <= 180.0");
                     table.ForeignKey(
-                        name: "FK_Reports_AspNetUsers_AuthorityId",
-                        column: x => x.AuthorityId,
+                        name: "FK_Reports_AspNetUsers_AssignedByAuthorityId",
+                        column: x => x.AssignedByAuthorityId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Reports_AspNetUsers_AssignedWorkerId",
+                        column: x => x.AssignedWorkerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Reports_AspNetUsers_SubmittedById",
+                        column: x => x.SubmittedById,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Reports_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Reports_AspNetUsers_WorkerId",
-                        column: x => x.WorkerId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Reports_Categories_Id",
-                        column: x => x.Id,
+                        name: "FK_Reports_Categories_CategoryId",
+                        column: x => x.CategoryId,
                         principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -262,13 +273,14 @@ namespace InfraReportingSystem.Persistence.Migrations
                 name: "ReportPics",
                 columns: table => new
                 {
-                    ReportId = table.Column<int>(type: "int", nullable: false),
-                    PicId = table.Column<int>(type: "int", nullable: false),
-                    PicUrl = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    PicId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PicUrl = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
+                    ReportId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReportPics", x => x.ReportId);
+                    table.PrimaryKey("PK_ReportPics", x => x.PicId);
                     table.ForeignKey(
                         name: "FK_ReportPics_Reports_ReportId",
                         column: x => x.ReportId,
@@ -310,11 +322,6 @@ namespace InfraReportingSystem.Persistence.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_RoleId",
-                table: "AspNetUsers",
-                column: "RoleId");
-
-            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -322,24 +329,80 @@ namespace InfraReportingSystem.Persistence.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OtpVerifications_UserId1",
-                table: "OtpVerifications",
-                column: "UserId1");
+                name: "IX_AuditLog_ActionType_Timestamp",
+                table: "AuditLog",
+                columns: new[] { "ActionType", "Timestamp" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reports_AuthorityId",
-                table: "Reports",
-                column: "AuthorityId");
+                name: "IX_AuditLog_Timestamp",
+                table: "AuditLog",
+                column: "Timestamp");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reports_UserId",
-                table: "Reports",
+                name: "IX_AuditLog_UserId",
+                table: "AuditLog",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reports_WorkerId",
+                name: "IX_Categories_Name",
+                table: "Categories",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OtpVerification_UserId",
+                table: "OtpVerifications",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OtpVerification_UserId_IsUsed_ExpiresAt",
+                table: "OtpVerifications",
+                columns: new[] { "UserId", "IsUsed", "ExpiresAt" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReportPics_ReportId",
+                table: "ReportPics",
+                column: "ReportId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Report_AssignedWorkerId_Status",
                 table: "Reports",
-                column: "WorkerId");
+                columns: new[] { "AssignedWorkerId", "Status" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Report_SubmittedById_Status",
+                table: "Reports",
+                columns: new[] { "SubmittedById", "Status" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_AssignedByAuthorityId",
+                table: "Reports",
+                column: "AssignedByAuthorityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_AssignedWorkerId",
+                table: "Reports",
+                column: "AssignedWorkerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_CategoryId",
+                table: "Reports",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_Status",
+                table: "Reports",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_SubmittedById",
+                table: "Reports",
+                column: "SubmittedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_UploadedAt",
+                table: "Reports",
+                column: "UploadedAt");
         }
 
         /// <inheritdoc />
@@ -361,6 +424,9 @@ namespace InfraReportingSystem.Persistence.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "AuditLog");
+
+            migrationBuilder.DropTable(
                 name: "OtpVerifications");
 
             migrationBuilder.DropTable(
@@ -377,9 +443,6 @@ namespace InfraReportingSystem.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categories");
-
-            migrationBuilder.DropTable(
-                name: "Roles");
         }
     }
 }

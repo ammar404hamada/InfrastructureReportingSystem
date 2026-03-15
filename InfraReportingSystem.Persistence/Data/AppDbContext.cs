@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using InfraReportingSystem.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
-using InfraReportingSystem.Domain.Entities;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace InfraReportingSystem.Persistence.Data
 {
@@ -14,7 +15,6 @@ namespace InfraReportingSystem.Persistence.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
       
-        public DbSet<User> Users { get; set; }
         public DbSet<Worker> Workers { get; set; }
         public DbSet<Authority> Authorities { get; set; }
 
@@ -28,11 +28,8 @@ namespace InfraReportingSystem.Persistence.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Apply all IEntityTypeConfiguration classes automatically
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-
-            modelBuilder.Entity<Report>()
-                .Property(r => r.Status)
-                .HasConversion<string>();
         }
     }
 }

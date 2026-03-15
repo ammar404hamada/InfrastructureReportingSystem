@@ -13,15 +13,14 @@ namespace InfraReportingSystem.Persistence.Data.Configurations {
     {
         public void Configure(EntityTypeBuilder<Category> builder)
         {
-            builder.ToTable("Categories");
-            builder.HasKey(c => c.Id);
             builder.Property(c => c.Name)
-                .IsRequired()
-                .HasMaxLength(100);
-            builder.HasMany(c => c.Reports)
-                .WithOne(r => r.Category)
-                .HasForeignKey(r => r.Id)
-                .OnDelete(DeleteBehavior.Restrict);
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+            // Unique index: no two categories can share the same name
+            builder.HasIndex(c => c.Name)
+                   .IsUnique();
+
         }
     }
 }
