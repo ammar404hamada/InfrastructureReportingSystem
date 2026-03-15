@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InfraReportingSystem.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260306152201_AddIdentityForUsers")]
-    partial class AddIdentityForUsers
+    [Migration("20260315015613_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,52 @@ namespace InfraReportingSystem.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("InfraReportingSystem.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActionType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("EntityId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EntityName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Timestamp")
+                        .HasDatabaseName("IX_AuditLog_Timestamp");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_AuditLog_UserId");
+
+                    b.HasIndex("ActionType", "Timestamp")
+                        .HasDatabaseName("IX_AuditLog_ActionType_Timestamp");
+
+                    b.ToTable("AuditLog");
+                });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.Category", b =>
                 {
@@ -40,7 +86,10 @@ namespace InfraReportingSystem.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.OtpVerification", b =>
@@ -55,21 +104,26 @@ namespace InfraReportingSystem.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("OtpCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId1")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_OtpVerification_UserId");
+
+                    b.HasIndex("UserId", "IsUsed", "ExpiresAt")
+                        .HasDatabaseName("IX_OtpVerification_UserId_IsUsed_ExpiresAt");
 
                     b.ToTable("OtpVerifications");
                 });
@@ -77,9 +131,18 @@ namespace InfraReportingSystem.Persistence.Migrations
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.Report", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("AuthorityId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("AssignedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("AssignedByAuthorityId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AssignedWorkerId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("CategoryId")
@@ -96,63 +159,71 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.Property<double>("Longitude")
                         .HasColumnType("float");
 
-                    b.Property<string>("Status")
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubmittedById")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("WorkerId")
-                        .HasColumnType("nvarchar(450)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorityId");
+                    b.HasIndex("AssignedByAuthorityId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("AssignedWorkerId");
 
-                    b.HasIndex("WorkerId");
+                    b.HasIndex("CategoryId");
 
-                    b.ToTable("Reports", (string)null);
+                    b.HasIndex("Status");
+
+                    b.HasIndex("SubmittedById");
+
+                    b.HasIndex("UploadedAt");
+
+                    b.HasIndex("AssignedWorkerId", "Status")
+                        .HasDatabaseName("IX_Report_AssignedWorkerId_Status");
+
+                    b.HasIndex("SubmittedById", "Status")
+                        .HasDatabaseName("IX_Report_SubmittedById_Status");
+
+                    b.ToTable("Reports", t =>
+                        {
+                            t.HasCheckConstraint("CK_Report_Latitude", "[Latitude] >= -90.0 AND [Latitude] <= 90.0");
+
+                            t.HasCheckConstraint("CK_Report_Longitude", "[Longitude] >= -180.0 AND [Longitude] <= 180.0");
+                        });
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.ReportPic", b =>
                 {
-                    b.Property<int>("ReportId")
-                        .HasColumnType("int");
-
                     b.Property<int>("PicId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PicUrl")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("ReportId");
-
-                    b.ToTable("ReportPics", (string)null);
-                });
-
-            modelBuilder.Entity("InfraReportingSystem.Domain.Entities.Role", b =>
-                {
-                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PicId"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("PicUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
-                    b.HasKey("Id");
+                    b.Property<int>("ReportId")
+                        .HasColumnType("int");
 
-                    b.ToTable("Roles");
+                    b.HasKey("PicId");
+
+                    b.HasIndex("ReportId");
+
+                    b.ToTable("ReportPics");
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.User", b =>
@@ -167,14 +238,9 @@ namespace InfraReportingSystem.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
-
                     b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -187,7 +253,8 @@ namespace InfraReportingSystem.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -206,19 +273,17 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Pic_url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("RoleId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -226,6 +291,11 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
 
                     b.HasKey("Id");
 
@@ -237,11 +307,9 @@ namespace InfraReportingSystem.Persistence.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("RoleId");
-
                     b.ToTable("AspNetUsers", (string)null);
 
-                    b.HasDiscriminator().HasValue("User");
+                    b.HasDiscriminator<string>("UserType").HasValue("User");
 
                     b.UseTphMappingStrategy();
                 });
@@ -391,48 +459,64 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.HasBaseType("InfraReportingSystem.Domain.Entities.User");
 
                     b.Property<string>("Specialization")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasDiscriminator().HasValue("Worker");
+                });
+
+            modelBuilder.Entity("InfraReportingSystem.Domain.Entities.AuditLog", b =>
+                {
+                    b.HasOne("InfraReportingSystem.Domain.Entities.User", "User")
+                        .WithMany("AuditLogs")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.OtpVerification", b =>
                 {
                     b.HasOne("InfraReportingSystem.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
+                        .WithMany("OtpVerifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.Report", b =>
                 {
-                    b.HasOne("InfraReportingSystem.Domain.Entities.Authority", "Authority")
+                    b.HasOne("InfraReportingSystem.Domain.Entities.Authority", "AssignedByAuthority")
                         .WithMany("ReportsAssignedByMe")
-                        .HasForeignKey("AuthorityId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("AssignedByAuthorityId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("InfraReportingSystem.Domain.Entities.Worker", "AssignedWorker")
+                        .WithMany("AssignedReports")
+                        .HasForeignKey("AssignedWorkerId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("InfraReportingSystem.Domain.Entities.Category", "Category")
                         .WithMany("Reports")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("InfraReportingSystem.Domain.Entities.User", null)
+                    b.HasOne("InfraReportingSystem.Domain.Entities.User", "SubmittedBy")
                         .WithMany("SubmittedReports")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("SubmittedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.HasOne("InfraReportingSystem.Domain.Entities.Worker", "Worker")
-                        .WithMany("AssignedReports")
-                        .HasForeignKey("WorkerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                    b.Navigation("AssignedByAuthority");
 
-                    b.Navigation("Authority");
+                    b.Navigation("AssignedWorker");
 
                     b.Navigation("Category");
 
-                    b.Navigation("Worker");
+                    b.Navigation("SubmittedBy");
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.ReportPic", b =>
@@ -444,15 +528,6 @@ namespace InfraReportingSystem.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Report");
-                });
-
-            modelBuilder.Entity("InfraReportingSystem.Domain.Entities.User", b =>
-                {
-                    b.HasOne("InfraReportingSystem.Domain.Entities.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId");
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -516,13 +591,12 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.Navigation("ReportPics");
                 });
 
-            modelBuilder.Entity("InfraReportingSystem.Domain.Entities.Role", b =>
-                {
-                    b.Navigation("Users");
-                });
-
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.User", b =>
                 {
+                    b.Navigation("AuditLogs");
+
+                    b.Navigation("OtpVerifications");
+
                     b.Navigation("SubmittedReports");
                 });
 
