@@ -86,13 +86,13 @@ namespace InfraReportingSystem.Persistence.Data.Configurations {
             builder.HasOne(r => r.AssignedWorker)
                    .WithMany(w => w.AssignedReports)
                    .HasForeignKey(r => r.AssignedWorkerId)
-                   .OnDelete(DeleteBehavior.SetNull);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             // Authority who assigned the worker
             builder.HasOne(r => r.AssignedByAuthority)
                    .WithMany(a => a.ReportsAssignedByMe)
                    .HasForeignKey(r => r.AssignedByAuthorityId)
-                   .OnDelete(DeleteBehavior.SetNull);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             // Report can have many pictures
             builder.HasMany(r => r.ReportPics)
