@@ -248,13 +248,13 @@ namespace InfraReportingSystem.Persistence.Migrations
                         column: x => x.AssignedByAuthorityId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Reports_AspNetUsers_AssignedWorkerId",
                         column: x => x.AssignedWorkerId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Reports_AspNetUsers_SubmittedById",
                         column: x => x.SubmittedById,

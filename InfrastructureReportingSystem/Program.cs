@@ -66,10 +66,7 @@ namespace InfrastructureReportingSystem
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
-            var app = builder.Build();
-
             builder.Services.AddScoped<DataSeeder>();
-            
             var app = builder.Build();
            
             using (var scope = app.Services.CreateScope())
