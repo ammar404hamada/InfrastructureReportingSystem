@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InfraReportingSystem.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260315015613_InitialCreate")]
+    [Migration("20260316010819_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -491,12 +491,12 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.HasOne("InfraReportingSystem.Domain.Entities.Authority", "AssignedByAuthority")
                         .WithMany("ReportsAssignedByMe")
                         .HasForeignKey("AssignedByAuthorityId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("InfraReportingSystem.Domain.Entities.Worker", "AssignedWorker")
                         .WithMany("AssignedReports")
                         .HasForeignKey("AssignedWorkerId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("InfraReportingSystem.Domain.Entities.Category", "Category")
                         .WithMany("Reports")

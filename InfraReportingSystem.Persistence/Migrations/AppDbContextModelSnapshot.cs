@@ -488,12 +488,12 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.HasOne("InfraReportingSystem.Domain.Entities.Authority", "AssignedByAuthority")
                         .WithMany("ReportsAssignedByMe")
                         .HasForeignKey("AssignedByAuthorityId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("InfraReportingSystem.Domain.Entities.Worker", "AssignedWorker")
                         .WithMany("AssignedReports")
                         .HasForeignKey("AssignedWorkerId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("InfraReportingSystem.Domain.Entities.Category", "Category")
                         .WithMany("Reports")
