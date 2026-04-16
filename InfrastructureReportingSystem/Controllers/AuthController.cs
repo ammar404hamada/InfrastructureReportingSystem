@@ -1,5 +1,6 @@
 ﻿using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.Shared.DTOs.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -65,6 +66,13 @@ namespace InfrastructureReportingSystem.Controllers {
             if (response)
                 return Ok("Password reset successfully");
             return BadRequest("Invalid or expired token");
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            return Ok("Logged out successfully");
         }
 
     }
