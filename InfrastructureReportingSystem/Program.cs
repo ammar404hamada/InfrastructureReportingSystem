@@ -1,11 +1,15 @@
 
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
+using InfraReportingSystem.Persistence.Repositories;
 using InfraReportingSystem.Persistence.Seed;
 using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.ServiceAbstractions.Email;
+using InfraReportingSystem.ServiceAbstractions.Repositories;
+using InfraReportingSystem.ServiceAbstractions.Worker;
 using InfraReportingSystem.Services.Auth;
 using InfraReportingSystem.Services.Email;
+using InfraReportingSystem.Services.Worker;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +70,8 @@ namespace InfrastructureReportingSystem
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IWorkerTasksRepository, WorkerTasksRepository>();
+            builder.Services.AddScoped<IWorkerTasksService, WorkerTasksService>();
             builder.Services.AddScoped<DataSeeder>();
             var app = builder.Build();
            
