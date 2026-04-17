@@ -68,13 +68,22 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<DataSeeder>();
             var app = builder.Build();
-           
+
             using (var scope = app.Services.CreateScope())
             {
+                
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                await context.Database.MigrateAsync();
+
+                
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                await RoleSeeder.SeedRolesAsync(roleManager);
+
+                
                 var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
                 await seeder.SeedAsync();
             }
-           
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -89,18 +98,7 @@ namespace InfrastructureReportingSystem
 
             app.MapControllers();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                // Apply pending EF Core migrations automatically at startup
-                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                await context.Database.MigrateAsync();
-
-                var roleManager = scope.ServiceProvider
-                    .GetRequiredService<RoleManager<IdentityRole>>(); // renamed variable for clarity
-
-
-                await RoleSeeder.SeedRolesAsync(roleManager);
-            }
+            
 
             app.Run();
 
