@@ -1,8 +1,6 @@
-
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.Persistence.Repositories;
-using InfraReportingSystem.Persistence.Seed;
 using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.ServiceAbstractions.Email;
 using InfraReportingSystem.ServiceAbstractions.Repositories;
@@ -25,13 +23,13 @@ namespace InfrastructureReportingSystem
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
@@ -39,14 +37,13 @@ namespace InfrastructureReportingSystem
                 options.Password.RequireNonAlphanumeric = false;
                 options.SignIn.RequireConfirmedEmail = true;
             })
-                .AddEntityFrameworkStores<AppDbContext>()
-                .AddDefaultTokenProviders();
-            
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
+
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 
             // Added validation to ensure the JWT key exists in configuration
             var key = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key missing");
-
 
             builder.Services.AddAuthentication(options =>
             {
@@ -63,24 +60,30 @@ namespace InfrastructureReportingSystem
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtSettings["Issuer"],
                     ValidAudience = jwtSettings["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
                 };
             });
 
+            // Dependency Injection Registration
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IWorkerTasksRepository, WorkerTasksRepository>();
             builder.Services.AddScoped<IWorkerTasksService, WorkerTasksService>();
+
+            // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
+
             var app = builder.Build();
-           
+
+            // Database Migration and Seeding Pipeline
             using (var scope = app.Services.CreateScope())
             {
                 var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+
+                // This handles both Migrations AND full database seeding.
                 await seeder.SeedAsync();
             }
-           
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -92,26 +95,9 @@ namespace InfrastructureReportingSystem
             app.UseAuthentication();
             app.UseAuthorization();
 
-
             app.MapControllers();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                // Apply pending EF Core migrations automatically at startup
-                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                await context.Database.MigrateAsync();
-
-                var roleManager = scope.ServiceProvider
-                    .GetRequiredService<RoleManager<IdentityRole>>(); // renamed variable for clarity
-
-
-                await RoleSeeder.SeedRolesAsync(roleManager);
-            }
-
             app.Run();
-
-
         }
     }
 }
- 
