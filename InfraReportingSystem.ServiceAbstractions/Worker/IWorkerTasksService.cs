@@ -1,14 +1,13 @@
-﻿using InfraReportingSystem.Shared.DTOs.Worker;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using InfraReportingSystem.Shared.DTOs.Common;
+using InfraReportingSystem.Shared.DTOs.Worker;
 
-namespace InfraReportingSystem.ServiceAbstractions.Worker
+namespace InfraReportingSystem.ServiceAbstractions.Worker;
+
+public interface IWorkerTasksService
 {
-    public interface IWorkerTasksService
-    {
-        Task<IEnumerable<WorkerTaskDto>> GetMyTasksAsync(string workerId, string? searchTerm);
-    }
+    Task<PaginatedResult<WorkerTaskDto>> GetMyTasksAsync(
+        string workerId,
+        string? searchTerm,
+        int pageNumber,
+        int pageSize);
 }

@@ -9,6 +9,10 @@ namespace InfraReportingSystem.ServiceAbstractions.Repositories.Worker
 {
     public interface IWorkerTasksRepository
     {
-        Task<IEnumerable<Report>> GetMyTasksAsync(string workerId, string? searchTerm);
+        Task<(IEnumerable<Report> Items, int TotalCount)> GetMyTasksAsync(
+            string workerId,
+            string? searchTerm,
+            int pageNumber,
+            int pageSize);
     }
 }

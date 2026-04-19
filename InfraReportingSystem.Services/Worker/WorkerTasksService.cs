@@ -1,23 +1,56 @@
 ﻿using InfraReportingSystem.Domain.Entities;
+using InfraReportingSystem.ServiceAbstractions.Repositories;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker;
 using InfraReportingSystem.ServiceAbstractions.Worker;
+using InfraReportingSystem.Shared.DTOs.Common;
 using InfraReportingSystem.Shared.DTOs.Worker;
+using Microsoft.Extensions.Logging;
 
 namespace InfraReportingSystem.Services.Worker;
 
 public class WorkerTasksService : IWorkerTasksService
 {
     private readonly IWorkerTasksRepository _workerTasksRepository;
+    private readonly ILogger<WorkerTasksService> _logger;
 
-    public WorkerTasksService(IWorkerTasksRepository workerTasksRepository)
+    public WorkerTasksService(
+        IWorkerTasksRepository workerTasksRepository,
+        ILogger<WorkerTasksService> logger)
     {
         _workerTasksRepository = workerTasksRepository;
+        _logger = logger;
     }
 
-    public async Task<IEnumerable<WorkerTaskDto>> GetMyTasksAsync(string workerId, string? searchTerm)
+    public async Task<PaginatedResult<WorkerTaskDto>> GetMyTasksAsync(
+        string workerId,
+        string? searchTerm,
+        int pageNumber,
+        int pageSize)
     {
-        var reports = await _workerTasksRepository.GetMyTasksAsync(workerId, searchTerm);
-        return reports.Select(MapToDto);
+        var (reports, totalCount) = await _workerTasksRepository.GetMyTasksAsync(workerId, searchTerm, pageNumber, pageSize);
+
+        var dtos = reports.Select(MapToDto).ToList();
+
+        if (totalCount == 0)
+        {
+            _logger.LogInformation(
+                "Worker {WorkerId} has no assigned tasks. SearchTerm: {SearchTerm}",
+                workerId,
+                searchTerm ?? "null");
+        }
+
+        string message = totalCount == 0
+            ? "No tasks found. Try adjusting your search or check back later."
+            : string.Empty;
+
+        return new PaginatedResult<WorkerTaskDto>
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            Items = dtos,
+            Message = message
+        };
     }
 
     private static WorkerTaskDto MapToDto(Report report)
