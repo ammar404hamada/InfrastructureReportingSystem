@@ -82,6 +82,12 @@ public class WorkerTaskActionsController : ControllerBase
         if (string.IsNullOrWhiteSpace(workerId))
             return Unauthorized(new { message = "Invalid worker identifier." });
 
+        // Manual validation for reason
+        if (string.IsNullOrWhiteSpace(dto.Reason))
+        {
+            return BadRequest(new { message = "You cannot reject a task without providing a reason." });
+        }
+
         try
         {
             var result = await _workerTaskActionsService.RejectTaskAsync(reportId, workerId, dto);

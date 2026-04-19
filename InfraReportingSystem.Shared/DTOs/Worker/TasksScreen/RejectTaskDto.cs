@@ -9,7 +9,6 @@ namespace InfraReportingSystem.Shared.DTOs.Worker.TasksScreen
 {
     public class RejectTaskDto
     {
-        [Required]
         public string Reason { get; set; } = null!;
     }
 }
