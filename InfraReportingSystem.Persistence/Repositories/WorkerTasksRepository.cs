@@ -1,7 +1,7 @@
 ﻿using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.Persistence.Data;
-using InfraReportingSystem.ServiceAbstractions.Repositories;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Worker;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

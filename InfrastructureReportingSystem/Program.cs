@@ -3,7 +3,7 @@ using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.Persistence.Repositories;
 using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.ServiceAbstractions.Email;
-using InfraReportingSystem.ServiceAbstractions.Repositories;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Worker;
 using InfraReportingSystem.ServiceAbstractions.Worker;
 using InfraReportingSystem.Services.Auth;
 using InfraReportingSystem.Services.Email;
