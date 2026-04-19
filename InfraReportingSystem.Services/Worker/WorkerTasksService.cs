@@ -1,6 +1,6 @@
 ﻿using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.ServiceAbstractions.Repositories;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Worker;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.ServiceAbstractions.Worker;
 using InfraReportingSystem.Shared.DTOs.Common;
 using InfraReportingSystem.Shared.DTOs.Worker.TasksScreen;

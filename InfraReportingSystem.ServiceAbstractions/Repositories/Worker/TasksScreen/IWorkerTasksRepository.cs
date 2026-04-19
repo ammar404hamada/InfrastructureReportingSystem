@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InfraReportingSystem.ServiceAbstractions.Repositories.Worker
+namespace InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen
 {
     public interface IWorkerTasksRepository
     {

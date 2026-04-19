@@ -1,9 +1,9 @@
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
-using InfraReportingSystem.Persistence.Repositories;
+using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.ServiceAbstractions.Email;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Worker;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.ServiceAbstractions.Worker;
 using InfraReportingSystem.Services.Auth;
 using InfraReportingSystem.Services.Email;
