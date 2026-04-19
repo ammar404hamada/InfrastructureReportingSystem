@@ -26,12 +26,15 @@ namespace InfraReportingSystem.Domain.Enums
         ReportUpdated = 10,
         ReportAssigned = 11,
         ReportBlocked = 12,
+
+        // PublicUser actions
         ReportResolved = 13,
         ReportRejected = 14,
 
         // Worker actions
         WorkerAcceptedTask = 15,
-        WorkerRejectedTask = 16
+        WorkerRejectedTask = 16,
+        WorkerMarkedTaskAsFixed = 17
 
     }
 }

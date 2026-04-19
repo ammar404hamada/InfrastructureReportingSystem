@@ -4,24 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InfraReportingSystem.Domain.Enums { 
-
+namespace InfraReportingSystem.Domain.Enums
+{
     public enum ReportStatus
     {
+        Submitted = 1,                  // Public user created report
 
-        Submitted = 1,                  // Initial state when a Public User successfully uploads a report.
+        Assigned = 2,                   // Authority assigned it to worker
 
-        Assigned = 2,                   // An Authority assigns the report to a Worker.
+        InProgress = 3,                 // Worker accepted and is currently working on it
 
-        OnHold = 3,                      // An Authority puts the report on hold (e.g., waiting on external factors).
+        OnHold = 4,                     // Put on hold by authority
 
-        Blocked = 4,                    // A Worker flags the task as incomplete/inaccessible.
+        Blocked = 5,                    // Worker cannot proceed
 
-        PendingConfirmation = 5,        // A Worker marks the task "Fixed"; waiting for the Public User to verify.
+        PendingConfirmation = 6,        // Worker marked as fixed, waiting for user confirmation
 
-        Resolved = 6,                  // The Public User confirms the fix, closing the issue.
+        WorkerRejected = 8,            // Worker rejected the task
 
-        Rejected = 7                  // The Public User Rejects The Fix, Reopening the Issue.(Was Not in The user Story)
-
+        FixRejectedByUser = 9          // User rejected the fix
     }
 }
