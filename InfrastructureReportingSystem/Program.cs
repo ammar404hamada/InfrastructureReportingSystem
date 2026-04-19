@@ -69,6 +69,9 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IWorkerTasksRepository, WorkerTasksRepository>();
             builder.Services.AddScoped<IWorkerTasksService, WorkerTasksService>();
+            builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            builder.Services.AddScoped<IWorkerTaskActionsRepository, WorkerTaskActionsRepository>();
+            builder.Services.AddScoped<IWorkerTaskActionsService, WorkerTaskActionsService>();
 
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
