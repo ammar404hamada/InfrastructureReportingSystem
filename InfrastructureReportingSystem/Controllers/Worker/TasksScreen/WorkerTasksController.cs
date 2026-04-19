@@ -1,9 +1,9 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Worker;
+﻿using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace InfrastructureReportingSystem.Controllers.Worker;
+namespace InfrastructureReportingSystem.Controllers.Worker.TasksScreen;
 
 [ApiController]
 [Route("api/[controller]")]
