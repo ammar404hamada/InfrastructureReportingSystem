@@ -33,7 +33,7 @@ public class WorkerTasksRepository : IWorkerTasksRepository
             .Include(r => r.AssignedByAuthority)
             .Where(r =>
                 r.AssignedWorkerId == workerId &&
-                (r.Status == ReportStatus.Assigned || r.Status == ReportStatus.Rejected));
+                (r.Status == ReportStatus.Assigned));
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {

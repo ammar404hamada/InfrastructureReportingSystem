@@ -1,4 +1,4 @@
-﻿namespace InfraReportingSystem.Shared.DTOs.Worker;
+﻿namespace InfraReportingSystem.Shared.DTOs.Worker.TasksScreen;
 
 public class WorkerTaskDto
 {

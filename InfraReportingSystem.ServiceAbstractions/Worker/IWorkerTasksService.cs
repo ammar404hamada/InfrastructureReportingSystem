@@ -1,5 +1,5 @@
 ﻿using InfraReportingSystem.Shared.DTOs.Common;
-using InfraReportingSystem.Shared.DTOs.Worker;
+using InfraReportingSystem.Shared.DTOs.Worker.TasksScreen;
 
 namespace InfraReportingSystem.ServiceAbstractions.Worker;
 
