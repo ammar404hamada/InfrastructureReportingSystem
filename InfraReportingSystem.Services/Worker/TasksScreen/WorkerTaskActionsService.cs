@@ -69,8 +69,6 @@ namespace InfraReportingSystem.Services.Worker.TasksScreen
 
             report.Status = ReportStatus.WorkerRejected;
             report.RejectionReason = dto.Reason;
-            report.AssignedWorkerId = null;
-            report.AssignedByAuthorityId = null;
 
             await _actionsRepository.UpdateAsync(report);
 

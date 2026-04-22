@@ -393,7 +393,84 @@ public class DataSeeder
                 Longitude = 31.2100,
                 UploadedAt = DateTime.UtcNow.AddDays(-8),
                 ReportPics = new List<ReportPic> { new ReportPic { PicUrl = "https://placehold.co/600x400/png?text=Light+Rejected" } }
+            },
+
+            // Second assigned report for Karim Ali (k.ali@gov.eg) – to test multiple assignments
+            new Report
+            {
+                Description = "Faulty traffic light at Tahrir Square intersection, causing confusion for drivers.",
+                CategoryId = lightingCategory.Id, // Street Lighting
+                SubmittedById = ahmed.Id,
+                AssignedByAuthorityId = authority.Id,
+                AssignedWorkerId = karim.Id,
+                Status = ReportStatus.Assigned,
+                AssignedAt = DateTime.UtcNow.AddDays(-1),
+                Latitude = 30.0440,
+                Longitude = 31.2350,
+                UploadedAt = DateTime.UtcNow.AddDays(-3),
+                ReportPics = new List<ReportPic>
+                {
+                    new ReportPic { PicUrl = "https://placehold.co/600x400/png?text=Traffic+Light" }
+                }
+            },
+
+            // 2nd assigned report for Karim – faulty traffic light
+            new Report
+            {
+                Description = "Traffic light at Tahrir Square intersection stuck on red for over 2 hours.",
+                CategoryId = lightingCategory.Id,
+                SubmittedById = ahmed.Id,
+                AssignedByAuthorityId = authority.Id,
+                AssignedWorkerId = karim.Id,
+                Status = ReportStatus.Assigned,
+                AssignedAt = DateTime.UtcNow.AddDays(-1),
+                Latitude = 30.0440,
+                Longitude = 31.2350,
+                UploadedAt = DateTime.UtcNow.AddDays(-3),
+                ReportPics = new List<ReportPic>
+                {
+                    new ReportPic { PicUrl = "https://placehold.co/600x400/png?text=Traffic+Light+Red" }
+                }
+            },
+
+            // 3rd assigned report for Karim – another electrical issue
+            new Report
+            {
+                Description = "Street lamp pole damaged and leaning dangerously on El-Merghany Street.",
+                CategoryId = lightingCategory.Id,
+                SubmittedById = ahmed.Id,
+                AssignedByAuthorityId = authority.Id,
+                AssignedWorkerId = karim.Id,
+                Status = ReportStatus.Assigned,
+                AssignedAt = DateTime.UtcNow.AddDays(-2),
+                Latitude = 30.0740,
+                Longitude = 31.2850,
+                UploadedAt = DateTime.UtcNow.AddDays(-4),
+                ReportPics = new List<ReportPic>
+                {
+                    new ReportPic { PicUrl = "https://placehold.co/600x400/png?text=Damaged+Lamp+Pole" }
+                }
+            },
+
+            // 4th assigned report for Karim – power fluctuation
+            new Report
+            {
+                Description = "Power fluctuations damaging home appliances in Heliopolis district.",
+                CategoryId = electricityCategory.Id,
+                SubmittedById = ahmed.Id,
+                AssignedByAuthorityId = authority.Id,
+                AssignedWorkerId = karim.Id,
+                Status = ReportStatus.Assigned,
+                AssignedAt = DateTime.UtcNow.AddDays(-3),
+                Latitude = 30.0890,
+                Longitude = 31.3220,
+                UploadedAt = DateTime.UtcNow.AddDays(-5),
+                ReportPics = new List<ReportPic>
+                {
+                    new ReportPic { PicUrl = "https://placehold.co/600x400/png?text=Power+Fluctuation" }
+                }
             }
+
         };
 
         // Add reports (idempotent)
