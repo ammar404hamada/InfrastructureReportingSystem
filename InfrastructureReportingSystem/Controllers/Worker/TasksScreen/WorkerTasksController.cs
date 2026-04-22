@@ -1,9 +1,9 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Worker;
+﻿using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace InfrastructureReportingSystem.Controllers.Worker;
+namespace InfrastructureReportingSystem.Controllers.Worker.TasksScreen;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -35,10 +35,10 @@ public class WorkerTasksController : ControllerBase
             return Unauthorized(new { message = "Invalid worker identifier." });
         }
 
-        // Validate pagination parameters
+        
         if (pageNumber < 1) pageNumber = 1;
         if (pageSize < 1) pageSize = 10;
-        if (pageSize > 50) pageSize = 50; // limit max page size
+        if (pageSize > 50) pageSize = 50; 
 
         try
         {

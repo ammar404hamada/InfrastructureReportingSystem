@@ -1,13 +1,13 @@
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
-using InfraReportingSystem.Persistence.Repositories;
+using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.ServiceAbstractions.Email;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Worker;
-using InfraReportingSystem.ServiceAbstractions.Worker;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
+using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
 using InfraReportingSystem.Services.Auth;
 using InfraReportingSystem.Services.Email;
-using InfraReportingSystem.Services.Worker;
+using InfraReportingSystem.Services.Worker.TasksScreen;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +69,9 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IWorkerTasksRepository, WorkerTasksRepository>();
             builder.Services.AddScoped<IWorkerTasksService, WorkerTasksService>();
+            builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            builder.Services.AddScoped<IWorkerTaskActionsRepository, WorkerTaskActionsRepository>();
+            builder.Services.AddScoped<IWorkerTaskActionsService, WorkerTaskActionsService>();
 
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();

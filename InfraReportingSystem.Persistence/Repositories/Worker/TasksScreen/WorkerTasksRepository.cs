@@ -2,11 +2,11 @@
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.ServiceAbstractions.Repositories;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Worker;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace InfraReportingSystem.Persistence.Repositories;
+namespace InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
 
 public class WorkerTasksRepository : IWorkerTasksRepository
 {
@@ -33,7 +33,7 @@ public class WorkerTasksRepository : IWorkerTasksRepository
             .Include(r => r.AssignedByAuthority)
             .Where(r =>
                 r.AssignedWorkerId == workerId &&
-                (r.Status == ReportStatus.Assigned || r.Status == ReportStatus.Rejected));
+                (r.Status == ReportStatus.Assigned));
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
