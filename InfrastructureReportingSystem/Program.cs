@@ -78,6 +78,8 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IWorkerTaskActionsService, WorkerTaskActionsService>();
             builder.Services.AddScoped<IWorkerCurrentTaskRepository, WorkerCurrentTaskRepository>();
             builder.Services.AddScoped<IWorkerCurrentTaskService, WorkerCurrentTaskService>();
+            builder.Services.AddScoped<IWorkerCurrentTaskActionsRepository, WorkerCurrentTaskActionsRepository>();
+            builder.Services.AddScoped<IWorkerCurrentTaskActionsService, WorkerCurrentTaskActionsService>();
 
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
