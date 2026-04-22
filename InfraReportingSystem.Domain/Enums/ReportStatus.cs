@@ -24,6 +24,6 @@ namespace InfraReportingSystem.Domain.Enums
 
         InProgress = 8,
 
-        WorkerRejected = 9
+        FixRejected = 9
     }
 }
