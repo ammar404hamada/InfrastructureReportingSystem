@@ -9,8 +9,8 @@ namespace InfraReportingSystem.Shared.DTOs.Worker.CurrentTaskScreen
 {
     public class MarkBlockedDto
     {
-        [Required]
-        [MinLength(3)]
+        [Required(ErrorMessage = "Reason is required when blocking a task.")]
+        [MinLength(5, ErrorMessage = "Reason must be at least 5 characters. Please provide a detailed reason.")]
         public string Reason { get; set; } = null!;
     }
 }
