@@ -13,47 +13,15 @@ namespace InfrastructureReportingSystem.Controllers.Worker.TasksScreen;
 [Authorize(Roles = "Worker")]
 public class WorkerTaskActionsController : ControllerBase
 {
-    private readonly IWorkerTasksService _workerTasksService;
     private readonly IWorkerTaskActionsService _workerTaskActionsService;
     private readonly ILogger<WorkerTaskActionsController> _logger;
 
     public WorkerTaskActionsController(
-        IWorkerTasksService workerTasksService,
         IWorkerTaskActionsService workerTaskActionsService,
         ILogger<WorkerTaskActionsController> logger)
     {
-        _workerTasksService = workerTasksService;
         _workerTaskActionsService = workerTaskActionsService;
         _logger = logger;
-    }
-
-    [HttpGet("my-tasks")]
-    public async Task<IActionResult> GetMyTasks(
-        [FromQuery] string? searchTerm,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
-    {
-        var workerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrWhiteSpace(workerId))
-        {
-            _logger.LogWarning("Token missing NameIdentifier claim.");
-            return Unauthorized(new { message = "Invalid worker identifier." });
-        }
-
-        if (pageNumber < 1) pageNumber = 1;
-        if (pageSize < 1) pageSize = 10;
-        if (pageSize > 50) pageSize = 50;
-
-        try
-        {
-            var result = await _workerTasksService.GetMyTasksAsync(workerId, searchTerm, pageNumber, pageSize);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching tasks for worker {WorkerId}", workerId);
-            return StatusCode(500, new { message = "An error occurred while retrieving your tasks. Please try again later." });
-        }
     }
 
     [HttpPost("{reportId}/accept")]
@@ -82,7 +50,6 @@ public class WorkerTaskActionsController : ControllerBase
         if (string.IsNullOrWhiteSpace(workerId))
             return Unauthorized(new { message = "Invalid worker identifier." });
 
-        // Manual validation for reason
         if (string.IsNullOrWhiteSpace(dto.Reason))
         {
             return BadRequest(new { message = "You cannot reject a task without providing a reason." });
