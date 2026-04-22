@@ -1,11 +1,13 @@
-
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
-using InfraReportingSystem.Persistence.Seed;
+using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.ServiceAbstractions.Email;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
+using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
 using InfraReportingSystem.Services.Auth;
 using InfraReportingSystem.Services.Email;
+using InfraReportingSystem.Services.Worker.TasksScreen;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,13 +23,13 @@ namespace InfrastructureReportingSystem
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
@@ -35,14 +37,13 @@ namespace InfrastructureReportingSystem
                 options.Password.RequireNonAlphanumeric = false;
                 options.SignIn.RequireConfirmedEmail = true;
             })
-                .AddEntityFrameworkStores<AppDbContext>()
-                .AddDefaultTokenProviders();
-            
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
+
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 
             // Added validation to ensure the JWT key exists in configuration
             var key = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key missing");
-
 
             builder.Services.AddAuthentication(options =>
             {
@@ -59,28 +60,30 @@ namespace InfrastructureReportingSystem
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtSettings["Issuer"],
                     ValidAudience = jwtSettings["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
                 };
             });
 
+            // Dependency Injection Registration
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IWorkerTasksRepository, WorkerTasksRepository>();
+            builder.Services.AddScoped<IWorkerTasksService, WorkerTasksService>();
+            builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            builder.Services.AddScoped<IWorkerTaskActionsRepository, WorkerTaskActionsRepository>();
+            builder.Services.AddScoped<IWorkerTaskActionsService, WorkerTaskActionsService>();
+
+            // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
+
             var app = builder.Build();
 
+            // Database Migration and Seeding Pipeline
             using (var scope = app.Services.CreateScope())
             {
-                
-                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                await context.Database.MigrateAsync();
-
-                
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                await RoleSeeder.SeedRolesAsync(roleManager);
-
-                
                 var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+
+                // This handles both Migrations AND full database seeding.
                 await seeder.SeedAsync();
             }
 
@@ -95,15 +98,9 @@ namespace InfrastructureReportingSystem
             app.UseAuthentication();
             app.UseAuthorization();
 
-
             app.MapControllers();
 
-            
-
             app.Run();
-
-
         }
     }
 }
- 
