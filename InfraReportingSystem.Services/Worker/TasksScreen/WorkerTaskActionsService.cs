@@ -67,7 +67,7 @@ namespace InfraReportingSystem.Services.Worker.TasksScreen
             if (report.Status != ReportStatus.Assigned)
                 return "This task cannot be rejected in its current status.";
 
-            report.Status = ReportStatus.WorkerRejected;
+            report.Status = ReportStatus.Rejected;
             report.RejectionReason = dto.Reason;
 
             await _actionsRepository.UpdateAsync(report);
