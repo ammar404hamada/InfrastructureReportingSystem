@@ -151,6 +151,7 @@ namespace InfraReportingSystem.Services.Auth {
                 Email = registerDto.Email,
                 Status = UserStatus.Inactive,
                 PhoneNumber = registerDto.Phone,
+                CreatedAt = DateTime.UtcNow,
 
             };
 
