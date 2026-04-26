@@ -14,7 +14,7 @@ namespace InfraReportingSystem.Persistence.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-      
+
         public DbSet<Worker> Workers { get; set; }
         public DbSet<Authority> Authorities { get; set; }
 
@@ -31,5 +31,21 @@ namespace InfraReportingSystem.Persistence.Data
             // Apply all IEntityTypeConfiguration classes automatically
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var entries = ChangeTracker.Entries<Report>();
+
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
     }
 }

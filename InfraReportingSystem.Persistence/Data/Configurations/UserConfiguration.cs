@@ -42,6 +42,10 @@ namespace InfraReportingSystem.Persistence.Data.Configurations
                    .HasConversion<int>()
                    .IsRequired()
                    .HasDefaultValue(UserStatus.Inactive);
+
+            builder.Property(u => u.CreatedAt)
+                   .IsRequired()
+                   .HasDefaultValueSql("GETUTCDATE()");
         }
     }
 

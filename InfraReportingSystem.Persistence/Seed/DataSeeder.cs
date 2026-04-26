@@ -78,7 +78,8 @@ public class DataSeeder
                 Name = "System Administrator",
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
-                PhoneNumber = "01000000000"
+                PhoneNumber = "01000000000",
+               CreatedAt = DateTime.UtcNow,
             };
             await _userManager.CreateAsync(admin, "Admin@123!");
             await _userManager.AddToRoleAsync(admin, "Admin");
@@ -94,7 +95,8 @@ public class DataSeeder
                 Name = "Ahmed Tariq",
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
-                PhoneNumber = "01012345678"
+                PhoneNumber = "01012345678",
+                CreatedAt = DateTime.UtcNow,
             };
             await _userManager.CreateAsync(publicUser, "User@123!");
             await _userManager.AddToRoleAsync(publicUser, "PublicUser");
@@ -110,7 +112,8 @@ public class DataSeeder
                 Name = "Mahmoud Hassan",
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
-                PhoneNumber = "01212345678"
+                PhoneNumber = "01212345678",
+                CreatedAt = DateTime.UtcNow,
             };
             await _userManager.CreateAsync(authority, "Auth@123!");
             await _userManager.AddToRoleAsync(authority, "Authority");
@@ -127,7 +130,8 @@ public class DataSeeder
                 Specialization = "Water & Plumbing",
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
-                PhoneNumber = "01512345678"
+                PhoneNumber = "01512345678",
+                CreatedAt = DateTime.UtcNow,
             };
             await _userManager.CreateAsync(worker1, "Worker@123!");
             await _userManager.AddToRoleAsync(worker1, "Worker");
@@ -144,7 +148,8 @@ public class DataSeeder
                 Specialization = "Electrical Systems",
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
-                PhoneNumber = "01123456789"
+                PhoneNumber = "01123456789",
+                CreatedAt = DateTime.UtcNow,
             };
             await _userManager.CreateAsync(worker2, "Worker@123!");
             await _userManager.AddToRoleAsync(worker2, "Worker");
@@ -161,7 +166,8 @@ public class DataSeeder
                 Specialization = "Roads & Asphalt",
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
-                PhoneNumber = "01234567890"
+                PhoneNumber = "01234567890",
+                CreatedAt = DateTime.UtcNow,
             };
             await _userManager.CreateAsync(worker3, "Worker@123!");
             await _userManager.AddToRoleAsync(worker3, "Worker");
@@ -178,7 +184,8 @@ public class DataSeeder
                 Specialization = "Water & Sewage",
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
-                PhoneNumber = "01598765432"
+                PhoneNumber = "01598765432",
+                CreatedAt = DateTime.UtcNow,
             };
             await _userManager.CreateAsync(worker4, "Worker@123!");
             await _userManager.AddToRoleAsync(worker4, "Worker");
@@ -195,7 +202,8 @@ public class DataSeeder
                 Specialization = "General",
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
-                PhoneNumber = "01987654321"
+                PhoneNumber = "01987654321",
+                CreatedAt = DateTime.UtcNow,
             };
             await _userManager.CreateAsync(worker5, "Worker@123!");
             await _userManager.AddToRoleAsync(worker5, "Worker");
