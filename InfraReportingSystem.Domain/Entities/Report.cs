@@ -23,7 +23,7 @@ namespace InfraReportingSystem.Domain.Entities {
 
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
 
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public DateTime? AssignedAt { get; set; }
 
