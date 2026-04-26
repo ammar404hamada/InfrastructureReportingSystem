@@ -20,8 +20,10 @@ namespace InfraReportingSystem.Domain.Entities {
         public double Latitude { get; set; }
         
         public double Longitude { get; set; }
-        
+
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime UpdatedAt { get; set; }
 
         public DateTime? AssignedAt { get; set; }
 

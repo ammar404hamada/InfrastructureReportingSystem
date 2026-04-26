@@ -17,6 +17,7 @@ namespace InfraReportingSystem.Domain.Entities
 
         public UserStatus Status { get; set; } = UserStatus.Inactive;
 
+        public DateTime CreatedAt { get; set; }
 
         public ICollection<Report> SubmittedReports { get; set; } = new List<Report>();
 
