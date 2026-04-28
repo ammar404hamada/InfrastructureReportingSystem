@@ -17,11 +17,25 @@ public class EmailService : IEmailService
 
     public async Task SendEmailAsync(string to, string subject, string body)
     {
+        var enableSending = _configuration.GetValue("EmailSettings:EnableSending", true);
+
+        if (!enableSending)
+        {
+            return;
+        }
+
         var host = _configuration["EmailSettings:Host"];
         var port = int.Parse(_configuration["EmailSettings:Port"]!);
         var userName = _configuration["EmailSettings:UserName"];
         var password = _configuration["EmailSettings:Password"];
         var displayName = _configuration["EmailSettings:DisplayName"];
+
+        if (string.IsNullOrWhiteSpace(host)
+            || string.IsNullOrWhiteSpace(userName)
+            || string.IsNullOrWhiteSpace(password))
+        {
+            return;
+        }
 
         var email = new MimeMessage();
         email.From.Add(new MailboxAddress(displayName, userName));

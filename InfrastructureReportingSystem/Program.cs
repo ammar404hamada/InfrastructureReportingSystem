@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace InfrastructureReportingSystem
@@ -33,8 +34,11 @@ namespace InfrastructureReportingSystem
             // Add services to the container.
             builder.Services.AddControllers();
 
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+            // add mybelove swagger
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Infra Reporting API", Version = "v1" });
+            });
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -101,11 +105,13 @@ namespace InfrastructureReportingSystem
                 await seeder.SeedAsync();
             }
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            // make the swagger UI public for testing (temporary)
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.MapOpenApi();
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Infra Reporting API V1");
+                c.RoutePrefix = string.Empty; // serve at app root
+            });
 
             app.UseHttpsRedirection();
 

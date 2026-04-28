@@ -12,6 +12,7 @@ namespace InfraReportingSystem.ServiceAbstractions.Auth {
         Task<RegisterResponseDto> RegisterAsync(RegisterDto registerDto);
         Task<LoginResponseDto> LoginAsync(LoginDto loginDto);
         Task<bool> ConfirmEmailAsync(string userId, string token);
+        Task<bool> ResendConfirmationEmailAsync(string email);
         Task ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto);
         Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
     }
