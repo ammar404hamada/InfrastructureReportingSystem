@@ -68,6 +68,17 @@ namespace InfrastructureReportingSystem.Controllers {
             return BadRequest("Invalid or expired token");
         }
 
+        [HttpPost("resend-confirmation")]
+        public async Task<IActionResult> ResendConfirmation(
+            [FromBody] ResendConfirmationDto resendConfirmationDto)
+        {
+            var result = await _authService.ResendConfirmationEmailAsync(resendConfirmationDto.Email);
+
+            if (result)
+                return Ok("Confirmation email sent");
+            return BadRequest("Invalid email or already confirmed");
+        }
+
         [HttpPost("logout")]
         [Authorize]
         public IActionResult Logout()

@@ -21,6 +21,7 @@ namespace InfraReportingSystem.Services.Auth {
 
     public class AuthService : IAuthService
     {
+        private const string PublicUserRole = "PublicUser";
         private readonly IConfiguration _configuration;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
@@ -52,6 +53,31 @@ namespace InfraReportingSystem.Services.Auth {
 
             user.Status = UserStatus.Active;
             await _userManager.UpdateAsync(user);
+            return true;
+        }
+
+        public async Task<bool> ResendConfirmationEmailAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return false;
+            if (user.EmailConfirmed) return false;
+
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedToken = Uri.EscapeDataString(token);
+            var confirmationLink = $"{_configuration["AppUrl"]}/api/auth/confirm-email?userId={user.Id}&token={encodedToken}";
+
+            var emailBody = $@"
+                <h2>Welcome to Infrastructure Reporting System!</h2>
+                <p>Hi {user.Name},</p>
+                <p>Please confirm your email by clicking the link below:</p>
+                <a href='{confirmationLink}' 
+                   style='background:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
+                   Confirm Email
+                </a>
+                <p>If you didn't register, ignore this email.</p>
+            ";
+
+            await _emailService.SendEmailAsync(user.Email!, "Confirm your Email", emailBody);
             return true;
         }
 
@@ -129,7 +155,7 @@ namespace InfraReportingSystem.Services.Auth {
                     {
                         Name = user.Name,
                         Email = user.Email,
-                        Role = userRole.FirstOrDefault() ?? "Public user"
+                        Role = userRole.FirstOrDefault() ?? PublicUserRole
                     },
                     Token = token
                 };
@@ -163,7 +189,17 @@ namespace InfraReportingSystem.Services.Auth {
                     Success = false,
                     Message = string.Join(", ", result.Errors.Select(e => e.Description))
                 };
-            await _userManager.AddToRoleAsync(user, "Public user");
+
+            var roleResult = await _userManager.AddToRoleAsync(user, PublicUserRole);
+            if (!roleResult.Succeeded)
+            {
+                await _userManager.DeleteAsync(user);
+                return new RegisterResponseDto
+                {
+                    Success = false,
+                    Message = string.Join(", ", roleResult.Errors.Select(e => e.Description))
+                };
+            }
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var encodedToken = Uri.EscapeDataString(token);
@@ -190,7 +226,7 @@ namespace InfraReportingSystem.Services.Auth {
                 {
                     Name = registerDto.Name,
                     Email = registerDto.Email,
-                    Role = "Public User"
+                    Role = PublicUserRole
                 }
             };
         }

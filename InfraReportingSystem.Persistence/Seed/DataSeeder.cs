@@ -7,6 +7,7 @@ using InfraReportingSystem.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Data.SqlClient;
 
 namespace InfraReportingSystem.Persistence.Data;
 
@@ -35,8 +36,22 @@ public class DataSeeder
         {
             if (_context.Database.IsSqlServer() && (await _context.Database.GetPendingMigrationsAsync()).Any())
             {
-                await _context.Database.MigrateAsync();
-                _logger.LogInformation("Applied pending database migrations.");
+                try
+                {
+                    await _context.Database.MigrateAsync();
+                    _logger.LogInformation("Applied database migrations.");
+                }
+                catch (SqlException sqlEx) when (sqlEx.Number == 2714)
+                {
+                    // Object already exists - likely migrations were applied manually or partially.
+                    _logger.LogWarning(sqlEx, "Migration already exists. Aborting seeding to avoid schema mismatch.");
+                    return; // stop seeding to avoid running against a partially migrated schema
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Unexpected error while applying migrations. Aborting seeding.");
+                    return;
+                }
             }
 
             await SeedRolesAsync();
