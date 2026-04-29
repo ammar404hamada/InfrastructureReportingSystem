@@ -21,4 +21,8 @@
     <ProjectReference Include="..\InfraReportingSystem.Presentation\InfraReportingSystem.Presentation.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Admin\UsersManagementScreen\" />
+  </ItemGroup>
+
 </Project>

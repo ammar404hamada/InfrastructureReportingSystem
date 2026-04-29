@@ -19,4 +19,8 @@
     <ProjectReference Include="..\InfraReportingSystem.ServiceAbstractions\InfraReportingSystem.ServiceAbstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Admin\UsersManagementScreen\" />
+  </ItemGroup>
+
 </Project>
