@@ -1,16 +1,20 @@
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
+using InfraReportingSystem.Persistence.Repositories.Admin.UsersManagementScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
+using InfraReportingSystem.ServiceAbstractions.Admin.UsersManagementScreen;
 using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.ServiceAbstractions.Email;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.UsersManagementScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.ServiceAbstractions.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
+using InfraReportingSystem.Services.Admin.UsersManagementScreen;
 using InfraReportingSystem.Services.Auth;
 using InfraReportingSystem.Services.Email;
 using InfraReportingSystem.Services.Worker.CurrentTaskScreen;
@@ -90,6 +94,8 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IWorkerCurrentTaskActionsService, WorkerCurrentTaskActionsService>();
             builder.Services.AddScoped<IWorkerHistoryRepository, WorkerHistoryRepository>();
             builder.Services.AddScoped<IWorkerHistoryService, WorkerHistoryService>();
+            builder.Services.AddScoped<IAdminUsersRepository, AdminUsersRepository>();
+            builder.Services.AddScoped<IAdminUsersService, AdminUsersService>();
 
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
