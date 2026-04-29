@@ -8,6 +8,7 @@ using InfraReportingSystem.Persistence.Seed;
 using InfraReportingSystem.ServiceAbstractions.Admin.UsersManagementScreen;
 using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.ServiceAbstractions.Email;
+using InfraReportingSystem.ServiceAbstractions.Repositories;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.UsersManagementScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksHistoryScreen;

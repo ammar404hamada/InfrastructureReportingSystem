@@ -1,6 +1,6 @@
 ﻿using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
+using InfraReportingSystem.ServiceAbstractions.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;

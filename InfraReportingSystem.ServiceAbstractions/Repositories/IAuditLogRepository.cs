@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen
+namespace InfraReportingSystem.ServiceAbstractions.Repositories
 {
     public interface IAuditLogRepository
     {
