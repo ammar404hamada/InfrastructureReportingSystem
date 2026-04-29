@@ -4,6 +4,7 @@ using InfraReportingSystem.Persistence.Repositories.Admin.UsersManagementScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
+using InfraReportingSystem.Persistence.Seed;
 using InfraReportingSystem.ServiceAbstractions.Admin.UsersManagementScreen;
 using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.ServiceAbstractions.Email;
@@ -105,10 +106,11 @@ namespace InfrastructureReportingSystem
             // Database Migration and Seeding Pipeline
             using (var scope = app.Services.CreateScope())
             {
-                var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+                // 1. Run Migrations (via your existing DataSeeder)
+                var dbSeeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+                await dbSeeder.SeedAsync(); // Assuming this calls context.Database.MigrateAsync()
 
-                // This handles both Migrations AND full database seeding.
-                await seeder.SeedAsync();
+                await UserSeeder.SeedAsync(app.Services);
             }
 
             // make the swagger UI public for testing (temporary)
