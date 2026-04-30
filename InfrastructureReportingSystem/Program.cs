@@ -1,12 +1,15 @@
+using System.Text;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.Persistence.Repositories.Admin.UsersManagementScreen;
+using InfraReportingSystem.Persistence.Repositories.Authority.IncomingReports;
 using InfraReportingSystem.Persistence.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.Persistence.Seed;
 using InfraReportingSystem.ServiceAbstractions.Admin.UsersManagementScreen;
 using InfraReportingSystem.ServiceAbstractions.Auth;
+using InfraReportingSystem.ServiceAbstractions.Authority.IncomingReports;
 using InfraReportingSystem.ServiceAbstractions.Email;
 using InfraReportingSystem.ServiceAbstractions.Repositories;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.UsersManagementScreen;
@@ -18,6 +21,7 @@ using InfraReportingSystem.ServiceAbstractions.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
 using InfraReportingSystem.Services.Admin.UsersManagementScreen;
 using InfraReportingSystem.Services.Auth;
+using InfraReportingSystem.Services.Authority.IncomingReports;
 using InfraReportingSystem.Services.Email;
 using InfraReportingSystem.Services.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Services.Worker.TasksHistoryScreen;
@@ -27,7 +31,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 namespace InfrastructureReportingSystem
 {
@@ -98,6 +101,8 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IWorkerHistoryService, WorkerHistoryService>();
             builder.Services.AddScoped<IAdminUsersRepository, AdminUsersRepository>();
             builder.Services.AddScoped<IAdminUsersService, AdminUsersService>();
+            builder.Services.AddScoped<IAuthorityIncomingReportsRepository, AuthorityIncomingReportsRepository>();
+            builder.Services.AddScoped<IAuthorityIncomingReportsService, AuthorityIncomingReportsService>();
 
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
