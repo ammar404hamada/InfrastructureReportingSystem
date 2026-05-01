@@ -1,4 +1,5 @@
-﻿using InfraReportingSystem.Services.Authority.Workers;
+﻿using InfraReportingSystem.ServiceAbstractions.Authority.Workers;
+using InfraReportingSystem.Services.Authority.Workers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,10 @@ namespace InfrastructureReportingSystem.Controllers.Authority.Workers
             _service = service;
         }
 
+       
+        /// <param name="search">Optional search across name, email, and phone number.</param>
+        /// <param name="pageNumber">1-based page index. Defaults to 1.</param>
+        /// <param name="pageSize">Items per page (1–100). Defaults to 50.</param>
         [HttpGet("workers")]
         public async Task<IActionResult> GetWorkers(
             [FromQuery] string? search,

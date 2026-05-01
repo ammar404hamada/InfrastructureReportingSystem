@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using InfraReportingSystem.Domain.Enums;
+using InfraReportingSystem.ServiceAbstractions.Authority.Workers;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
 using InfraReportingSystem.Shared.DTOs.Authority.Workers;
 using InfraReportingSystem.Shared.DTOs.Common;
 using Microsoft.Extensions.Logging;
@@ -30,12 +33,14 @@ namespace InfraReportingSystem.Services.Authority.Workers
             pageNumber = Math.Max(pageNumber, 1);
             pageSize = Math.Clamp(pageSize, 1, 100);
 
-            var (workers, totalCount) = await _repository.GetWorkersAsync(search, pageNumber, pageSize);
+            var (workers, totalCount) = await _repository.GetWorkersAsync(
+                search, pageNumber, pageSize);
 
             if (totalCount == 0)
             {
                 _logger.LogInformation(
-                    "No active workers found. Search: '{Search}'", search ?? "none");
+                    "No active workers found. Search: '{Search}'",
+                    search ?? "none");
 
                 return new PaginatedResult<WorkerListDto>
                 {
@@ -59,7 +64,7 @@ namespace InfraReportingSystem.Services.Authority.Workers
             };
         }
 
-        private static WorkerListDto MapToDto(Worker worker) => new()
+        private static WorkerListDto MapToDto(WorkerEntity worker) => new()
         {
             Id = worker.Id,
             Name = worker.Name,
