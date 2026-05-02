@@ -13,7 +13,6 @@ namespace InfraReportingSystem.Shared.DTOs.Authority.Workers
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string? Specialization { get; set; }
-
         public int ActiveTaskCount { get; set; }
     }
 }

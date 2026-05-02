@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using InfraReportingSystem.Shared.DTOs.Authority.Workers;
 using InfraReportingSystem.Shared.DTOs.Common;
 
-namespace InfraReportingSystem.ServiceAbstractions.Authority.Workers
+using InfraReportingSystem.Domain.Entities;
+
+namespace InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers
 {
     public interface IAuthorityWorkersService
     {

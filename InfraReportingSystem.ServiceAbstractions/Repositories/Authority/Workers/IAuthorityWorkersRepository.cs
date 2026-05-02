@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using InfraReportingSystem.Domain.Entities;
 
 namespace InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers
 {
     public interface IAuthorityWorkersRepository
     {
-        Task<(IEnumerable<Worker> Workers, int TotalCount)> GetWorkersAsync(
-            string? search,
-            int pageNumber,
-            int pageSize);
+        // "Worker" is the domain entity — not "Workers"
+        Task<(IEnumerable<User> Workers, int TotalCount)> GetWorkersAsync(
+     string? search,
+     int pageNumber,
+     int pageSize);
+
     }
 }
