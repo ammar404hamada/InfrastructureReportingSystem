@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Authority;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.AssignWorker;
+using Microsoft.EntityFrameworkCore;
 
 namespace InfraReportingSystem.Persistence.Repositories.Authority.AssignWorker
 {
@@ -21,13 +23,13 @@ namespace InfraReportingSystem.Persistence.Repositories.Authority.AssignWorker
         public async Task<Report?> GetByIdAsync(int reportId)
         {
             return await _context.Reports
-                .Include(r => r.SubmittedBy)
+                .Include(r => r.SubmittedBy)       
                 .FirstOrDefaultAsync(r => r.Id == reportId);
         }
 
         public async Task SaveChangesAsync()
         {
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();     
         }
     }
 }
