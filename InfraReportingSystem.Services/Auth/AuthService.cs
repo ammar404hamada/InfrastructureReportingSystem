@@ -234,14 +234,24 @@ namespace InfraReportingSystem.Services.Auth {
         public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
         {
             var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
-
             if (user == null) return false;
 
             var decodedToken = Uri.UnescapeDataString(resetPasswordDto.Token);
-
             var result = await _userManager.ResetPasswordAsync(user, decodedToken, resetPasswordDto.NewPassword);
             if (!result.Succeeded)
                 return false;
+
+
+            if (user.Status == UserStatus.Inactive)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles.Contains("Worker") || roles.Contains("Authority"))
+                {
+                    user.Status = UserStatus.Active;
+                    await _userManager.UpdateAsync(user);
+                }
+            }
+
             return true;
         }
 
