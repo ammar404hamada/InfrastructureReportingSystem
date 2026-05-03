@@ -1,6 +1,6 @@
-using System.Text;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
+using InfraReportingSystem.Persistence.Repositories.Admin.AuditLogsScreen;
 using InfraReportingSystem.Persistence.Repositories.Admin.UsersManagementScreen;
 using InfraReportingSystem.Persistence.Repositories.Authority.AssignWorker;
 using InfraReportingSystem.Persistence.Repositories.Authority.IncomingReports;
@@ -9,6 +9,7 @@ using InfraReportingSystem.Persistence.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.Persistence.Seed;
+using InfraReportingSystem.ServiceAbstractions.Admin.AuditLogsScreen;
 using InfraReportingSystem.ServiceAbstractions.Admin.UserCreationScreen;
 using InfraReportingSystem.ServiceAbstractions.Admin.UsersManagementScreen;
 using InfraReportingSystem.ServiceAbstractions.Auth;
@@ -17,6 +18,7 @@ using InfraReportingSystem.ServiceAbstractions.Authority.AssignWorker;
 using InfraReportingSystem.ServiceAbstractions.Authority.IncomingReports;
 using InfraReportingSystem.ServiceAbstractions.Email;
 using InfraReportingSystem.ServiceAbstractions.Repositories;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.AuditLogsScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.UsersManagementScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.AssignWorker;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
@@ -26,6 +28,7 @@ using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.ServiceAbstractions.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
+using InfraReportingSystem.Services.Admin.AuditLogsScreen;
 using InfraReportingSystem.Services.Admin.UserCreationScreen;
 using InfraReportingSystem.Services.Admin.UsersManagementScreen;
 using InfraReportingSystem.Services.Auth;
@@ -41,6 +44,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace InfrastructureReportingSystem
 {
@@ -142,6 +146,8 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IAuthorityWorkersService, AuthorityWorkersService>();
             builder.Services.AddScoped<IAuthorityAssignWorkerRepository, AuthorityAssignWorkerRepository>();
             builder.Services.AddScoped<IAuthorityAssignWorkerService, AuthorityAssignWorkerService>();
+            builder.Services.AddScoped<IAdminAuditLogsRepository, AdminAuditLogsRepository>();
+            builder.Services.AddScoped<IAdminAuditLogsService, AdminAuditLogsService>();
 
 
             // Register DataSeeder
