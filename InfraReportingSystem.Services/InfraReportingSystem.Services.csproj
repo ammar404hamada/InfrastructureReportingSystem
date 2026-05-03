@@ -19,8 +19,4 @@
     <ProjectReference Include="..\InfraReportingSystem.ServiceAbstractions\InfraReportingSystem.ServiceAbstractions.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Admin\AuditLogsScreen\" />
-  </ItemGroup>
-
 </Project>
