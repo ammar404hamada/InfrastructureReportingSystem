@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\InfraReportingSystem.Domain\InfraReportingSystem.Domain.csproj" />
     <ProjectReference Include="..\InfraReportingSystem.Persistence\InfraReportingSystem.Persistence.csproj" />
     <ProjectReference Include="..\InfraReportingSystem.Presentation\InfraReportingSystem.Presentation.csproj" />
   </ItemGroup>

@@ -1,6 +1,10 @@
+using System.Text;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.Persistence.Repositories.Admin.UsersManagementScreen;
+using InfraReportingSystem.Persistence.Repositories.Authority.AssignWorker;
+using InfraReportingSystem.Persistence.Repositories.Authority.IncomingReports;
+using InfraReportingSystem.Persistence.Repositories.Authority.Workers;
 using InfraReportingSystem.Persistence.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
@@ -8,9 +12,14 @@ using InfraReportingSystem.Persistence.Seed;
 using InfraReportingSystem.ServiceAbstractions.Admin.UserCreationScreen;
 using InfraReportingSystem.ServiceAbstractions.Admin.UsersManagementScreen;
 using InfraReportingSystem.ServiceAbstractions.Auth;
+using InfraReportingSystem.ServiceAbstractions.Authority;
+using InfraReportingSystem.ServiceAbstractions.Authority.AssignWorker;
+using InfraReportingSystem.ServiceAbstractions.Authority.IncomingReports;
 using InfraReportingSystem.ServiceAbstractions.Email;
 using InfraReportingSystem.ServiceAbstractions.Repositories;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.UsersManagementScreen;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.AssignWorker;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
@@ -20,6 +29,9 @@ using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
 using InfraReportingSystem.Services.Admin.UserCreationScreen;
 using InfraReportingSystem.Services.Admin.UsersManagementScreen;
 using InfraReportingSystem.Services.Auth;
+using InfraReportingSystem.Services.Authority;
+using InfraReportingSystem.Services.Authority.AssignWorker;
+using InfraReportingSystem.Services.Authority.IncomingReports;
 using InfraReportingSystem.Services.Email;
 using InfraReportingSystem.Services.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Services.Worker.TasksHistoryScreen;
@@ -29,7 +41,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 namespace InfrastructureReportingSystem
 {
@@ -46,6 +57,30 @@ namespace InfrastructureReportingSystem
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Infra Reporting API", Version = "v1" });
+            
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header
+                });
+            
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
 
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -101,6 +136,13 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IAdminUsersRepository, AdminUsersRepository>();
             builder.Services.AddScoped<IAdminUsersService, AdminUsersService>();
             builder.Services.AddScoped<IAdminUserCreationService, AdminUserCreationService>();
+            builder.Services.AddScoped<IAuthorityIncomingReportsRepository, AuthorityIncomingReportsRepository>();
+            builder.Services.AddScoped<IAuthorityIncomingReportsService, AuthorityIncomingReportsService>();
+            builder.Services.AddScoped<IAuthorityWorkersRepository, AuthorityWorkersRepository>();
+            builder.Services.AddScoped<IAuthorityWorkersService, AuthorityWorkersService>();
+            builder.Services.AddScoped<IAuthorityAssignWorkerRepository, AuthorityAssignWorkerRepository>();
+            builder.Services.AddScoped<IAuthorityAssignWorkerService, AuthorityAssignWorkerService>();
+
 
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
