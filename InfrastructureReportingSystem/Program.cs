@@ -163,6 +163,7 @@ namespace InfrastructureReportingSystem
                 await dbSeeder.SeedAsync(); // Assuming this calls context.Database.MigrateAsync()
 
                 await UserSeeder.SeedAsync(app.Services);
+                await TestAuditLogSeeder.SeedAsync(app.Services);
             }
 
             // make the swagger UI public for testing (temporary)
