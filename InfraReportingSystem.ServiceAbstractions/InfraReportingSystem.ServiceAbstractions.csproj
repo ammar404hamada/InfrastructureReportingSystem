@@ -11,9 +11,4 @@
     <ProjectReference Include="..\InfraReportingSystem.Shared\InfraReportingSystem.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Admin\AuditLogsScreen\" />
-    <Folder Include="Repositories\Admin\AuditLogsScreen\" />
-  </ItemGroup>
-
 </Project>
