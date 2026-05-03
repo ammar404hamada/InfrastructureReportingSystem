@@ -38,7 +38,7 @@ namespace InfraReportingSystem.Services.Admin.UserCreationScreen
 
         public async Task<CreateUserResponseDto> CreateUserAsync(CreateUserRequestDto request, string adminUserId)
         {
-            // Validation
+
             if (string.IsNullOrWhiteSpace(request.FullName))
                 return Error("Full name is required.");
 
@@ -58,7 +58,6 @@ namespace InfraReportingSystem.Services.Admin.UserCreationScreen
             if (roleLower == "worker" && string.IsNullOrWhiteSpace(request.Specialization))
                 return Error("Specialization is required for Worker accounts.");
 
-            // Create entity (TPH)
             User newUser;
             string identityRole;
 
@@ -72,7 +71,7 @@ namespace InfraReportingSystem.Services.Admin.UserCreationScreen
             }
             else
             {
-                newUser = new Authority();
+                newUser = new InfraReportingSystem.Domain.Entities.Authority();
                 identityRole = "Authority";
             }
 
@@ -81,30 +80,30 @@ namespace InfraReportingSystem.Services.Admin.UserCreationScreen
             newUser.Email = request.Email;
             newUser.PhoneNumber = request.PhoneNumber;
             newUser.Status = UserStatus.Inactive;
-            // CreatedAt uses DB default GETUTCDATE()
 
-            // Placeholder password
+
+
             var placeholderPassword = Guid.NewGuid().ToString("N")[..12] + "Aa1!";
 
-            // Create via UserManager
+
             var createResult = await _userManager.CreateAsync(newUser, placeholderPassword);
             if (!createResult.Succeeded)
                 return Error(string.Join(", ", createResult.Errors.Select(e => e.Description)));
 
-            // Assign Identity role
+
             var roleResult = await _userManager.AddToRoleAsync(newUser, identityRole);
             if (!roleResult.Succeeded)
             {
-                await _userManager.DeleteAsync(newUser); // rollback
+                await _userManager.DeleteAsync(newUser); 
                 return Error(string.Join(", ", roleResult.Errors.Select(e => e.Description)));
             }
 
-            // Password reset token (exact pattern from AuthService.ForgotPasswordAsync)
+
             var token = await _userManager.GeneratePasswordResetTokenAsync(newUser);
             var encodedToken = Uri.EscapeDataString(token);
             var resetLink = $"{_configuration["FrontendUrl"]}/reset-password?userId={newUser.Id}&token={encodedToken}";
 
-            // Email
+
             var emailBody = $@"
             <h2>Account created by admin</h2>
             <p>Hi {newUser.Name},</p>
@@ -116,8 +115,7 @@ namespace InfraReportingSystem.Services.Admin.UserCreationScreen
         ";
             await _emailService.SendEmailAsync(newUser.Email!, "Set your password – Infrastructure Reporting System", emailBody);
 
-            // Audit log
-            // Ensure AuditActionType.AccountCreated exists in the enum; if not, add it.
+
             var auditLog = new AuditLog
             {
                 EntityId = newUser.Id,
