@@ -1,3 +1,4 @@
+using System.Text;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.Persistence.Repositories.Admin.AuditLogsScreen;
@@ -5,6 +6,7 @@ using InfraReportingSystem.Persistence.Repositories.Admin.UsersManagementScreen;
 using InfraReportingSystem.Persistence.Repositories.Authority.AssignWorker;
 using InfraReportingSystem.Persistence.Repositories.Authority.IncomingReports;
 using InfraReportingSystem.Persistence.Repositories.Authority.Workers;
+using InfraReportingSystem.Persistence.Repositories.PublicUser.Map;
 using InfraReportingSystem.Persistence.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
@@ -17,11 +19,13 @@ using InfraReportingSystem.ServiceAbstractions.Authority;
 using InfraReportingSystem.ServiceAbstractions.Authority.AssignWorker;
 using InfraReportingSystem.ServiceAbstractions.Authority.IncomingReports;
 using InfraReportingSystem.ServiceAbstractions.Email;
+using InfraReportingSystem.ServiceAbstractions.PublicUser.Map;
 using InfraReportingSystem.ServiceAbstractions.Repositories;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.AuditLogsScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.UsersManagementScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.AssignWorker;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
+using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.Map;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
@@ -36,6 +40,7 @@ using InfraReportingSystem.Services.Authority;
 using InfraReportingSystem.Services.Authority.AssignWorker;
 using InfraReportingSystem.Services.Authority.IncomingReports;
 using InfraReportingSystem.Services.Email;
+using InfraReportingSystem.Services.PublicUser.Map;
 using InfraReportingSystem.Services.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Services.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Services.Worker.TasksScreen;
@@ -44,7 +49,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 namespace InfrastructureReportingSystem
 {
@@ -148,7 +152,8 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IAuthorityAssignWorkerService, AuthorityAssignWorkerService>();
             builder.Services.AddScoped<IAdminAuditLogsRepository, AdminAuditLogsRepository>();
             builder.Services.AddScoped<IAdminAuditLogsService, AdminAuditLogsService>();
-
+            builder.Services.AddScoped<IPublicMapRepository, PublicMapRepository>();
+            builder.Services.AddScoped<IPublicMapService, PublicMapService>();
 
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
