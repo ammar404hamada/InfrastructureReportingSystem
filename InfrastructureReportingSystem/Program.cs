@@ -8,6 +8,7 @@ using InfraReportingSystem.Persistence.Repositories.Authority.IncomingReports;
 using InfraReportingSystem.Persistence.Repositories.Authority.Workers;
 using InfraReportingSystem.Persistence.Repositories.PublicUser.Map;
 using InfraReportingSystem.Persistence.Repositories.PublicUser.MarkerPopup;
+using InfraReportingSystem.Persistence.Repositories.PublicUser.NearbyReports;
 using InfraReportingSystem.Persistence.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
@@ -22,6 +23,7 @@ using InfraReportingSystem.ServiceAbstractions.Authority.IncomingReports;
 using InfraReportingSystem.ServiceAbstractions.Email;
 using InfraReportingSystem.ServiceAbstractions.PublicUser.Map;
 using InfraReportingSystem.ServiceAbstractions.PublicUser.MarkerPopup;
+using InfraReportingSystem.ServiceAbstractions.PublicUser.NearbyReports;
 using InfraReportingSystem.ServiceAbstractions.Repositories;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.AuditLogsScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.UsersManagementScreen;
@@ -29,6 +31,7 @@ using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.AssignWork
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
 using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.Map;
 using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.MarkerPopup;
+using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.NearbyReports;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
@@ -45,6 +48,7 @@ using InfraReportingSystem.Services.Authority.IncomingReports;
 using InfraReportingSystem.Services.Email;
 using InfraReportingSystem.Services.PublicUser.Map;
 using InfraReportingSystem.Services.PublicUser.MarkerPopup;
+using InfraReportingSystem.Services.PublicUser.NearbyReports;
 using InfraReportingSystem.Services.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Services.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Services.Worker.TasksScreen;
@@ -160,6 +164,8 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IPublicMapService, PublicMapService>();
             builder.Services.AddScoped<IPublicMarkerPopupRepository, PublicMarkerPopupRepository>();
             builder.Services.AddScoped<IPublicMarkerPopupService, PublicMarkerPopupService>();
+            builder.Services.AddScoped<IPublicNearbyReportsRepository, PublicNearbyReportsRepository>();
+            builder.Services.AddScoped<IPublicNearbyReportsService, PublicNearbyReportsService>();
 
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
