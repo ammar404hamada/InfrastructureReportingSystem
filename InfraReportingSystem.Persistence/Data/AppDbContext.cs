@@ -24,6 +24,8 @@ namespace InfraReportingSystem.Persistence.Data
         public DbSet<AuditLog> AuditLog { get; set; }
         public DbSet<OtpVerification> OtpVerifications { get; set; }
 
+        public DbSet<ReportAffectedUser> ReportAffectedUsers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
