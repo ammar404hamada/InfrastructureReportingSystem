@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.Persistence.Data;
+using Microsoft.EntityFrameworkCore;
 using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.AlsoSuffer;
 
 namespace InfraReportingSystem.Persistence.Repositories.PublicUser.AlsoSuffer

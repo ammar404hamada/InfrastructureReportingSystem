@@ -8,6 +8,7 @@ using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.PublicUser.AlsoSuffer;
 using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.AlsoSuffer;
 using Microsoft.EntityFrameworkCore;
+using InfraReportingSystem.Shared.DTOs.PublicUser.AlsoSuffer;
 
 namespace InfraReportingSystem.Services.PublicUser.AlsoSuffer
 {
