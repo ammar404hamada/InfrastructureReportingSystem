@@ -24,5 +24,7 @@ namespace InfraReportingSystem.Domain.Entities
         public ICollection<OtpVerification> OtpVerifications { get; set; } = new List<OtpVerification>();
 
         public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+
+        public ICollection<ReportAffectedUser> AffectedReports { get; set; } = new List<ReportAffectedUser>();
     }
 }

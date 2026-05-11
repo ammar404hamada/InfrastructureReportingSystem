@@ -48,6 +48,8 @@ namespace InfraReportingSystem.Domain.Entities {
 
         public ICollection<ReportPic> ReportPics { get; set; } = new List<ReportPic>();
 
+        public ICollection<ReportAffectedUser> AffectedUsers { get; set; } = new List<ReportAffectedUser>();
+
     }
 
 }
