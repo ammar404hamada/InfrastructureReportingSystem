@@ -153,6 +153,16 @@ namespace InfrastructureReportingSystem
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+
             var app = builder.Build();
 
             // Database Migration and Seeding Pipeline
@@ -175,7 +185,7 @@ namespace InfrastructureReportingSystem
             });
 
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowFrontend");
             app.UseAuthentication();
             app.UseAuthorization();
 
