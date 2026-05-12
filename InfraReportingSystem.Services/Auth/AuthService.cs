@@ -1,13 +1,10 @@
 ﻿using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Auth;
-using InfraReportingSystem.ServiceAbstractions.Email;
 using InfraReportingSystem.Shared.DTOs.Auth;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,37 +20,37 @@ namespace InfraReportingSystem.Services.Auth {
     {
         private const string PublicUserRole = "PublicUser";
         private readonly IConfiguration _configuration;
-        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
-        private readonly IEmailService _emailService;
+        private readonly IOtpService _otpService;
 
         public AuthService(
             UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManager,
             IConfiguration configuration,
-            IEmailService emailService
+            IOtpService otpService
             )
         {
             _userManager = userManager;
-            _roleManager = roleManager;
             _configuration = configuration;
-            _emailService = emailService;
+            _otpService = otpService;
         }
-        public async Task<bool> ConfirmEmailAsync(string userId, string token)
+        public async Task<bool> ConfirmEmailAsync(ConfirmEmailDto confirmEmailDto)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            
+            var user = await _userManager.FindByIdAsync(confirmEmailDto.UserId);
             if (user == null) return false;
 
-            var decodeToken = Uri.UnescapeDataString(token);
+            var isValid = await _otpService.VerifyOtp(
+                user.Id,
+                OtpPurpose.EmailConfirmation,
+                confirmEmailDto.OtpCode
+                );
 
+            if (!isValid) return false;
 
-            var result = await _userManager.ConfirmEmailAsync(user, decodeToken);
-            if (!result.Succeeded) return false;
-
+            user.EmailConfirmed = true;
             user.Status = UserStatus.Active;
-            await _userManager.UpdateAsync(user);
-            return true;
+
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded;
         }
 
         public async Task<bool> ResendConfirmationEmailAsync(string email)
@@ -62,22 +59,8 @@ namespace InfraReportingSystem.Services.Auth {
             if (user == null) return false;
             if (user.EmailConfirmed) return false;
 
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = Uri.EscapeDataString(token);
-            var confirmationLink = $"{_configuration["AppUrl"]}/api/auth/confirm-email?userId={user.Id}&token={encodedToken}";
+            await _otpService.GenerateOtp(user.Id, OtpPurpose.EmailConfirmation);
 
-            var emailBody = $@"
-                <h2>Welcome to Infrastructure Reporting System!</h2>
-                <p>Hi {user.Name},</p>
-                <p>Please confirm your email by clicking the link below:</p>
-                <a href='{confirmationLink}' 
-                   style='background:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
-                   Confirm Email
-                </a>
-                <p>If you didn't register, ignore this email.</p>
-            ";
-
-            await _emailService.SendEmailAsync(user.Email!, "Confirm your Email", emailBody);
             return true;
         }
 
@@ -86,24 +69,8 @@ namespace InfraReportingSystem.Services.Auth {
             var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
             if (user == null) return;
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var encodedToken = Uri.EscapeDataString(token);
-            var resetLink = $"{_configuration["FrontendUrl"]}/reset-password?userId={user.Id}&token={encodedToken}";
-
-            var emailBody = $@"
-                <h2>Welcome to Infrastructure Reporting System!</h2>
-                <p>Hi {user.Name},</p>
-                <p>We received a request to reset your password. Click the link below:</p>
-                <a href='{resetLink}' 
-                   style='background:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
-                   Reset Password
-                </a>
-                <p>If you didn't forget your password, ignore this email.</p>
-            ";
-
-            await _emailService.SendEmailAsync(user.Email!, "Reset your password", emailBody);
-
-
+            await _otpService.GenerateOtp(user.Id, OtpPurpose.PasswordReset);
+                
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto)
@@ -114,33 +81,33 @@ namespace InfraReportingSystem.Services.Auth {
                 return new LoginResponseDto
                 {
                     Success = false,
-                    Message = "User Does Not Exsit"
+                    Message = "User does not exist."
                 };
 
             if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
                 return new LoginResponseDto
                 {
                     Success = false,
-                    Message = "Invalide Password"
+                    Message = "Invalid password."
                 };
 
-            if (user.Status == UserStatus.Inactive)
+            if (!user.EmailConfirmed || user.Status == UserStatus.Inactive)
                 return new LoginResponseDto
                 {
                     Success = false,
-                    Message = "Please confirm your email first"
+                    Message = "Please confirm your email first."
                 };
             if (user.Status == UserStatus.Suspended)
                 return new LoginResponseDto
                 {
                     Success = false,
-                    Message = "Your account has been suspended"
+                    Message = "Your account has been suspended."
                 };
             if (user.Status == UserStatus.Locked)
                 return new LoginResponseDto
                 {
                     Success = false,
-                    Message = "Your account is locked"
+                    Message = "Your account is locked."
                 };
 
             var userRole = await _userManager.GetRolesAsync(user);
@@ -150,11 +117,11 @@ namespace InfraReportingSystem.Services.Auth {
                 return new LoginResponseDto
                 {
                     Success = true,
-                    Message = "Login Successful",
+                    Message = "Login successful.",
                     User = new UserDto
                     {
                         Name = user.Name,
-                        Email = user.Email,
+                        Email = user.Email!,
                         Role = userRole.FirstOrDefault() ?? PublicUserRole
                     },
                     Token = token
@@ -167,7 +134,7 @@ namespace InfraReportingSystem.Services.Auth {
                 return new RegisterResponseDto
                 {
                     Success = false,
-                    Message = "Email Already exists"
+                    Message = "Email already exists."
                 };
 
             var user = new User
@@ -201,27 +168,24 @@ namespace InfraReportingSystem.Services.Auth {
                 };
             }
 
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = Uri.EscapeDataString(token);
-            var confirmationLink = $"{_configuration["AppUrl"]}/api/auth/confirm-email?userId={user.Id}&token={encodedToken}";
-            
-            var emailBody = $@"
-                <h2>Welcome to Infrastructure Reporting System!</h2>
-                <p>Hi {user.Name},</p>
-                <p>Please confirm your email by clicking the link below:</p>
-                <a href='{confirmationLink}' 
-                   style='background:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
-                   Confirm Email
-                </a>
-                <p>If you didn't register, ignore this email.</p>
-            ";
-
-            await _emailService.SendEmailAsync(user.Email, "Confirm your Email", emailBody);
+            try
+            {
+                await _otpService.GenerateOtp(user.Id, OtpPurpose.EmailConfirmation);
+            }
+            catch
+            {
+                await _userManager.DeleteAsync(user);
+                return new RegisterResponseDto
+                {
+                    Success = false,
+                    Message = "Registration failed because the verification code could not be sent. Please try again later."
+                };
+            }
 
             return new RegisterResponseDto
             {
                 Success = true,
-                Message = "Registeration Successful, Please confirm your Email",
+                Message = "Registration successful. Please confirm your email.",
                 User = new UserDto
                 {
                     Name = registerDto.Name,
@@ -236,11 +200,19 @@ namespace InfraReportingSystem.Services.Auth {
             var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
             if (user == null) return false;
 
-            var decodedToken = Uri.UnescapeDataString(resetPasswordDto.Token);
-            var result = await _userManager.ResetPasswordAsync(user, decodedToken, resetPasswordDto.NewPassword);
-            if (!result.Succeeded)
-                return false;
+            var isValidOtp = await _otpService.VerifyOtp(
+                user.Id,
+                OtpPurpose.PasswordReset,
+                resetPasswordDto.OtpCode
+                );
 
+            if (!isValidOtp) return false;
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var result = await _userManager.ResetPasswordAsync(user, token, resetPasswordDto.NewPassword);
+
+            if (!result.Succeeded) return false;
 
             if (user.Status == UserStatus.Inactive)
             {
@@ -248,7 +220,8 @@ namespace InfraReportingSystem.Services.Auth {
                 if (roles.Contains("Worker") || roles.Contains("Authority"))
                 {
                     user.Status = UserStatus.Active;
-                    await _userManager.UpdateAsync(user);
+                    var updateResult = await _userManager.UpdateAsync(user);
+                    if (!updateResult.Succeeded) return false;
                 }
             }
 

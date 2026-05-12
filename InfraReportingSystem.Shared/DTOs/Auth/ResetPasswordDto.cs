@@ -10,13 +10,19 @@ namespace InfraReportingSystem.Shared.DTOs.Auth {
     public class ResetPasswordDto
     {
         [Required]
-        public string Email { get; set; }
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+        
+        [Required]
+        public string OtpCode { get; set; } = string.Empty;
+        
         [Required]
         [MinLength(8)]
-        public string NewPassword { get; set; }
+        public string NewPassword { get; set; } = string.Empty;
+        
         [Required]
-        [Compare("ConfirmPassword", ErrorMessage = "Passwords do not match")]
-        public string ConfirmPassword { get; set; }
-        public string Token { get; set; }
+        [Compare("NewPassword", ErrorMessage = "Passwords do not match")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+        
     }
 }

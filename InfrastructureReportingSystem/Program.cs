@@ -3,6 +3,7 @@ using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.Persistence.Repositories.Admin.AuditLogsScreen;
 using InfraReportingSystem.Persistence.Repositories.Admin.UsersManagementScreen;
+using InfraReportingSystem.Persistence.Repositories.Auth;
 using InfraReportingSystem.Persistence.Repositories.Authority.AssignWorker;
 using InfraReportingSystem.Persistence.Repositories.Authority.IncomingReports;
 using InfraReportingSystem.Persistence.Repositories.Authority.Workers;
@@ -25,6 +26,7 @@ using InfraReportingSystem.ServiceAbstractions.PublicUser.MarkerPopup;
 using InfraReportingSystem.ServiceAbstractions.Repositories;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.AuditLogsScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.UsersManagementScreen;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Auth;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.AssignWorker;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
 using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.Map;
@@ -110,7 +112,9 @@ namespace InfrastructureReportingSystem
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 
             // Added validation to ensure the JWT key exists in configuration
-            var key = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key missing");
+            var key = jwtSettings["Key"];
+            if (string.IsNullOrWhiteSpace(key))
+                throw new InvalidOperationException("JWT settings key is missing. Configure JwtSettings:Key before running the API.");
 
             builder.Services.AddAuthentication(options =>
             {
@@ -160,6 +164,8 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IPublicMapService, PublicMapService>();
             builder.Services.AddScoped<IPublicMarkerPopupRepository, PublicMarkerPopupRepository>();
             builder.Services.AddScoped<IPublicMarkerPopupService, PublicMarkerPopupService>();
+            builder.Services.AddScoped<IOtpRepository, OtpRepository>();
+            builder.Services.AddScoped<IOtpService, OtpService>();
 
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();

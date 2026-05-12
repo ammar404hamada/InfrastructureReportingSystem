@@ -1,7 +1,6 @@
 ﻿using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.Shared.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InfrastructureReportingSystem.Controllers { 
@@ -36,17 +35,14 @@ namespace InfrastructureReportingSystem.Controllers {
             return Unauthorized(response);
         }
 
-        [HttpGet("Confirm-email")]
-        public async Task<IActionResult> ConfirmEmail(
-            [FromQuery] string userId,
-            [FromQuery] string token
-            )
+        [HttpPost("Confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
         {
-            var result = await _authService.ConfirmEmailAsync(userId, token);
+            var result = await _authService.ConfirmEmailAsync(dto);
 
             if (result)
-                return Ok("Email confirmed successfully");
-            return BadRequest("Invalid or expired token");
+                return Ok(new { success = true, message = "Email confirmed successfully." });
+            return BadRequest(new { success = false, message = "Invalid or expired OTP code." });
         }
 
         [HttpPost("forgot-password")]
@@ -54,7 +50,7 @@ namespace InfrastructureReportingSystem.Controllers {
             [FromBody]  ForgotPasswordDto forgotPasswordDto)
         {
             await _authService.ForgotPasswordAsync(forgotPasswordDto);
-            return Ok("If this email exists, you'll receive a reset link");
+            return Ok(new { success = true, message = "If this email exists, you will receive a password reset code." });
         }
 
         [HttpPost("reset-password")]
@@ -64,8 +60,8 @@ namespace InfrastructureReportingSystem.Controllers {
             var response = await _authService.ResetPasswordAsync(resetPasswordDto);
 
             if (response)
-                return Ok("Password reset successfully");
-            return BadRequest("Invalid or expired token");
+                return Ok(new { success = true, message = "Password reset successfully." });
+            return BadRequest(new { success = false, message = "Invalid or expired OTP code, or the new password is invalid." });
         }
 
         [HttpPost("resend-confirmation")]
@@ -75,15 +71,15 @@ namespace InfrastructureReportingSystem.Controllers {
             var result = await _authService.ResendConfirmationEmailAsync(resendConfirmationDto.Email);
 
             if (result)
-                return Ok("Confirmation email sent");
-            return BadRequest("Invalid email or already confirmed");
+                return Ok(new { success = true, message = "Verification code sent successfully." });
+            return BadRequest(new { success = false, message = "Invalid email or the account is already confirmed." });
         }
 
         [HttpPost("logout")]
         [Authorize]
         public IActionResult Logout()
         {
-            return Ok("Logged out successfully");
+            return Ok(new { success = true, message = "Logged out successfully." });
         }
 
     }
