@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace InfraReportingSystem.Shared.DTOs.Auth { 
 
-    public class RegisterResponseDto
+    public class ResetPasswordResponseDto
     {
         public bool Success { get; set; }
-        public string Message { get; set; } = null!;
-        public UserDto? User { get; set; }
+        public string Message { get; set; } = string.Empty;
     }
 }

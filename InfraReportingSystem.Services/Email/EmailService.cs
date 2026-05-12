@@ -2,6 +2,7 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MimeKit;
 
 namespace InfraReportingSystem.Services.Email;
@@ -9,10 +10,12 @@ namespace InfraReportingSystem.Services.Email;
 public class EmailService : IEmailService
 {
     private readonly IConfiguration _configuration;
+    private readonly ILogger<EmailService> _logger;
 
-    public EmailService(IConfiguration configuration)
+    public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
     {
         _configuration = configuration;
+        _logger = logger;
     }
 
     public async Task SendEmailAsync(string to, string subject, string body)
@@ -21,20 +24,22 @@ public class EmailService : IEmailService
 
         if (!enableSending)
         {
+            _logger.LogInformation("Email sending is disabled. Skipping email to {Email}.", to);
             return;
         }
 
         var host = _configuration["EmailSettings:Host"];
-        var port = int.Parse(_configuration["EmailSettings:Port"]!);
+        var portValue = _configuration["EmailSettings:Port"];
         var userName = _configuration["EmailSettings:UserName"];
         var password = _configuration["EmailSettings:Password"];
         var displayName = _configuration["EmailSettings:DisplayName"];
 
         if (string.IsNullOrWhiteSpace(host)
             || string.IsNullOrWhiteSpace(userName)
-            || string.IsNullOrWhiteSpace(password))
+            || string.IsNullOrWhiteSpace(password)
+            || !int.TryParse(portValue, out var port))
         {
-            return;
+            throw new InvalidOperationException("Email settings are missing or incomplete.");
         }
 
         var email = new MimeMessage();
@@ -48,5 +53,7 @@ public class EmailService : IEmailService
         await smtp.AuthenticateAsync(userName, password);
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
+
+        _logger.LogInformation("Email sent to {Email} with subject {Subject}.", to, subject);
     }
 }

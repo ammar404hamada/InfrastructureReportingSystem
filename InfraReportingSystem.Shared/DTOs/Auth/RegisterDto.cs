@@ -10,19 +10,19 @@ namespace InfraReportingSystem.Shared.DTOs.Auth {
     {
         [Required]
         [MaxLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
         [Required]
         [Phone]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = string.Empty;
         [Required]
         [MinLength(8)]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
         [Required]
         [Compare("Password", ErrorMessage = "Password does not match")]
-        public string RePassword { get; set; }
+        public string RePassword { get; set; } = string.Empty;
         
 
     }

@@ -4,6 +4,7 @@ using InfraReportingSystem.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InfraReportingSystem.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260511133237_AddPurposeAndCreatedAtToOtpVerification")]
+    partial class AddPurposeAndCreatedAtToOtpVerification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -209,38 +212,6 @@ namespace InfraReportingSystem.Persistence.Migrations
 
                             t.HasCheckConstraint("CK_Report_Longitude", "[Longitude] >= -180.0 AND [Longitude] <= 180.0");
                         });
-                });
-
-            modelBuilder.Entity("InfraReportingSystem.Domain.Entities.ReportAffectedUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<int>("ReportId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("IX_ReportAffectedUser_UserId");
-
-                    b.HasIndex("ReportId", "UserId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_ReportAffectedUser_ReportId_UserId");
-
-                    b.ToTable("ReportAffectedUsers");
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.ReportPic", b =>
@@ -564,25 +535,6 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.Navigation("SubmittedBy");
                 });
 
-            modelBuilder.Entity("InfraReportingSystem.Domain.Entities.ReportAffectedUser", b =>
-                {
-                    b.HasOne("InfraReportingSystem.Domain.Entities.Report", "Report")
-                        .WithMany("AffectedUsers")
-                        .HasForeignKey("ReportId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("InfraReportingSystem.Domain.Entities.User", "User")
-                        .WithMany("AffectedReports")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Report");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.ReportPic", b =>
                 {
                     b.HasOne("InfraReportingSystem.Domain.Entities.Report", "Report")
@@ -652,15 +604,11 @@ namespace InfraReportingSystem.Persistence.Migrations
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.Report", b =>
                 {
-                    b.Navigation("AffectedUsers");
-
                     b.Navigation("ReportPics");
                 });
 
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.User", b =>
                 {
-                    b.Navigation("AffectedReports");
-
                     b.Navigation("AuditLogs");
 
                     b.Navigation("OtpVerifications");

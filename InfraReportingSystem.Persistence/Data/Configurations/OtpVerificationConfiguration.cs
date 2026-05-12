@@ -35,6 +35,11 @@ namespace InfraReportingSystem.Persistence.Data.Configurations
             builder.HasIndex(o => new { o.UserId, o.IsUsed, o.ExpiresAt })
                    .HasDatabaseName("IX_OtpVerification_UserId_IsUsed_ExpiresAt");
 
+            // To save the enum property as string instead of int, to be more readable
+            builder.Property(o => o.Purpose)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
             // Relationship: each OTP belongs to one User
             builder.HasOne(o => o.User)
                    .WithMany(u => u.OtpVerifications)
