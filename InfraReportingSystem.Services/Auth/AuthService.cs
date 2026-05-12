@@ -35,7 +35,7 @@ namespace InfraReportingSystem.Services.Auth {
         }
         public async Task<bool> ConfirmEmailAsync(ConfirmEmailDto confirmEmailDto)
         {
-            var user = await _userManager.FindByIdAsync(confirmEmailDto.UserId);
+            var user = await _userManager.FindByEmailAsync(confirmEmailDto.UserEmail);
             if (user == null) return false;
 
             var isValid = await _otpService.VerifyOtp(
@@ -195,25 +195,36 @@ namespace InfraReportingSystem.Services.Auth {
             };
         }
 
-        public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        public async Task<ResetPasswordResponseDto> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
         {
             var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
-            if (user == null) return false;
-
-            var isValidOtp = await _otpService.VerifyOtp(
-                user.Id,
-                OtpPurpose.PasswordReset,
-                resetPasswordDto.OtpCode
-                );
-
-            if (!isValidOtp) return false;
-
+            if (user == null)
+            { 
+                return new ResetPasswordResponseDto 
+                { 
+                    Success = false, 
+                    Message = "User not found." 
+                };
+            }
+            var isValidOtp = await _otpService.VerifyOtp(user.Id, OtpPurpose.PasswordReset, resetPasswordDto.OtpCode);
+            if (!isValidOtp) 
+            { 
+                return new ResetPasswordResponseDto 
+                { 
+                    Success = false, 
+                    Message = "Invalid or expired OTP." 
+                };
+            }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
             var result = await _userManager.ResetPasswordAsync(user, token, resetPasswordDto.NewPassword);
-
-            if (!result.Succeeded) return false;
-
+            if (!result.Succeeded)
+            { 
+                return new ResetPasswordResponseDto 
+                { 
+                    Success = false, 
+                    Message = string.Join(", ", result.Errors.Select(e => e.Description)) 
+                };
+            }
             if (user.Status == UserStatus.Inactive)
             {
                 var roles = await _userManager.GetRolesAsync(user);
@@ -221,11 +232,22 @@ namespace InfraReportingSystem.Services.Auth {
                 {
                     user.Status = UserStatus.Active;
                     var updateResult = await _userManager.UpdateAsync(user);
-                    if (!updateResult.Succeeded) return false;
+                    if (!updateResult.Succeeded)
+                    { 
+                        return new ResetPasswordResponseDto 
+                        { 
+                            Success = false, 
+                            Message = "Password reset but failed to activate account." 
+                        };
+                    }
                 }
             }
 
-            return true;
+            return new ResetPasswordResponseDto 
+            { 
+                Success = true, 
+                Message = "Password reset successfully." 
+            };
         }
 
         private string GenerateJwtToken(User user, IList<string> roles)

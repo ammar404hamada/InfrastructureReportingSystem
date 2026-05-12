@@ -13,7 +13,7 @@ namespace InfraReportingSystem.ServiceAbstractions.Auth {
         Task<LoginResponseDto> LoginAsync(LoginDto loginDto);
         Task<bool> ResendConfirmationEmailAsync(string email);
         Task ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto);
-        Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
+        Task<ResetPasswordResponseDto> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
         Task<bool> ConfirmEmailAsync(ConfirmEmailDto confirmEmailDto);
     }
 }

@@ -54,14 +54,14 @@ namespace InfrastructureReportingSystem.Controllers {
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword(
-            [FromBody]  ResetPasswordDto resetPasswordDto)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
         {
             var response = await _authService.ResetPasswordAsync(resetPasswordDto);
 
-            if (response)
-                return Ok(new { success = true, message = "Password reset successfully." });
-            return BadRequest(new { success = false, message = "Invalid or expired OTP code, or the new password is invalid." });
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
         }
 
         [HttpPost("resend-confirmation")]

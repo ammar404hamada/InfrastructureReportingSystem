@@ -10,7 +10,7 @@ namespace InfraReportingSystem.Shared.DTOs.Auth
     public class ConfirmEmailDto
     {
         [Required]
-        public string UserId { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
 
         [Required]
         public string OtpCode { get; set; } = string.Empty;
