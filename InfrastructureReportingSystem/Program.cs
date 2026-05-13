@@ -7,6 +7,7 @@ using InfraReportingSystem.Persistence.Repositories.Auth;
 using InfraReportingSystem.Persistence.Repositories.Authority.AssignWorker;
 using InfraReportingSystem.Persistence.Repositories.Authority.IncomingReports;
 using InfraReportingSystem.Persistence.Repositories.Authority.Map;
+using InfraReportingSystem.Persistence.Repositories.Authority.MarkerPopup;
 using InfraReportingSystem.Persistence.Repositories.Authority.Workers;
 using InfraReportingSystem.Persistence.Repositories.PublicUser.AlsoSuffer;
 using InfraReportingSystem.Persistence.Repositories.PublicUser.Map;
@@ -24,6 +25,7 @@ using InfraReportingSystem.ServiceAbstractions.Authority;
 using InfraReportingSystem.ServiceAbstractions.Authority.AssignWorker;
 using InfraReportingSystem.ServiceAbstractions.Authority.IncomingReports;
 using InfraReportingSystem.ServiceAbstractions.Authority.Map;
+using InfraReportingSystem.ServiceAbstractions.Authority.MarkerPopup;
 using InfraReportingSystem.ServiceAbstractions.Email;
 using InfraReportingSystem.ServiceAbstractions.PublicUser.AlsoSuffer;
 using InfraReportingSystem.ServiceAbstractions.PublicUser.Map;
@@ -35,6 +37,7 @@ using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.UsersManagemen
 using InfraReportingSystem.ServiceAbstractions.Repositories.Auth;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.AssignWorker;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Map;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.MarkerPopup;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
 using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.AlsoSuffer;
 using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.Map;
@@ -54,6 +57,7 @@ using InfraReportingSystem.Services.Authority;
 using InfraReportingSystem.Services.Authority.AssignWorker;
 using InfraReportingSystem.Services.Authority.IncomingReports;
 using InfraReportingSystem.Services.Authority.Map;
+using InfraReportingSystem.Services.Authority.MarkerPopup;
 using InfraReportingSystem.Services.Email;
 using InfraReportingSystem.Services.PublicUser.AlsoSuffer;
 using InfraReportingSystem.Services.PublicUser.Map;
@@ -193,6 +197,9 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IPublicAlsoSufferService, PublicAlsoSufferService>();
             builder.Services.AddScoped<IAuthorityMapRepository, AuthorityMapRepository>();
             builder.Services.AddScoped<IAuthorityMapService, AuthorityMapService>();
+            builder.Services.AddScoped<IAuthorityMarkerPopupRepository, AuthorityMarkerPopupRepository>();
+            builder.Services.AddScoped<IAuthorityMarkerPopupService, AuthorityMarkerPopupService>();
+
 
 
             // Register DataSeeder
