@@ -10,6 +10,7 @@ namespace InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Assign
     public interface IAuthorityAssignWorkerRepository
     {
         Task<Report?> GetByIdAsync(int reportId);
+        Task<bool> HasActiveTaskAsync(string workerId);
         Task SaveChangesAsync();
     }
 }

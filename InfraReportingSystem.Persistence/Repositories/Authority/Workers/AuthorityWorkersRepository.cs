@@ -22,12 +22,11 @@ namespace InfraReportingSystem.Persistence.Repositories.Authority.Workers
             _context = context;
         }
 
-        public async Task<(IEnumerable<User> Workers, int TotalCount)> GetWorkersAsync(
+        public async Task<(IEnumerable<(User Worker, int ActiveTaskCount)> Workers, int TotalCount)> GetWorkersAsync(
             string? search,
             int pageNumber,
             int pageSize)
         {
-            // Join with roles to guarantee role = "Worker" (authoritative source)
             var workerUserIds =
                 from ur in _context.UserRoles
                 join r in _context.Roles on ur.RoleId equals r.Id
@@ -49,7 +48,14 @@ namespace InfraReportingSystem.Persistence.Repositories.Authority.Workers
 
             var totalCount = await query.CountAsync();
             if (totalCount == 0)
-                return (Enumerable.Empty<User>(), 0);
+                return (Enumerable.Empty<(User, int)>(), 0);
+
+            var activeTaskCounts = await _context.Reports
+                .AsNoTracking()
+                .Where(r => r.Status == ReportStatus.InProgress && r.AssignedWorkerId != null)
+                .GroupBy(r => r.AssignedWorkerId!)
+                .Select(g => new { WorkerId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.WorkerId, x => x.Count);
 
             var workers = await query
                 .OrderBy(w => w.Name)
@@ -57,7 +63,10 @@ namespace InfraReportingSystem.Persistence.Repositories.Authority.Workers
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (workers, totalCount);
+            var result = workers
+                .Select(w => (w, activeTaskCounts.GetValueOrDefault(w.Id, 0)));
+
+            return (result, totalCount);
         }
     }
 }

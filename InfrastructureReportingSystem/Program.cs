@@ -173,6 +173,7 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IPublicAlsoSufferRepository, PublicAlsoSufferRepository>();
             builder.Services.AddScoped<IPublicAlsoSufferService, PublicAlsoSufferService>();
 
+
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
 

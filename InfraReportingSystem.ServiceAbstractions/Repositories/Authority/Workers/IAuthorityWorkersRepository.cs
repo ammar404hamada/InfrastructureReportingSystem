@@ -6,11 +6,9 @@ namespace InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Worker
 {
     public interface IAuthorityWorkersRepository
     {
-        // "Worker" is the domain entity — not "Workers"
-        Task<(IEnumerable<User> Workers, int TotalCount)> GetWorkersAsync(
-     string? search,
-     int pageNumber,
-     int pageSize);
-
+        Task<(IEnumerable<(User Worker, int ActiveTaskCount)> Workers, int TotalCount)> GetWorkersAsync(
+            string? search,
+            int pageNumber,
+            int pageSize);
     }
 }
