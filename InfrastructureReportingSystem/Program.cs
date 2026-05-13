@@ -106,7 +106,16 @@ namespace InfrastructureReportingSystem
             });
 
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+                sqloptions =>
+                {
+                    sqloptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(10),
+                        errorNumbersToAdd: null
+                        );
+                }).LogTo(Console.WriteLine, LogLevel.Warning)
+                );
 
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
@@ -197,12 +206,30 @@ namespace InfrastructureReportingSystem
             // Database Migration and Seeding Pipeline
             using (var scope = app.Services.CreateScope())
             {
-                // 1. Run Migrations (via your existing DataSeeder)
-                var dbSeeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
-                await dbSeeder.SeedAsync(); // Assuming this calls context.Database.MigrateAsync()
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-                await UserSeeder.SeedAsync(app.Services);
-                await TestAuditLogSeeder.SeedAsync(app.Services);
+                try
+                {
+                    logger.LogInformation("Starting database migration and seeding...");
+
+                    // Run Migrations (via your existing DataSeeder)
+                    var dbSeeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+                    await dbSeeder.SeedAsync(); // Assuming this calls context.Database.MigrateAsync()
+                    logger.LogInformation("DataSeeder completed successfully.");
+
+                    await UserSeeder.SeedAsync(app.Services);
+                    logger.LogInformation("UserSeeder completed successfully.");
+
+
+                    await TestAuditLogSeeder.SeedAsync(app.Services);
+                    logger.LogInformation("TestAuditLogSeeder completed successfully.");
+
+
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "An error occurred during database migration or seeding. App will continue running.");
+                }
             }
 
             // make the swagger UI public for testing (temporary)
