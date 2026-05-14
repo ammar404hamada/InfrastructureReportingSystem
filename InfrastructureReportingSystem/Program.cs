@@ -58,6 +58,7 @@ using InfraReportingSystem.Services.PublicUser.NearbyReports;
 using InfraReportingSystem.Services.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Services.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Services.Worker.TasksScreen;
+using InfrastructureReportingSystem.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -79,6 +80,10 @@ namespace InfrastructureReportingSystem
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Infra Reporting API", Version = "v1" });
+                var xmlFile = $"{typeof(Program).Assembly.GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+                c.OperationFilter<AuthResponseExamplesOperationFilter>();
             
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
@@ -188,6 +193,7 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IPublicAlsoSufferRepository, PublicAlsoSufferRepository>();
             builder.Services.AddScoped<IPublicAlsoSufferService, PublicAlsoSufferService>();
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
             
 
             // Register DataSeeder

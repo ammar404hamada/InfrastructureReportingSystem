@@ -24,7 +24,7 @@ namespace InfraReportingSystem.Persistence.Repositories.Auth
 
         }
 
-        public async Task<User> FindUserWithRefreshTokenAsync(string refreshToken)
+        public async Task<User?> FindUserWithRefreshTokenAsync(string refreshToken)
         {
             return await _context.Users
                 .Include(u => u.RefreshTokens)

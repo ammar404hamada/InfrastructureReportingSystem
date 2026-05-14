@@ -117,7 +117,9 @@ namespace InfraReportingSystem.Services.Auth {
             var token = GenerateJwtToken(user, userRole);
             var refreshToken = GenerateRefreshToken();
 
-            user.RefreshTokens!.Add(refreshToken);
+            refreshToken.UserId = user.Id;
+            user.RefreshTokens ??= new List<RefreshToken>();
+            user.RefreshTokens.Add(refreshToken);
             await _userManager.UpdateAsync(user);
 
                 return new LoginResponseDto
@@ -200,6 +202,7 @@ namespace InfraReportingSystem.Services.Auth {
                     Email = registerDto.Email,
                     Role = PublicUserRole
                 }
+                
             };
         }
 
@@ -258,9 +261,50 @@ namespace InfraReportingSystem.Services.Auth {
             };
         }
 
-        public Task<LoginResponseDto> RefreshTokenAsync(string token)
+        public async Task<LoginResponseDto> RefreshTokenAsync(string token)
         {
-            throw new NotImplementedException();
+            var user = await _refreshTokenRepository.FindUserWithRefreshTokenAsync(token);
+            if (user == null)
+            { 
+                return new LoginResponseDto
+                {
+                    Success = false,
+                    Message = "No user has this refresh token"
+
+                };
+            }
+
+            var incomeToken = await _refreshTokenRepository.FindRefreshTokenAsync(token);
+
+            if (incomeToken is null || !incomeToken.IsActive)
+            { 
+                return new LoginResponseDto
+                {
+                    Success = false,
+                    Message = "This refresh token is not active"
+
+                };
+            }
+
+            incomeToken.RevokedOn = DateTime.UtcNow;
+            
+            var newRefreshToken = GenerateRefreshToken();
+            user.RefreshTokens!.Add(newRefreshToken);
+            var userRole = await _userManager.GetRolesAsync(user);
+            
+            await _userManager.UpdateAsync(user);
+
+            var jwtToken = GenerateJwtToken(user, userRole);
+
+            return new LoginResponseDto
+            {
+                Success = true,
+                Message = "New refresh token generated successflly",
+                Token = jwtToken,
+                RefreshToken = newRefreshToken.Token,
+                RefreshTokenExpiresOn = newRefreshToken.ExpiresOn
+            };
+
         }
 
         private RefreshToken GenerateRefreshToken()
@@ -268,13 +312,15 @@ namespace InfraReportingSystem.Services.Auth {
             var randomBytes = new byte[64];
             RandomNumberGenerator.Fill(randomBytes);
             var token = Convert.ToBase64String(randomBytes);
-
+            var durationInDays = int.Parse(
+                _configuration["JwtSettings:RefreshTokenDurationInDays"]!
+                );
 
             RefreshToken refreshToken = new RefreshToken
             {
                 Token = token,
                 CreatedOn = DateTime.UtcNow,
-                ExpiresOn = DateTime.UtcNow.AddDays(7)
+                ExpiresOn = DateTime.UtcNow.AddDays(durationInDays)
             };
             
             return refreshToken;

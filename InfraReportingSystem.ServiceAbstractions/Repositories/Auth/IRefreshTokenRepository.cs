@@ -10,7 +10,7 @@ namespace InfraReportingSystem.ServiceAbstractions.Repositories.Auth
 
     public interface IRefreshTokenRepository
     {
-        Task<User> FindUserWithRefreshTokenAsync(string refreshToken);
+        Task<User?> FindUserWithRefreshTokenAsync(string refreshToken);
         Task<RefreshToken?> FindRefreshTokenAsync(string refreshToken);
         Task SaveTokenChangesAsync();
     }
