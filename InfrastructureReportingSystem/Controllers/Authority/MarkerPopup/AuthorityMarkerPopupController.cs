@@ -17,6 +17,8 @@ namespace InfrastructureReportingSystem.Controllers.Authority.MarkerPopup
         }
 
         [HttpGet("{reportId:int}/popup")]
+        [Tags("Authority")]
+        [EndpointSummary("GetReportMapPopup")]
         public async Task<IActionResult> GetReportPopup(int reportId)
         {
             var result = await _popupService.GetReportPopupAsync(reportId);
