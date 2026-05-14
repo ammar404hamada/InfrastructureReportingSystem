@@ -19,6 +19,8 @@ namespace InfraReportingSystem.Domain.Entities
 
         public DateTime CreatedAt { get; set; }
 
+        public ICollection<RefreshToken>? RefreshTokens { get; set; }
+
         public ICollection<Report> SubmittedReports { get; set; } = new List<Report>();
 
         public ICollection<OtpVerification> OtpVerifications { get; set; } = new List<OtpVerification>();

@@ -27,6 +27,7 @@ namespace InfraReportingSystem.Persistence.Repositories.Auth
                         o.UserId == userId &&
                         o.Purpose == purpose &&
                         o.IsUsed == false &&
+                        
                         o.ExpiresAt > DateTime.UtcNow);
 
             return otp;
