@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
@@ -81,6 +78,13 @@ namespace InfraReportingSystem.Services.Authority.AssignWorker
                 return (false, "The specified user is not a worker.");
             }
 
+            if (await _repository.HasActiveTaskAsync(workerId))
+            {
+                _logger.LogWarning(
+                    "AssignWorker: Worker {WorkerId} already has an active task in progress.", workerId);
+                return (false, "Worker already has an active task in progress.");
+            }
+
             report.AssignedWorkerId = worker.Id;
             report.AssignedByAuthorityId = authorityId;
             report.Status = ReportStatus.Assigned;
@@ -94,7 +98,7 @@ namespace InfraReportingSystem.Services.Authority.AssignWorker
                 EntityName = "Report",
                 EntityId = reportId.ToString(),
                 Details = $"Authority {authorityId} assigned report {reportId} " +
-                             $"to worker {worker.Id} ({worker.Name}).",
+                          $"to worker {worker.Id} ({worker.Name}).",
                 Timestamp = DateTime.UtcNow
             });
 

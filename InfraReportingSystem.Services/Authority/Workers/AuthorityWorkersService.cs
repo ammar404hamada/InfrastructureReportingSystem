@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using InfraReportingSystem.Domain.Entities;
-using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Authority;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Authority;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
 using InfraReportingSystem.Shared.DTOs.Authority.Workers;
 using InfraReportingSystem.Shared.DTOs.Common;
@@ -52,13 +49,14 @@ namespace InfraReportingSystem.Services.Authority
             }
 
             var items = workers
-                .Select(w => new WorkerListDto
+                .Select(tuple => new WorkerListDto
                 {
-                    Id = w.Id,
-                    Name = w.Name,
-                    Email = w.Email ?? string.Empty,
-                    PhoneNumber = w.PhoneNumber ?? string.Empty,
-                    Specialization = (w as InfraReportingSystem.Domain.Entities.Worker)?.Specialization
+                    Id = tuple.Worker.Id,
+                    Name = tuple.Worker.Name,
+                    Email = tuple.Worker.Email ?? string.Empty,
+                    PhoneNumber = tuple.Worker.PhoneNumber ?? string.Empty,
+                    Specialization = (tuple.Worker as InfraReportingSystem.Domain.Entities.Worker)?.Specialization,
+                    ActiveTaskCount = tuple.ActiveTaskCount
                 })
                 .ToList();
 

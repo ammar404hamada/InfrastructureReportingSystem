@@ -17,6 +17,8 @@ namespace InfrastructureReportingSystem.Controllers.Authority.IncomingReports
         }
 
         [HttpGet("incoming")]
+        [Tags("Authority")]
+        [EndpointSummary("GetIncomingReports")]
         public async Task<IActionResult> GetIncomingReports(
             [FromQuery] string? search,
             [FromQuery] string? sortBy,

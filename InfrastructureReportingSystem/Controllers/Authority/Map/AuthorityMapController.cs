@@ -1,25 +1,27 @@
 ﻿using InfraReportingSystem.Domain.Enums;
-using InfraReportingSystem.ServiceAbstractions.PublicUser.Map;
+using InfraReportingSystem.ServiceAbstractions.Authority.Map;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace InfrastructureReportingSystem.Controllers.PublicUser.Map
+namespace InfrastructureReportingSystem.Controllers.Authority.Map
 {
     [ApiController]
-    [Route("api/public/map-reports")]
-    public class PublicMapController : ControllerBase
+    [Route("api/authority/map-reports")]
+    [Authorize(Roles = "Authority")]
+    public class AuthorityMapController : ControllerBase
     {
-        private readonly IPublicMapService _mapService;
+        private readonly IAuthorityMapService _mapService;
 
-        public PublicMapController(IPublicMapService mapService)
+        public AuthorityMapController(IAuthorityMapService mapService)
         {
             _mapService = mapService;
         }
 
         [HttpGet]
-        [Tags("PublicUser")]
-        [EndpointSummary("GetPublicMapReports")]
+        [Tags("Authority")]
+        [EndpointSummary("GetAuthorityMapReports")]
         public async Task<IActionResult> GetMapReports(
-            [FromQuery] int? categoryId,
+             [FromQuery] int? categoryId,
             [FromQuery] string? status)
         {
             ReportStatus? parsedStatus = null;

@@ -20,6 +20,8 @@ namespace InfrastructureReportingSystem.Controllers.Authority.AssignWorker
         }
 
         [HttpPost("{reportId:int}/assign-worker")]
+        [Tags("Authority")]
+        [EndpointSummary("AssignWorkerToReport")]
         public async Task<IActionResult> AssignWorker(
             int reportId,
             [FromBody] AssignWorkerDto dto)

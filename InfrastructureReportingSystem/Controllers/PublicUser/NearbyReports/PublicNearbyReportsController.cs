@@ -18,6 +18,8 @@ namespace InfrastructureReportingSystem.Controllers.PublicUser.NearbyReports
         /// <param name="longitude">User's current longitude (-180 to 180).</param>
         /// <param name="radiusInKm">Search radius in KM (default 3, max 50).</param>
         [HttpGet]
+        [Tags("PublicUser")]
+        [EndpointSummary("GetNearbyReports")]
         public async Task<IActionResult> GetNearbyReports(
             [FromQuery] double latitude,
             [FromQuery] double longitude,
