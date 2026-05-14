@@ -31,7 +31,17 @@ namespace InfrastructureReportingSystem.Controllers {
             var response = await _authService.LoginAsync(loginDto);
 
             if (response.Success)
+            {
+                Response.Cookies.Append("refreshToken", response.RefreshToken!, new CookieOptions
+                {
+                    Secure = true,
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = response.RefreshTokenExpiresOn
+                });
+                response.RefreshToken = null;
                 return Ok(response);
+            }
             return Unauthorized(response);
         }
 

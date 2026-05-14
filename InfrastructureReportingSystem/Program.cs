@@ -187,6 +187,8 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IPublicNearbyReportsService, PublicNearbyReportsService>();
             builder.Services.AddScoped<IPublicAlsoSufferRepository, PublicAlsoSufferRepository>();
             builder.Services.AddScoped<IPublicAlsoSufferService, PublicAlsoSufferService>();
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            
 
             // Register DataSeeder
             builder.Services.AddScoped<DataSeeder>();
@@ -197,7 +199,8 @@ namespace InfrastructureReportingSystem
                 {
                     policy.WithOrigins("http://localhost:4200")
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                 });
             });
 

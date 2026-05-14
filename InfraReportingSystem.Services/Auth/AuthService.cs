@@ -1,17 +1,16 @@
 ﻿using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Auth;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Auth;
 using InfraReportingSystem.Shared.DTOs.Auth;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 
 namespace InfraReportingSystem.Services.Auth {
@@ -22,16 +21,19 @@ namespace InfraReportingSystem.Services.Auth {
         private readonly IConfiguration _configuration;
         private readonly UserManager<User> _userManager;
         private readonly IOtpService _otpService;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
 
         public AuthService(
             UserManager<User> userManager, 
             IConfiguration configuration,
-            IOtpService otpService
+            IOtpService otpService,
+            IRefreshTokenRepository refreshTokenRepository
             )
         {
             _userManager = userManager;
             _configuration = configuration;
             _otpService = otpService;
+            _refreshTokenRepository = refreshTokenRepository;
         }
         public async Task<bool> ConfirmEmailAsync(ConfirmEmailDto confirmEmailDto)
         {
@@ -113,6 +115,10 @@ namespace InfraReportingSystem.Services.Auth {
             var userRole = await _userManager.GetRolesAsync(user);
 
             var token = GenerateJwtToken(user, userRole);
+            var refreshToken = GenerateRefreshToken();
+
+            user.RefreshTokens!.Add(refreshToken);
+            await _userManager.UpdateAsync(user);
 
                 return new LoginResponseDto
                 {
@@ -124,7 +130,9 @@ namespace InfraReportingSystem.Services.Auth {
                         Email = user.Email!,
                         Role = userRole.FirstOrDefault() ?? PublicUserRole
                     },
-                    Token = token
+                    Token = token,
+                    RefreshToken = refreshToken.Token,
+                    RefreshTokenExpiresOn = refreshToken.ExpiresOn
                 };
         }
 
@@ -250,6 +258,28 @@ namespace InfraReportingSystem.Services.Auth {
             };
         }
 
+        public Task<LoginResponseDto> RefreshTokenAsync(string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        private RefreshToken GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+            RandomNumberGenerator.Fill(randomBytes);
+            var token = Convert.ToBase64String(randomBytes);
+
+
+            RefreshToken refreshToken = new RefreshToken
+            {
+                Token = token,
+                CreatedOn = DateTime.UtcNow,
+                ExpiresOn = DateTime.UtcNow.AddDays(7)
+            };
+            
+            return refreshToken;
+        }
+
         private string GenerateJwtToken(User user, IList<string> roles)
         {
             var claims = new List<Claim>
@@ -280,5 +310,7 @@ namespace InfraReportingSystem.Services.Auth {
             
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        
     }
 }
