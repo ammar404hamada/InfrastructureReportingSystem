@@ -16,6 +16,8 @@ namespace InfrastructureReportingSystem.Controllers.PublicUser.Map
         }
 
         [HttpGet]
+        [Tags("PublicUser")]
+        [EndpointSummary("GetPublicMapReports")]
         public async Task<IActionResult> GetMapReports(
             [FromQuery] int? categoryId,
             [FromQuery] string? status)

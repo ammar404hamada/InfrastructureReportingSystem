@@ -18,8 +18,10 @@ namespace InfrastructureReportingSystem.Controllers.Authority.Map
         }
 
         [HttpGet]
+        [Tags("Authority")]
+        [EndpointSummary("GetAuthorityMapReports")]
         public async Task<IActionResult> GetMapReports(
-            [FromQuery] int? categoryId,
+             [FromQuery] int? categoryId,
             [FromQuery] string? status)
         {
             ReportStatus? parsedStatus = null;

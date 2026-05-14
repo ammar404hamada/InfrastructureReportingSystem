@@ -19,6 +19,8 @@ namespace InfrastructureReportingSystem.Controllers.PublicUser.AlsoSuffer
         }
 
         [HttpPost("{reportId:int}/also-suffer")]
+        [Tags("PublicUser")]
+        [EndpointSummary("ConfirmAlsoSuffering")]
         public async Task<IActionResult> ConfirmAlsoSuffer(int reportId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
