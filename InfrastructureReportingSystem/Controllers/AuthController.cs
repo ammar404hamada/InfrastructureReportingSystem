@@ -4,6 +4,7 @@ using InfraReportingSystem.ServiceAbstractions.Auth;
 using InfraReportingSystem.Shared.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace InfrastructureReportingSystem.Controllers { 
 
@@ -190,7 +191,7 @@ namespace InfrastructureReportingSystem.Controllers {
         }
 
         /// <summary>
-        /// Logs out the current authenticated user on the client side.
+        /// Logs out the current authenticated user and close all of his sessions.
         /// </summary>
         /// <remarks>
         /// Confirms logout for an authenticated request. The client should remove its access token after this response.
@@ -201,8 +202,14 @@ namespace InfrastructureReportingSystem.Controllers {
         [Authorize]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId is null)
+                return Unauthorized();
+
+            await _authService.LogoutAllAsync(userId);
             return Ok(new { success = true, message = "Logged out successfully." });
         }
 

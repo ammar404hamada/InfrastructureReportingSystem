@@ -307,6 +307,21 @@ namespace InfraReportingSystem.Services.Auth {
 
         }
 
+        public async Task<bool> LogoutAllAsync(string userId)
+        {
+            ICollection<RefreshToken> allRefreshTokens =
+                await _refreshTokenRepository.GetAllRefreshTokenByUserIdAsync(userId);
+
+            foreach (RefreshToken refreshToken in allRefreshTokens)
+            {
+                refreshToken.RevokedOn = DateTime.UtcNow;
+            }
+
+            await _refreshTokenRepository.SaveTokenChangesAsync();
+
+            return true;
+        }
+
         private RefreshToken GenerateRefreshToken()
         {
             var randomBytes = new byte[64];

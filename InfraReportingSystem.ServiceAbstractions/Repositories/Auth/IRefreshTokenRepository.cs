@@ -13,5 +13,6 @@ namespace InfraReportingSystem.ServiceAbstractions.Repositories.Auth
         Task<User?> FindUserWithRefreshTokenAsync(string refreshToken);
         Task<RefreshToken?> FindRefreshTokenAsync(string refreshToken);
         Task SaveTokenChangesAsync();
+        Task<ICollection<RefreshToken>> GetAllRefreshTokenByUserIdAsync(string userId);
     }
 }
