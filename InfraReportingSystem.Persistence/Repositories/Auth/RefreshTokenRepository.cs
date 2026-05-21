@@ -31,6 +31,14 @@ namespace InfraReportingSystem.Persistence.Repositories.Auth
                 .FirstOrDefaultAsync(u => u.RefreshTokens!.Any(r => r.Token == refreshToken));
         }
 
+        public async Task<ICollection<RefreshToken>> GetAllRefreshTokenByUserIdAsync(string userId)
+        {
+            List < RefreshToken > tokens = await _context.RefreshTokens
+                .Where(r => r.UserId == userId).ToListAsync();
+
+            return tokens;
+        }
+
         public async Task SaveTokenChangesAsync()
         {
             await _context.SaveChangesAsync();
