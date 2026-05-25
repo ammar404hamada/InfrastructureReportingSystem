@@ -23,6 +23,10 @@ namespace InfrastructureReportingSystem.Controllers.Admin.UserCreationScreen
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto request)
         {
             var adminUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(adminUserId))
+                return Unauthorized();
+
             var result = await _creationService.CreateUserAsync(request, adminUserId);
 
             if (string.IsNullOrEmpty(result.UserId))
