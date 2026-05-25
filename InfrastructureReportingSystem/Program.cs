@@ -66,6 +66,10 @@ using InfraReportingSystem.Services.PublicUser.NearbyReports;
 using InfraReportingSystem.Services.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Services.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Services.Worker.TasksScreen;
+using InfraReportingSystem.ServiceAbstractions.Profile;
+using InfraReportingSystem.Services.Profile;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Profile;
+using InfraReportingSystem.Persistence.Repositories.Profile;
 using InfrastructureReportingSystem.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -201,6 +205,8 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IPublicAlsoSufferRepository, PublicAlsoSufferRepository>();
             builder.Services.AddScoped<IPublicAlsoSufferService, PublicAlsoSufferService>();
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
 
             
             builder.Services.AddScoped<IAuthorityMapRepository, AuthorityMapRepository>();
