@@ -77,7 +77,7 @@ public class WorkerCurrentTaskServiceTests
     {
         var category = new Category { Id = 1, Name = "Roads" };
         var submitter = new User { Id = "user-abc", Name = "Ahmad" };
-        var authority = new Authority { Id = "auth-xyz", Name = "Municipality Admin" };
+        var authority = new InfraReportingSystem.Domain.Entities.Authority { Id = "auth-xyz", Name = "Municipality Admin" };
         var reportPics = new List<ReportPic>
         {
             new() { PicId = 10, ReportId = id, PicUrl = "http://example.com/pic1.jpg" },

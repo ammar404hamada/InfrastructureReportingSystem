@@ -3,6 +3,7 @@ using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.Services.Worker.TasksScreen;
+using InfraReportingSystem.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -102,7 +103,7 @@ public class WorkerTasksServiceTests
     {
         var category = new Category { Id = 1, Name = "Roads" };
         var submitter = new User { Id = "user-abc", Name = "Ali" };
-        var authority = new Authority { Id = "auth-xyz", Name = "Highway Dept" };
+        var authority = new InfraReportingSystem.Domain.Entities.Authority { Id = "auth-xyz", Name = "Highway Dept" };
         var reportPics = new List<ReportPic>
         {
             new() { PicId = 10, ReportId = id, PicUrl = "http://example.com/pic1.jpg" }

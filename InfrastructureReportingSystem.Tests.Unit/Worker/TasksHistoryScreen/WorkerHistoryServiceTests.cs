@@ -134,7 +134,7 @@ public class WorkerHistoryServiceTests
     {
         var category = new Category { Id = 1, Name = "Electricity" };
         var submitter = new User { Id = "user-abc", Name = "Mariam" };
-        var authority = new Authority { Id = "auth-xyz", Name = "Electricity Board" };
+        var authority = new InfraReportingSystem.Domain.Entities.Authority { Id = "auth-xyz", Name = "Electricity Board" };
         var reportPics = new List<ReportPic>
         {
             new() { PicId = 10, ReportId = id, PicUrl = "http://example.com/pic1.jpg" }
