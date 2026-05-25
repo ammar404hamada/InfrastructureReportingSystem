@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Map;
-using InfraReportingSystem.Services.Authority.Map;
-using InfraReportingSystem.Shared.DTOs.Authority.Map;
+using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.Map;
+using InfraReportingSystem.Services.PublicUser.Map;
+using InfraReportingSystem.Shared.DTOs.PublicUser.Map;
 using Moq;
 using Xunit;
 
-namespace InfrastructureReportingSystem.Tests.Unit.Authority.Map
+namespace InfrastructureReportingSystem.Tests.Unit.PublicUser.Map
 {
-    public class AuthorityMapServiceTests
+    public class PublicMapServiceTests
     {
-        private readonly Mock<IAuthorityMapRepository> _repositoryMock = new();
+        private readonly Mock<IPublicMapRepository> _repositoryMock = new();
 
         [Fact]
         public async Task GetMapReportsAsync_WithNullParameters_CallsRepositoryWithNullAndMapsCorrectly()
@@ -107,9 +107,9 @@ namespace InfrastructureReportingSystem.Tests.Unit.Authority.Map
             await action.Should().ThrowAsync<InvalidOperationException>().WithMessage("DB error");
         }
 
-        private AuthorityMapService CreateService()
+        private PublicMapService CreateService()
         {
-            return new AuthorityMapService(_repositoryMock.Object);
+            return new PublicMapService(_repositoryMock.Object);
         }
     }
 }

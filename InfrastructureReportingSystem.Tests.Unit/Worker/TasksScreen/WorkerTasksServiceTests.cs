@@ -3,7 +3,6 @@ using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
 using InfraReportingSystem.Services.Worker.TasksScreen;
-using InfraReportingSystem.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;

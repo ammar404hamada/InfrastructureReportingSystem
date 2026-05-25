@@ -5,29 +5,29 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.MarkerPopup;
-using InfraReportingSystem.Services.Authority.MarkerPopup;
-using InfraReportingSystem.Shared.DTOs.Authority.MarkerPopup;
+using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.MarkerPopup;
+using InfraReportingSystem.Services.PublicUser.MarkerPopup;
+using InfraReportingSystem.Shared.DTOs.PublicUser.MarkerPopup;
 using Moq;
 using Xunit;
 
-namespace InfrastructureReportingSystem.Tests.Unit.Authority.MarkerPopup
+namespace InfrastructureReportingSystem.Tests.Unit.PublicUser.MarkerPopup
 {
-    public class AuthorityMarkerPopupServiceTests
+    public class PublicMarkerPopupServiceTests
     {
-        private readonly Mock<IAuthorityMarkerPopupRepository> _repositoryMock = new();
+        private readonly Mock<IPublicMarkerPopupRepository> _repositoryMock = new();
 
         [Theory]
         [InlineData(0)]
         [InlineData(-1)]
         [InlineData(-100)]
-        public async Task GetReportPopupAsync_WhenReportIdIsZeroOrNegative_ReturnsNullImmediatelyWithoutQueryingRepo(int invalidId)
+        public async Task GetReportDetailsAsync_WhenReportIdIsZeroOrNegative_ReturnsNullImmediatelyWithoutQueryingRepo(int invalidId)
         {
             // Arrange
             var service = CreateService();
 
             // Action
-            var result = await service.GetReportPopupAsync(invalidId);
+            var result = await service.GetReportDetailsAsync(invalidId);
 
             // Assert
             result.Should().BeNull();
@@ -35,7 +35,7 @@ namespace InfrastructureReportingSystem.Tests.Unit.Authority.MarkerPopup
         }
 
         [Fact]
-        public async Task GetReportPopupAsync_WhenReportNotFound_ReturnsNull()
+        public async Task GetReportDetailsAsync_WhenReportNotFound_ReturnsNull()
         {
             // Arrange
             int reportId = 99;
@@ -46,7 +46,7 @@ namespace InfrastructureReportingSystem.Tests.Unit.Authority.MarkerPopup
             var service = CreateService();
 
             // Action
-            var result = await service.GetReportPopupAsync(reportId);
+            var result = await service.GetReportDetailsAsync(reportId);
 
             // Assert
             result.Should().BeNull();
@@ -54,7 +54,7 @@ namespace InfrastructureReportingSystem.Tests.Unit.Authority.MarkerPopup
         }
 
         [Fact]
-        public async Task GetReportPopupAsync_WhenReportExists_MapsAllPropertiesCorrectly()
+        public async Task GetReportDetailsAsync_WhenReportExists_MapsAllPropertiesCorrectly()
         {
             // Arrange
             int reportId = 42;
@@ -66,8 +66,11 @@ namespace InfrastructureReportingSystem.Tests.Unit.Authority.MarkerPopup
                 Longitude = 31.5678,
                 Description = "Broken street lamp.",
                 UploadedAt = new DateTime(2026, 5, 25, 14, 0, 0, DateTimeKind.Utc),
+                UpdatedAt = new DateTime(2026, 5, 26, 9, 30, 0, DateTimeKind.Utc),
                 Category = new Category { Id = 3, Name = "Lighting" },
                 SubmittedBy = new User { Id = "user-1", Name = "Alice Smith" },
+                AssignedWorkerId = "worker-1",
+                AssignedWorker = new InfraReportingSystem.Domain.Entities.Worker {Id = "worker-1",Name = "Worker Bob"},
                 ReportPics = new List<ReportPic>
                 {
                     new ReportPic { PicId = 1, PicUrl = "url1.jpg" },
@@ -82,27 +85,37 @@ namespace InfrastructureReportingSystem.Tests.Unit.Authority.MarkerPopup
             var service = CreateService();
 
             // Action
-            var result = await service.GetReportPopupAsync(reportId);
+            var result = await service.GetReportDetailsAsync(reportId);
 
             // Assert
             result.Should().NotBeNull();
             result!.ReportId.Should().Be(42);
-            result.Status.Should().Be("InProgress");
-            result.CategoryName.Should().Be("Lighting");
-            result.CreatedAt.Should().Be(report.UploadedAt);
-            result.Photos.Should().HaveCount(2);
-            result.Photos.Should().Equal("url1.jpg", "url2.jpg");
+            result.Title.Should().Be("Broken street lamp.");
             result.Description.Should().Be("Broken street lamp.");
+            result.Address.Should().BeNull();
             result.Latitude.Should().Be(30.1234);
             result.Longitude.Should().Be(31.5678);
-            result.MapUrl.Should().Be("https://www.google.com/maps?q=30.1234,31.5678");
-            result.ReporterName.Should().Be("Alice Smith");
+            result.CategoryName.Should().Be("Lighting");
+            result.Status.Should().Be("InProgress");
+            result.CreatedAt.Should().Be(report.UploadedAt);
+            result.UpdatedAt.Should().Be(report.UpdatedAt);
+
+            result.Photos.Should().HaveCount(2);
+            result.Photos.Select(p => p.ImageUrl).Should().Equal("url1.jpg", "url2.jpg");
+
+            result.ReportedBy.Should().NotBeNull();
+            result.ReportedBy.UserId.Should().Be("user-1");
+            result.ReportedBy.FullName.Should().Be("Alice Smith");
+
+            result.AssignedWorker.Should().NotBeNull();
+            result.AssignedWorker!.UserId.Should().Be("worker-1");
+            result.AssignedWorker.FullName.Should().Be("Worker Bob");
 
             _repositoryMock.Verify(r => r.GetReportAsync(reportId), Times.Once);
         }
 
         [Fact]
-        public async Task GetReportPopupAsync_WhenCategoryOrReporterAreNull_MapsEmptyStringForProperties()
+        public async Task GetReportDetailsAsync_WhenCategoryOrReporterOrWorkerAreNull_MapsEmptyStringOrNullForProperties()
         {
             // Arrange
             int reportId = 42;
@@ -116,6 +129,8 @@ namespace InfrastructureReportingSystem.Tests.Unit.Authority.MarkerPopup
                 UploadedAt = DateTime.UtcNow,
                 Category = null!,
                 SubmittedBy = null!,
+                AssignedWorkerId = null,
+                AssignedWorker = null,
                 ReportPics = new List<ReportPic>()
             };
 
@@ -126,17 +141,48 @@ namespace InfrastructureReportingSystem.Tests.Unit.Authority.MarkerPopup
             var service = CreateService();
 
             // Action
-            var result = await service.GetReportPopupAsync(reportId);
+            var result = await service.GetReportDetailsAsync(reportId);
 
             // Assert
             result.Should().NotBeNull();
             result!.CategoryName.Should().BeEmpty();
-            result.ReporterName.Should().BeEmpty();
+            result.ReportedBy.UserId.Should().BeEmpty();
+            result.ReportedBy.FullName.Should().Be("Unknown");
+            result.AssignedWorker.Should().BeNull();
             result.Photos.Should().BeEmpty();
         }
 
+        [Theory]
+        [InlineData("A short description.", "A short description.")]
+        [InlineData(null, "")]
+        [InlineData("", "")]
+        public async Task GetReportDetailsAsync_ChecksTitleEllipsisTruncation(string? description, string expectedTitle)
+        {
+            // Arrange
+            var report = new Report
+            {
+                Id = 1,
+                Description = description!,
+                UploadedAt = DateTime.UtcNow,
+                Status = ReportStatus.Submitted,
+                ReportPics = new List<ReportPic>()
+            };
+
+            _repositoryMock
+                .Setup(r => r.GetReportAsync(1))
+                .ReturnsAsync(report);
+
+            var service = CreateService();
+
+            // Action
+            var result = await service.GetReportDetailsAsync(1);
+
+            // Assert
+            result!.Title.Should().Be(expectedTitle);
+        }
+
         [Fact]
-        public async Task GetReportPopupAsync_WhenRepositoryThrows_PropagatesException()
+        public async Task GetReportDetailsAsync_WhenRepositoryThrows_PropagatesException()
         {
             // Arrange
             int reportId = 42;
@@ -147,13 +193,13 @@ namespace InfrastructureReportingSystem.Tests.Unit.Authority.MarkerPopup
             var service = CreateService();
 
             // Action & Assert
-            Func<Task> action = async () => await service.GetReportPopupAsync(reportId);
+            Func<Task> action = async () => await service.GetReportDetailsAsync(reportId);
             await action.Should().ThrowAsync<InvalidOperationException>().WithMessage("DB connection failed");
         }
 
-        private AuthorityMarkerPopupService CreateService()
+        private PublicMarkerPopupService CreateService()
         {
-            return new AuthorityMarkerPopupService(_repositoryMock.Object);
+            return new PublicMarkerPopupService(_repositoryMock.Object);
         }
     }
 }
