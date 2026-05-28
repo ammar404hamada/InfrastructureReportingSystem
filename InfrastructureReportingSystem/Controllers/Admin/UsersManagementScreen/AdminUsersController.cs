@@ -1,4 +1,4 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Admin.UsersManagementScreen;
+﻿using InfraReportingSystem.ServiceAbstractions.Users.Admin.UsersManagementScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

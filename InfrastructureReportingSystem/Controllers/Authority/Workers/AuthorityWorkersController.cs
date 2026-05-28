@@ -1,5 +1,4 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Authority;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.Workers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

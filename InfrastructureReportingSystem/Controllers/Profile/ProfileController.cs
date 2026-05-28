@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
-using InfraReportingSystem.ServiceAbstractions.Profile;
-using InfraReportingSystem.Shared.DTOs.Profile;
+using InfraReportingSystem.ServiceAbstractions.Shared.Profile;
+using InfraReportingSystem.Shared.DTOs.Shared.Profile.ViewProfile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

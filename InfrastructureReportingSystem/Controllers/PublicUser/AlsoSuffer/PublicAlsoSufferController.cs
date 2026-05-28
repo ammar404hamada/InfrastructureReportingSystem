@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using InfraReportingSystem.Domain.Entities;
-using InfraReportingSystem.ServiceAbstractions.PublicUser.AlsoSuffer;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.AlsoSuffer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,6 +1,6 @@
 ﻿using InfraReportingSystem.Domain.Entities;
-using InfraReportingSystem.ServiceAbstractions.Worker.CurrentTaskScreen;
-using InfraReportingSystem.Shared.DTOs.Worker.CurrentTaskScreen;
+using InfraReportingSystem.ServiceAbstractions.Users.Worker.CurrentTaskScreen;
+using InfraReportingSystem.Shared.DTOs.UserServices.Worker.CurrentTaskScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

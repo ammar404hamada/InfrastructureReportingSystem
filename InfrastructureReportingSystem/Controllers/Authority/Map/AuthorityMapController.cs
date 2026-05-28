@@ -1,5 +1,5 @@
 ﻿using InfraReportingSystem.Domain.Enums;
-using InfraReportingSystem.ServiceAbstractions.Authority.Map;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.Map;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

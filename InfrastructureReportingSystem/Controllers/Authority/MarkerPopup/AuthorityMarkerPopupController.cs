@@ -1,4 +1,4 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Authority.MarkerPopup;
+﻿using InfraReportingSystem.ServiceAbstractions.Users.Authority.MarkerPopup;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
