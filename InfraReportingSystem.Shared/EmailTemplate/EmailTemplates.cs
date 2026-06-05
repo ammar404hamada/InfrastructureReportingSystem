@@ -5,13 +5,151 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InfraReportingSystem.Shared.EmailTemplate
+namespace InfrastructureReportingSystem.Shared.EmailTemplate
 {
+    /// <summary>
+    /// Static class containing email HTML templates used throughout the application.
+    /// All templates use placeholder tokens like {UserName}, {CODE}, {UserEmail} that are
+    /// replaced at runtime with actual values.
+    /// </summary>
     public static class EmailTemplates
     {
-        public static string OtpEmailTemplate(string UserName, string CODE, string UserEmail) 
-        { 
-            string template = $"<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n  <meta charset=\"UTF-8\" />\r\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n  <title>IRS Verification Email</title>\r\n</head>\r\n\r\n<body style=\"margin:0; padding:0; background-color:#000000; font-family:Arial, Helvetica, sans-serif;\">\r\n\r\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background-color:#000000; padding:40px 0;\">\r\n    <tr>\r\n      <td align=\"center\">\r\n\r\n        <!-- Main Container -->\r\n        <table width=\"700\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\r\n          style=\"background-color:#2b2b2b; border:1px solid #444444; border-radius:20px; overflow:hidden;\">\r\n\r\n          <!-- Header -->\r\n          <tr>\r\n            <td align=\"center\"\r\n              style=\"background-color:#111111; padding:50px 30px 40px 30px;\">\r\n\r\n              <h1 style=\"margin:0; color:#ff9800; font-size:72px; font-weight:bold; letter-spacing:2px;\">\r\n                IRS\r\n              </h1>\r\n\r\n              <p style=\"margin:15px 0 0 0; color:#8a8a8a; font-size:20px; letter-spacing:5px;\">\r\n                INFRASTRUCTURE REPORTING SYSTEM\r\n              </p>\r\n            </td>\r\n          </tr>\r\n\r\n          <!-- Body -->\r\n          <tr>\r\n            <td style=\"padding:50px 55px; color:#ffffff;\">\r\n\r\n              <h2 style=\"margin:0 0 35px 0; font-size:28px; font-weight:normal;\">\r\n                Hi {UserName},\r\n              </h2>\r\n\r\n              <p style=\"margin:0; color:#d0d0d0; font-size:20px; line-height:1.8;\">\r\n                We received a request to verify your identity.\r\n                Use the code below to continue.\r\n                <br />\r\n                Do not share this code with anyone.\r\n              </p>\r\n\r\n              <!-- Verification Box -->\r\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\r\n                style=\"margin-top:40px; background-color:#222222; border:1px solid #4b4b4b; border-radius:16px;\">\r\n\r\n                <tr>\r\n                  <td align=\"center\" style=\"padding:40px 20px 20px 20px;\">\r\n\r\n                    <p style=\"margin:0; color:#9c9c9c; font-size:18px; letter-spacing:4px;\">\r\n                      YOUR VERIFICATION CODE\r\n                    </p>\r\n\r\n                  </td>\r\n                </tr>\r\n\r\n                <tr>\r\n                  <td align=\"center\" style=\"padding:10px 20px;\">\r\n\r\n                    <div style=\"font-size:70px; color:#ff9800; letter-spacing:25px; font-weight:300;\">\r\n                      {CODE}\r\n                    </div>\r\n\r\n                  </td>\r\n                </tr>\r\n\r\n                <tr>\r\n                  <td align=\"center\" style=\"padding:10px 20px 40px 20px;\">\r\n\r\n                    <p style=\"margin:0; color:#a0a0a0; font-size:16px;\">\r\n                      Expires in 10 minutes\r\n                    </p>\r\n\r\n                  </td>\r\n                </tr>\r\n\r\n              </table>\r\n\r\n              <!-- Warning Box -->\r\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\r\n                style=\"margin-top:35px; background-color:#5b4300; border:1px solid #c28b00; border-radius:14px;\">\r\n\r\n                <tr>\r\n                  <td style=\"padding:24px 30px; color:#ffcc66; font-size:18px; line-height:1.7;\">\r\n\r\n                    If you did not request this code, please ignore this email.\r\n                    Your account remains secure.\r\n\r\n                  </td>\r\n                </tr>\r\n\r\n              </table>\r\n\r\n              <!-- Divider -->\r\n              <div style=\"height:1px; background-color:#4a4a4a; margin:50px 0;\"></div>\r\n\r\n              <!-- Footer Text -->\r\n              <p style=\"margin:0; color:#bdbdbd; font-size:18px; line-height:1.8;\">\r\n                This is an automated message from the Infrastructure Reporting System.\r\n                Please do not reply to this email.\r\n              </p>\r\n\r\n            </td>\r\n          </tr>\r\n\r\n          <!-- Bottom Footer -->\r\n          <tr>\r\n            <td align=\"center\"\r\n              style=\"padding:35px 30px; border-top:1px solid #444444; background-color:#232323;\">\r\n\r\n              <p style=\"margin:0; color:#9d9d9d; font-size:16px; line-height:1.8;\">\r\n                © 2025 Infrastructure Reporting System - EELU Graduation Project\r\n                <br />\r\n                This email was sent to {UserEmail}\r\n              </p>\r\n\r\n            </td>\r\n          </tr>\r\n\r\n        </table>\r\n\r\n      </td>\r\n    </tr>\r\n  </table>\r\n\r\n</body>\r\n</html>";
+        /// <summary>
+        /// Generates an OTP (One-Time Password) verification email template.
+        /// </summary>
+        /// <param name="UserName">The recipient's display name (e.g., "Mostafa Ahmed")</param>
+        /// <param name="CODE">The 6-digit verification code to display in the email</param>
+        /// <param name="UserEmail">The recipient's email address, displayed in the footer</param>
+        /// <returns>A formatted HTML email string ready to be sent via SMTP</returns>
+        public static string OtpEmailTemplate(string UserName, string CODE, string UserEmail)
+        {
+            string template = $"""
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                  <meta charset="UTF-8" />
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                  <title>IRS Verification Email</title>
+                </head>
+
+                <body style="margin:0; padding:0; background-color:#000000; font-family:Arial, Helvetica, sans-serif;">
+
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#000000; padding:40px 20px;">
+                    <tr>
+                      <td align="center">
+
+                        <table width="600" cellpadding="0" cellspacing="0" border="0"
+                          style="background-color:#2b2b2b; border:1px solid #444444; border-radius:16px; border-collapse:separate;">
+
+                          <!-- Header -->
+                          <tr>
+                            <td align="center"
+                              style="background-color:#111111; padding:36px 30px 32px 30px; border-radius:16px 16px 0 0;">
+
+                              <div style="margin:0; color:#ff9800; font-size:48px; font-weight:bold; letter-spacing:4px;">
+                                IRS
+                              </div>
+
+                              <p style="margin:10px 0 0 0; color:#8a8a8a; font-size:12px; letter-spacing:4px;">
+                                INFRASTRUCTURE REPORTING SYSTEM
+                              </p>
+                            </td>
+                          </tr>
+
+                          <!-- Body -->
+                          <tr>
+                            <td style="padding:36px 44px; color:#ffffff;">
+
+                              <p style="margin:0 0 16px 0; font-size:22px; font-weight:normal; color:#ffffff;">
+                                Hi {UserName},
+                              </p>
+
+                              <p style="margin:0; color:#d0d0d0; font-size:15px; line-height:1.8;">
+                                We received a request to verify your identity.
+                                Use the code below to continue.
+                                <br />
+                                Do not share this code with anyone.
+                              </p>
+
+                              <!-- Verification Box -->
+                              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                style="margin-top:28px; background-color:#1a1a1a; border:1px solid #3a3a3a; border-radius:12px; border-collapse:separate;">
+
+                                <tr>
+                                  <td align="center" style="padding:28px 20px 8px 20px;">
+                                    <p style="margin:0; color:#9c9c9c; font-size:11px; letter-spacing:4px;">
+                                      YOUR VERIFICATION CODE
+                                    </p>
+                                  </td>
+                                </tr>
+
+                                <tr>
+                                  <td align="center" style="padding:12px 20px;">
+                                    <div style="font-size:48px; color:#ff9800; letter-spacing:14px; font-weight:300;">
+                                      {CODE}
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr>
+                                  <td align="center" style="padding:6px 20px 24px 20px;">
+                                    <p style="margin:0; color:#a0a0a0; font-size:13px;">
+                                      Expires in 10 minutes
+                                    </p>
+                                  </td>
+                                </tr>
+
+                              </table>
+
+                              <!-- Warning Box -->
+                              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                style="margin-top:20px; background-color:#3d2e00; border-left:3px solid #ff9800; border-collapse:separate;">
+
+                                <tr>
+                                  <td style="padding:16px 20px; color:#ffcc66; font-size:14px; line-height:1.7;">
+                                    If you did not request this code, please ignore this email.
+                                    Your account remains secure.
+                                  </td>
+                                </tr>
+
+                              </table>
+
+                              <!-- Divider -->
+                              <div style="height:1px; background-color:#3a3a3a; margin:32px 0;"></div>
+
+                              <!-- Footer Text -->
+                              <p style="margin:0; color:#9a9a9a; font-size:13px; line-height:1.8;">
+                                This is an automated message from the Infrastructure Reporting System.
+                                Please do not reply to this email.
+                              </p>
+
+                            </td>
+                          </tr>
+
+                          <!-- Bottom Footer -->
+                          <tr>
+                            <td align="center"
+                              style="padding:24px 30px; border-top:1px solid #3a3a3a; background-color:#1e1e1e; border-radius:0 0 16px 16px;">
+
+                              <p style="margin:0; color:#6a6a6a; font-size:12px; line-height:1.8;">
+                                © 2026 Infrastructure Reporting System — EELU Graduation Project
+                                <br />
+                                This email was sent to {UserEmail}
+                              </p>
+
+                            </td>
+                          </tr>
+
+                        </table>
+
+                      </td>
+                    </tr>
+                  </table>
+
+                </body>
+                </html>
+                """;
+
             return template;
         }
     }
