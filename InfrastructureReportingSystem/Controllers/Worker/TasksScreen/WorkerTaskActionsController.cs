@@ -1,7 +1,5 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Worker;
-using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
-using InfraReportingSystem.Shared.DTOs.Worker;
-using InfraReportingSystem.Shared.DTOs.Worker.TasksScreen;
+using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksScreen;
+using InfraReportingSystem.Shared.DTOs.UserServices.Worker.TasksScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

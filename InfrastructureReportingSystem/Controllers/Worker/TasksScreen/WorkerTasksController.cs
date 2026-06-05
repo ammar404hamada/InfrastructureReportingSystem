@@ -1,4 +1,4 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
+﻿using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

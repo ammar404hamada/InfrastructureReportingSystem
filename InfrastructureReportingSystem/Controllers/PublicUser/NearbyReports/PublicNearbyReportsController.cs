@@ -1,4 +1,4 @@
-﻿using InfraReportingSystem.ServiceAbstractions.PublicUser.NearbyReports;
+﻿using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.NearbyReports;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InfrastructureReportingSystem.Controllers.PublicUser.NearbyReports

@@ -1,4 +1,4 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Authority.IncomingReports;
+﻿using InfraReportingSystem.ServiceAbstractions.Users.Authority.IncomingReports;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

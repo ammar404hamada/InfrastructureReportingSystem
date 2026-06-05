@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using InfraReportingSystem.Domain.Entities;
-using InfraReportingSystem.ServiceAbstractions.Authority.AssignWorker;
-using InfraReportingSystem.Shared.DTOs.Authority.AssignWorker;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.AssignWorker;
+using InfraReportingSystem.Shared.DTOs.UserServices.Authority.AssignWorker;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

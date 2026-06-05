@@ -1,4 +1,4 @@
-﻿using InfraReportingSystem.ServiceAbstractions.PublicUser.MarkerPopup;
+﻿using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.MarkerPopup;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InfrastructureReportingSystem.Controllers.PublicUser.MarkerPopup

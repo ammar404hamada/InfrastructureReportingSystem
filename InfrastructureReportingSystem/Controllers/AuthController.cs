@@ -1,7 +1,7 @@
 ﻿using Azure;
 using InfraReportingSystem.Domain.Entities;
-using InfraReportingSystem.ServiceAbstractions.Auth;
-using InfraReportingSystem.Shared.DTOs.Auth;
+using InfraReportingSystem.ServiceAbstractions.Shared.Auth;
+using InfraReportingSystem.Shared.DTOs.Shared.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

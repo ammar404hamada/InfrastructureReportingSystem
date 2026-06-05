@@ -1,5 +1,5 @@
 ﻿using InfraReportingSystem.Domain.Enums;
-using InfraReportingSystem.ServiceAbstractions.PublicUser.Map;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.Map;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InfrastructureReportingSystem.Controllers.PublicUser.Map
