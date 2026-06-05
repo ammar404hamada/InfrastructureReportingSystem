@@ -1,9 +1,9 @@
-﻿using InfraReportingSystem.Domain.Entities;
+using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Shared.Auth;
 using InfraReportingSystem.ServiceAbstractions.Shared.Auth;
 using InfraReportingSystem.ServiceAbstractions.Shared.Email;
-using InfraReportingSystem.Shared.EmailTemplate;
+using InfrastructureReportingSystem.Shared.EmailTemplate;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
