@@ -15,6 +15,7 @@ namespace InfrastructureReportingSystem.Controllers {
     {
         private readonly IAuthService _authService;
         private readonly IWebHostEnvironment _environment;
+        
 
         public AuthController(
             IAuthService authService,
@@ -42,6 +43,47 @@ namespace InfrastructureReportingSystem.Controllers {
             if (response.Success)
                 return Ok(response);
             return BadRequest(response);
+        }
+
+        /// <summary>
+        /// Confirms a user's email address.
+        /// </summary>
+        /// <remarks>
+        /// Verifies the email confirmation OTP code, marks the email as confirmed, and activates the user account.
+        /// </remarks>
+        /// <response code="200">The email was confirmed successfully.</response>
+        /// <response code="400">The OTP code is invalid, expired, or the user email was not found.</response>
+        [HttpPost("Confirm-email")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
+        {
+            var result = await _authService.ConfirmEmailAsync(dto);
+
+            if (result)
+                return Ok(new { success = true, message = "Email confirmed successfully." });
+            return BadRequest(new { success = false, message = "Invalid or expired OTP code." });
+        }
+
+        /// <summary>
+        /// Resends the email confirmation OTP code.
+        /// </summary>
+        /// <remarks>
+        /// Generates and emails a new confirmation OTP for an existing user whose email is not already confirmed.
+        /// </remarks>
+        /// <response code="200">A new verification code was sent successfully.</response>
+        /// <response code="400">The email is invalid, the user does not exist, or the account is already confirmed.</response>
+        [HttpPost("resend-confirmation")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ResendConfirmation(
+            [FromBody] ResendConfirmationDto resendConfirmationDto)
+        {
+            var result = await _authService.ResendConfirmationEmailAsync(resendConfirmationDto.Email);
+
+            if (result)
+                return Ok(new { success = true, message = "Verification code sent successfully." });
+            return BadRequest(new { success = false, message = "Invalid email or the account is already confirmed." });
         }
 
         /// <summary>
@@ -113,26 +155,6 @@ namespace InfrastructureReportingSystem.Controllers {
         }
 
         /// <summary>
-        /// Confirms a user's email address.
-        /// </summary>
-        /// <remarks>
-        /// Verifies the email confirmation OTP code, marks the email as confirmed, and activates the user account.
-        /// </remarks>
-        /// <response code="200">The email was confirmed successfully.</response>
-        /// <response code="400">The OTP code is invalid, expired, or the user email was not found.</response>
-        [HttpPost("Confirm-email")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
-        {
-            var result = await _authService.ConfirmEmailAsync(dto);
-
-            if (result)
-                return Ok(new { success = true, message = "Email confirmed successfully." });
-            return BadRequest(new { success = false, message = "Invalid or expired OTP code." });
-        }
-
-        /// <summary>
         /// Sends a password reset OTP code.
         /// </summary>
         /// <remarks>
@@ -149,10 +171,30 @@ namespace InfrastructureReportingSystem.Controllers {
         }
 
         /// <summary>
+        /// Verifies a password reset OTP code.
+        /// </summary>
+        /// <remarks>
+        /// Checks whether the supplied password reset OTP is valid before allowing the client to show the reset password step. This check does not mark the OTP as used.
+        /// </remarks>
+        /// <response code="200">The OTP is valid.</response>
+        /// <response code="400">The user was not found, or the OTP is invalid or expired.</response>
+        [HttpPost("verify-OTP-for-password-reset")]
+        [ProducesResponseType(typeof(ResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> VerifyOtpForPasswordReset([FromBody] VerifyPasswordResetOtpDto verifyPasswordResetOtpDto)
+        {
+            var response = await _authService.VerifyOtpForPasswordResetAsync(verifyPasswordResetOtpDto);
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        /// <summary>
         /// Resets a user's password using an OTP code.
         /// </summary>
         /// <remarks>
-        /// Verifies the password reset OTP, resets the password, and activates inactive Worker or Authority accounts after a successful reset.
+        /// Performs the final password reset step. The OTP is verified again here and marked as used so the reset endpoint cannot be called without a valid code.
         /// </remarks>
         /// <response code="200">The password was reset successfully.</response>
         /// <response code="400">The user was not found, the OTP is invalid or expired, the new password is invalid, or account activation failed.</response>
@@ -169,26 +211,6 @@ namespace InfrastructureReportingSystem.Controllers {
             return BadRequest(response);
         }
 
-        /// <summary>
-        /// Resends the email confirmation OTP code.
-        /// </summary>
-        /// <remarks>
-        /// Generates and emails a new confirmation OTP for an existing user whose email is not already confirmed.
-        /// </remarks>
-        /// <response code="200">A new verification code was sent successfully.</response>
-        /// <response code="400">The email is invalid, the user does not exist, or the account is already confirmed.</response>
-        [HttpPost("resend-confirmation")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ResendConfirmation(
-            [FromBody] ResendConfirmationDto resendConfirmationDto)
-        {
-            var result = await _authService.ResendConfirmationEmailAsync(resendConfirmationDto.Email);
-
-            if (result)
-                return Ok(new { success = true, message = "Verification code sent successfully." });
-            return BadRequest(new { success = false, message = "Invalid email or the account is already confirmed." });
-        }
 
         /// <summary>
         /// Logs out the current authenticated user and close all of his sessions.

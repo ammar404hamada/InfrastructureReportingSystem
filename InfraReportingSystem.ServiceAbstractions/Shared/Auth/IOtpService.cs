@@ -11,6 +11,7 @@ namespace InfraReportingSystem.ServiceAbstractions.Shared.Auth
     public interface IOtpService
     {
         Task GenerateOtp(string userId, OtpPurpose purpose);
+        Task<bool> ValidateOtp(string userId, OtpPurpose purpose, string otpCode);
         Task<bool> VerifyOtp(string userId, OtpPurpose purpose, string otpCode);
     }
 }

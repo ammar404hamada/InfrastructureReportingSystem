@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\InfraReportingSystem.ServiceAbstractions\InfraReportingSystem.ServiceAbstractions.csproj" />
     <ProjectReference Include="..\InfraReportingSystem.Services\InfraReportingSystem.Services.csproj" />
+    <ProjectReference Include="..\InfraReportingSystem.Shared\InfraReportingSystem.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
