@@ -39,7 +39,7 @@ using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.TasksSc
 using InfraReportingSystem.ServiceAbstractions.Shared.Auth;
 using InfraReportingSystem.ServiceAbstractions.Shared.Email;
 using InfraReportingSystem.ServiceAbstractions.Shared.Images;
-using InfraReportingSystem.ServiceAbstractions.Shared.Profile;
+using InfraReportingSystem.ServiceAbstractions.Profile;
 using InfraReportingSystem.ServiceAbstractions.Shared.Profile.ProfileManagement;
 using InfraReportingSystem.ServiceAbstractions.Users.Admin.AuditLogsScreen;
 using InfraReportingSystem.ServiceAbstractions.Users.Admin.UserCreationScreen;
@@ -59,7 +59,7 @@ using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksScreen;
 using InfraReportingSystem.Services.Shared.Auth;
 using InfraReportingSystem.Services.Shared.Email;
 using InfraReportingSystem.Services.Shared.Images;
-using InfraReportingSystem.Services.Shared.Profile;
+using InfraReportingSystem.Services.Profile;
 using InfraReportingSystem.Services.Shared.Profile.ProfileManagement;
 using InfraReportingSystem.Services.Users.Admin.AuditLogsScreen;
 using InfraReportingSystem.Services.Users.Admin.UserCreationScreen;
