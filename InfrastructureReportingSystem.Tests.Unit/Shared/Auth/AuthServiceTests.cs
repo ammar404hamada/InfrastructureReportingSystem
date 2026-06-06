@@ -25,14 +25,38 @@ public class AuthServiceTests
         var dto = CreateRegisterDto();
         _userManagerMock
             .Setup(manager => manager.FindByEmailAsync(dto.Email))
-            .ReturnsAsync(CreateUser(dto.Email));
+            .ReturnsAsync(CreateUser(dto.Email, emailConfirmed: true, status: UserStatus.Active));
 
         var service = CreateService();
 
         var result = await service.RegisterAsync(dto);
 
         result.Success.Should().BeFalse();
-        result.Message.Should().Be("Email already exists.");
+        result.Message.Should().Be("This email already exists.");
+        _userManagerMock.Verify(
+            manager => manager.CreateAsync(It.IsAny<User>(), It.IsAny<string>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task RegisterAsync_WhenExistingUserIsNotConfirmed_ResendsOtpAndReturnsActionCode()
+    {
+        var dto = CreateRegisterDto();
+        var user = CreateUser(dto.Email, emailConfirmed: false, status: UserStatus.Inactive);
+        _userManagerMock
+            .Setup(manager => manager.FindByEmailAsync(dto.Email))
+            .ReturnsAsync(user);
+
+        var service = CreateService();
+
+        var result = await service.RegisterAsync(dto);
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("Please confirm your email first.");
+        result.Code.Should().Be("EMAIL_CONFIRMATION_REQUIRED");
+        _otpServiceMock.Verify(
+            service => service.GenerateOtp(user.Id, OtpPurpose.EmailConfirmation),
+            Times.Once);
         _userManagerMock.Verify(
             manager => manager.CreateAsync(It.IsAny<User>(), It.IsAny<string>()),
             Times.Never);
@@ -184,6 +208,8 @@ public class AuthServiceTests
 
         result.Success.Should().BeFalse();
         result.Message.Should().Be("Invalid password.");
+        result.Code.Should().Be("INVALID_CREDENTIALS");
+        _userManagerMock.Verify(manager => manager.AccessFailedAsync(user), Times.Once);
     }
 
     [Fact]
@@ -204,6 +230,10 @@ public class AuthServiceTests
 
         result.Success.Should().BeFalse();
         result.Message.Should().Be("Please confirm your email first.");
+        result.Code.Should().Be("EMAIL_CONFIRMATION_REQUIRED");
+        _otpServiceMock.Verify(
+            otp => otp.GenerateOtp(user.Id, OtpPurpose.EmailConfirmation),
+            Times.Once);
     }
 
     [Theory]
