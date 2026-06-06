@@ -86,30 +86,67 @@ namespace InfraReportingSystem.Services.Shared.Auth {
                     Message = "User does not exist."
                 };
 
-            if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
+            if (await _userManager.IsLockedOutAsync(user))
                 return new LoginResponseDto
                 {
                     Success = false,
-                    Message = "Invalid password."
+                    Message = "Your account is temporarily locked. Please try again later.",
+                    Code = "ACCOUNT_LOCKED"
                 };
 
-            if (!user.EmailConfirmed || user.Status == UserStatus.Inactive)
+            if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
+            {
+                await _userManager.AccessFailedAsync(user);
+
+                if (await _userManager.IsLockedOutAsync(user))
+                    return new LoginResponseDto
+                    {
+                        Success = false,
+                        Message = "Your account is temporarily locked. Please try again later.",
+                        Code = "ACCOUNT_LOCKED"
+                    };
+
                 return new LoginResponseDto
                 {
                     Success = false,
-                    Message = "Please confirm your email first."
+                    Message = "Invalid password.",
+                    Code = "INVALID_CREDENTIALS"
                 };
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                await _otpService.GenerateOtp(user.Id, OtpPurpose.EmailConfirmation);
+                return new LoginResponseDto
+                {
+                    Success = false,
+                    Message = "Please confirm your email first.",
+                    Code = "EMAIL_CONFIRMATION_REQUIRED"
+                };
+            }
+
+            if (user.Status == UserStatus.Inactive)
+            {
+                return new LoginResponseDto
+                {
+                    Success = false,
+                    Message = "Your account is inactive.",
+                    Code = "ACCOUNT_INACTIVE"
+                };
+            }
             if (user.Status == UserStatus.Suspended)
                 return new LoginResponseDto
                 {
                     Success = false,
-                    Message = "Your account has been suspended."
+                    Message = "Your account has been suspended.",
+                    Code = "ACCOUNT_SUSPENDED"
                 };
             if (user.Status == UserStatus.Locked)
                 return new LoginResponseDto
                 {
                     Success = false,
-                    Message = "Your account is locked."
+                    Message = "Your account is locked.",
+                    Code = "ACCOUNT_LOCKED"
                 };
 
             var userRole = await _userManager.GetRolesAsync(user);
@@ -120,6 +157,7 @@ namespace InfraReportingSystem.Services.Shared.Auth {
             refreshToken.UserId = user.Id;
             user.RefreshTokens ??= new List<RefreshToken>();
             user.RefreshTokens.Add(refreshToken);
+            await _userManager.ResetAccessFailedCountAsync(user);
             await _userManager.UpdateAsync(user);
 
                 return new LoginResponseDto
@@ -140,11 +178,36 @@ namespace InfraReportingSystem.Services.Shared.Auth {
 
         public async Task<RegisterResponseDto> RegisterAsync(RegisterDto registerDto)
         {
-            if (await _userManager.FindByEmailAsync(registerDto.Email) != null)
+            var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
+            if (existingUser != null && !existingUser.EmailConfirmed)
+            {
+                try
+                {
+                    await _otpService.GenerateOtp(existingUser.Id, OtpPurpose.EmailConfirmation);
+                }
+                catch
+                {
+                    return new RegisterResponseDto
+                    {
+                        Success = false,
+                        Message = "The account exists but the verification code could not be sent. Please try again later."
+                    };
+                }
+
                 return new RegisterResponseDto
                 {
                     Success = false,
-                    Message = "Email already exists."
+                    Message = "Please confirm your email first.",
+                    Code = "EMAIL_CONFIRMATION_REQUIRED"
+                };
+
+            } 
+            
+            else if (existingUser != null && existingUser.EmailConfirmed)
+                return new RegisterResponseDto
+                {
+                    Success = false,
+                    Message = "This email already exists."
                 };
 
             var user = new User
