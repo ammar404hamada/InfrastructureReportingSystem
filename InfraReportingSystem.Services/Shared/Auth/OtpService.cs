@@ -3,7 +3,7 @@ using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Shared.Auth;
 using InfraReportingSystem.ServiceAbstractions.Shared.Auth;
 using InfraReportingSystem.ServiceAbstractions.Shared.Email;
-using InfraReportingSystem.Shared.EmailTemplate;
+using InfrastructureReportingSystem.Shared.EmailTemplate;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -84,10 +84,19 @@ namespace InfraReportingSystem.Services.Shared.Auth
             if (otp.OtpCode != otpCode.Trim()) return false;
 
             otp.IsUsed = true;
-            {
-                await _repository.Invalidate(userId, otpPurpose);
-                return true;
-            }
+
+            await _repository.Invalidate(userId, otpPurpose);
+            return true;
+        }
+
+        public async Task<bool> ValidateOtp(string userId, OtpPurpose otpPurpose, string otpCode)
+        {
+            if (string.IsNullOrWhiteSpace(otpCode)) return false;
+
+            OtpVerification? otp = await _repository.FindOtp(userId, otpPurpose);
+            if (otp == null) return false;
+
+            return otp.OtpCode == otpCode.Trim();
         }
 
         private string GenerateCode()

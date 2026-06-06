@@ -206,6 +206,35 @@ namespace InfraReportingSystem.Services.Shared.Auth {
             };
         }
 
+        public async Task<ResponseDto> VerifyOtpForPasswordResetAsync(VerifyPasswordResetOtpDto verifyPasswordResetOtpDto)
+        {
+            var user = await _userManager.FindByEmailAsync(verifyPasswordResetOtpDto.Email);
+            if (user == null)
+            {
+                return new ResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            var isValidOtp = await _otpService.ValidateOtp(user.Id, OtpPurpose.PasswordReset, verifyPasswordResetOtpDto.OtpCode);
+            if (!isValidOtp)
+            {
+                return new ResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid or expired OTP."
+                };
+            }
+
+            return new ResponseDto
+            {
+                Success = true,
+                Message = "OTP is valid."
+            };
+        }
+
         public async Task<ResetPasswordResponseDto> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
         {
             var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
@@ -260,6 +289,8 @@ namespace InfraReportingSystem.Services.Shared.Auth {
                 Message = "Password reset successfully." 
             };
         }
+
+
 
         public async Task<LoginResponseDto> RefreshTokenAsync(string token)
         {
