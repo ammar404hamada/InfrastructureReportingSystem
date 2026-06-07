@@ -80,6 +80,7 @@ namespace InfraReportingSystem.Services.Users.Admin.UserCreationScreen
             newUser.Email = request.Email;
             newUser.PhoneNumber = request.PhoneNumber;
             newUser.Status = UserStatus.Inactive;
+            newUser.EmailConfirmed = true;
 
 
 
