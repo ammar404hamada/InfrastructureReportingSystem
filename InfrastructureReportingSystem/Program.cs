@@ -13,6 +13,7 @@ using InfraReportingSystem.Persistence.Repositories.Users.Authority.Workers;
 using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.AlsoSuffer;
 using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.Map;
 using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.MarkerPopup;
+using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.MyReports;
 using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.NearbyReports;
 using InfraReportingSystem.Persistence.Repositories.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Persistence.Repositories.Users.Worker.TasksHistoryScreen;
@@ -32,6 +33,7 @@ using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Authority.Work
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.AlsoSuffer;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.Map;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.MarkerPopup;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.MyReports;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.NearbyReports;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.TasksHistoryScreen;
@@ -52,6 +54,7 @@ using InfraReportingSystem.ServiceAbstractions.Users.Authority.Workers;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.AlsoSuffer;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.Map;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.MarkerPopup;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.MyReports;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.NearbyReports;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksHistoryScreen;
@@ -72,6 +75,7 @@ using InfraReportingSystem.Services.Users.Authority.Workers;
 using InfraReportingSystem.Services.Users.PublicUser.AlsoSuffer;
 using InfraReportingSystem.Services.Users.PublicUser.Map;
 using InfraReportingSystem.Services.Users.PublicUser.MarkerPopup;
+using InfraReportingSystem.Services.Users.PublicUser.MyReports;
 using InfraReportingSystem.Services.Users.PublicUser.NearbyReports;
 using InfraReportingSystem.Services.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Services.Users.Worker.TasksHistoryScreen;
@@ -243,6 +247,8 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IAuthorityMapService, AuthorityMapService>();
             builder.Services.AddScoped<IAuthorityMarkerPopupRepository, AuthorityMarkerPopupRepository>();
             builder.Services.AddScoped<IAuthorityMarkerPopupService, AuthorityMarkerPopupService>();
+            builder.Services.AddScoped<IPublicUserReportsRepository, PublicUserReportsRepository>();
+            builder.Services.AddScoped<IPublicUserReportsService, PublicUserReportsService>();
 
 
 
