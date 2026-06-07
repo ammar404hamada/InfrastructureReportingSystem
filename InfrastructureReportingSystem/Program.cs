@@ -87,7 +87,7 @@ namespace InfrastructureReportingSystem
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Infra Reporting API", Version = "v1" });
-            
+                c.AddServer(new OpenApiServer { Url = "http://localhost:5000" });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
