@@ -213,6 +213,65 @@ public class AuthServiceTests
     }
 
     [Fact]
+    public async Task LoginAsync_WhenInvalidPasswordLocksAccount_SyncsStatusToLocked()
+    {
+        var dto = CreateLoginDto();
+        var user = CreateUser(dto.Email, emailConfirmed: true, status: UserStatus.Active);
+        _userManagerMock
+            .Setup(manager => manager.FindByEmailAsync(dto.Email))
+            .ReturnsAsync(user);
+        _userManagerMock
+            .Setup(manager => manager.CheckPasswordAsync(user, dto.Password))
+            .ReturnsAsync(false);
+        _userManagerMock
+            .SetupSequence(manager => manager.IsLockedOutAsync(user))
+            .ReturnsAsync(false)
+            .ReturnsAsync(true);
+        _userManagerMock
+            .Setup(manager => manager.UpdateAsync(user))
+            .ReturnsAsync(IdentityResult.Success);
+
+        var service = CreateService();
+
+        var result = await service.LoginAsync(dto);
+
+        result.Success.Should().BeFalse();
+        result.Code.Should().Be("ACCOUNT_LOCKED");
+        user.Status.Should().Be(UserStatus.Locked);
+        _userManagerMock.Verify(manager => manager.UpdateAsync(user), Times.Once);
+    }
+
+    [Fact]
+    public async Task LoginAsync_WhenIdentityLockoutExpired_RestoresStatusToActiveAndAllowsLogin()
+    {
+        var dto = CreateLoginDto();
+        var user = CreateUser(dto.Email, emailConfirmed: true, status: UserStatus.Locked);
+        _userManagerMock
+            .Setup(manager => manager.FindByEmailAsync(dto.Email))
+            .ReturnsAsync(user);
+        _userManagerMock
+            .Setup(manager => manager.IsLockedOutAsync(user))
+            .ReturnsAsync(false);
+        _userManagerMock
+            .Setup(manager => manager.CheckPasswordAsync(user, dto.Password))
+            .ReturnsAsync(true);
+        _userManagerMock
+            .Setup(manager => manager.GetRolesAsync(user))
+            .ReturnsAsync([PublicUserRole]);
+        _userManagerMock
+            .Setup(manager => manager.UpdateAsync(user))
+            .ReturnsAsync(IdentityResult.Success);
+
+        var service = CreateService();
+
+        var result = await service.LoginAsync(dto);
+
+        result.Success.Should().BeTrue();
+        user.Status.Should().Be(UserStatus.Active);
+        _userManagerMock.Verify(manager => manager.UpdateAsync(user), Times.Exactly(2));
+    }
+
+    [Fact]
     public async Task LoginAsync_WhenEmailIsNotConfirmed_ReturnsFailure()
     {
         var dto = CreateLoginDto();
@@ -238,7 +297,6 @@ public class AuthServiceTests
 
     [Theory]
     [InlineData(UserStatus.Suspended, "Your account has been suspended.")]
-    [InlineData(UserStatus.Locked, "Your account is locked.")]
     public async Task LoginAsync_WhenAccountCannotLogin_ReturnsFailure(UserStatus status, string expectedMessage)
     {
         var dto = CreateLoginDto();
@@ -559,7 +617,7 @@ public class AuthServiceTests
     public async Task RefreshTokenAsync_WhenTokenIsInactive_ReturnsFailure()
     {
         const string token = "inactive-refresh-token";
-        var user = CreateUser("mostafa@example.com");
+        var user = CreateUser("mostafa@example.com", emailConfirmed: true, status: UserStatus.Active);
         var refreshToken = new RefreshToken
         {
             Token = token,

@@ -87,24 +87,35 @@ namespace InfraReportingSystem.Services.Shared.Auth {
                 };
 
             if (await _userManager.IsLockedOutAsync(user))
+            {
+                await SyncUserStatusAsync(user, UserStatus.Locked);
                 return new LoginResponseDto
                 {
                     Success = false,
                     Message = "Your account is temporarily locked. Please try again later.",
                     Code = "ACCOUNT_LOCKED"
                 };
+            }
+
+            if (user.Status == UserStatus.Locked)
+            {
+                await SyncUserStatusAsync(user, UserStatus.Active);
+            }
 
             if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
             {
                 await _userManager.AccessFailedAsync(user);
 
                 if (await _userManager.IsLockedOutAsync(user))
+                {
+                    await SyncUserStatusAsync(user, UserStatus.Locked);
                     return new LoginResponseDto
                     {
                         Success = false,
                         Message = "Your account is temporarily locked. Please try again later.",
                         Code = "ACCOUNT_LOCKED"
                     };
+                }
 
                 return new LoginResponseDto
                 {
@@ -368,6 +379,15 @@ namespace InfraReportingSystem.Services.Shared.Auth {
                 };
             }
 
+            if (user.Status != UserStatus.Active)
+            {
+                return new LoginResponseDto
+                {
+                    Success = false,
+                    Message = "This account is not active."
+                };
+            }
+
             var incomeToken = await _refreshTokenRepository.FindRefreshTokenAsync(token);
 
             if (incomeToken is null || !incomeToken.IsActive)
@@ -464,6 +484,15 @@ namespace InfraReportingSystem.Services.Shared.Auth {
                 );
             
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private async Task SyncUserStatusAsync(User user, UserStatus status)
+        {
+            if (user.Status == status)
+                return;
+
+            user.Status = status;
+            await _userManager.UpdateAsync(user);
         }
 
         
