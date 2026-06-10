@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.MyReports;
 using InfraReportingSystem.Shared.DTOs.UserServices.PublicUser.MyReports;
@@ -44,6 +45,18 @@ namespace InfraReportingSystem.Persistence.Repositories.Users.PublicUser.MyRepor
                 .ToListAsync();
 
             return reports;
+        }
+
+        public async Task<Report?> GetUserReportByIdAsync(string userId, int reportId)
+        {
+            return await _context.Reports
+                .FirstOrDefaultAsync(r => r.Id == reportId && r.SubmittedById == userId);
+        }
+
+        public async Task UpdateAsync(Report report)
+        {
+            _context.Reports.Update(report);
+            await _context.SaveChangesAsync();
         }
     }
 }
