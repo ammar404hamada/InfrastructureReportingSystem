@@ -1,5 +1,6 @@
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.MyReports;
+using InfraReportingSystem.Shared.DTOs.Users.PublicUser.MyReports;
 using InfraReportingSystem.Shared.DTOs.UserServices.PublicUser.MyReports;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,12 +21,14 @@ namespace InfrastructureReportingSystem.Controllers.PublicUser.MyReports
         [HttpGet]
         [Tags("PublicUser")]
         [EndpointSummary("GetReportsByUserId")]
-        public async Task<IActionResult> GetReportsByUserId([FromRoute] string userId)
+        public async Task<IActionResult> GetReportsByUserId(
+        [FromRoute] string userId,
+        [FromQuery] PublicUserReportsFilterDto filter)
         {
             if (string.IsNullOrWhiteSpace(userId))
                 return BadRequest(new { message = "userId is required." });
 
-            var reports = await _service.GetReportsByUserIdAsync(userId);
+            var reports = await _service.GetReportsByUserIdAsync(userId, filter);
             return Ok(reports);
         }
 

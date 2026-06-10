@@ -7,7 +7,10 @@ namespace InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser
 {
     public interface IPublicUserReportsRepository
     {
-        Task<IEnumerable<PublicUserReportsDto>> GetReportsByUserIdAsync(string userId);
+        Task<(List<PublicUserReportsDto> items, int totalCount)> GetReportsByUserIdAsync(
+            string userId,
+            int pageNumber,
+            int pageSize);
         Task<Report?> GetUserReportByIdAsync(string userId, int reportId);
         Task UpdateAsync(Report report);
     }
