@@ -32,11 +32,13 @@ public class EmailService : IEmailService
         var portValue = _configuration["EmailSettings:Port"];
         var userName = _configuration["EmailSettings:UserName"];
         var password = _configuration["EmailSettings:Password"];
+        var fromEmail = _configuration["EmailSettings:FromEmail"];
         var displayName = _configuration["EmailSettings:DisplayName"];
 
         if (string.IsNullOrWhiteSpace(host)
             || string.IsNullOrWhiteSpace(userName)
             || string.IsNullOrWhiteSpace(password)
+            || string.IsNullOrWhiteSpace(fromEmail)
             || !int.TryParse(portValue, out var port))
         {
             throw new InvalidOperationException("Email settings are missing or incomplete.");
@@ -53,7 +55,7 @@ public class EmailService : IEmailService
         }
 
         var email = new MimeMessage();
-        email.From.Add(new MailboxAddress(displayName ?? userName, userName));
+        email.From.Add(new MailboxAddress(displayName ?? fromEmail, fromEmail));
         email.To.Add(recipient);
         email.Subject = subject;
         email.Body = new TextPart("html") { Text = body };
@@ -68,8 +70,8 @@ public class EmailService : IEmailService
         }
         catch (MailKit.Security.AuthenticationException ex)
         {
-            _logger.LogError(ex, "SMTP authentication failed for {UserName}. Check EmailSettings:UserName and the Gmail App Password.", userName);
-            throw new InvalidOperationException("Email authentication failed. For Gmail SMTP, EmailSettings:Password must be a 16-character App Password, not the normal Gmail password.", ex);
+            _logger.LogError(ex, "SMTP authentication failed for {UserName}. Check EmailSettings:UserName and EmailSettings:Password.", userName);
+            throw new InvalidOperationException("Email authentication failed. Check your SMTP username and SMTP key/password.", ex);
         }
         catch (SmtpCommandException ex)
         {
