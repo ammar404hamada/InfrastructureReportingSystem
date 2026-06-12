@@ -1,4 +1,4 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Authority.MarkerPopup;
+﻿using InfraReportingSystem.ServiceAbstractions.Users.Authority.MarkerPopup;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +17,8 @@ namespace InfrastructureReportingSystem.Controllers.Authority.MarkerPopup
         }
 
         [HttpGet("{reportId:int}/popup")]
+        [Tags("Authority")]
+        [EndpointSummary("GetReportMapPopup")]
         public async Task<IActionResult> GetReportPopup(int reportId)
         {
             var result = await _popupService.GetReportPopupAsync(reportId);

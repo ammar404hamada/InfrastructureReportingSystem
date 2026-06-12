@@ -23,7 +23,7 @@ namespace InfraReportingSystem.Persistence.Data
         public DbSet<ReportPic> ReportPics { get; set; }
         public DbSet<AuditLog> AuditLog { get; set; }
         public DbSet<OtpVerification> OtpVerifications { get; set; }
-
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ReportAffectedUser> ReportAffectedUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,76 +1,90 @@
-using System.Text;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
-using InfraReportingSystem.Persistence.Repositories.Admin.AuditLogsScreen;
-using InfraReportingSystem.Persistence.Repositories.Admin.UsersManagementScreen;
-using InfraReportingSystem.Persistence.Repositories.Auth;
-using InfraReportingSystem.Persistence.Repositories.Authority.AssignWorker;
-using InfraReportingSystem.Persistence.Repositories.Authority.IncomingReports;
-using InfraReportingSystem.Persistence.Repositories.Authority.Map;
-using InfraReportingSystem.Persistence.Repositories.Authority.MarkerPopup;
-using InfraReportingSystem.Persistence.Repositories.Authority.Workers;
-using InfraReportingSystem.Persistence.Repositories.PublicUser.AlsoSuffer;
-using InfraReportingSystem.Persistence.Repositories.PublicUser.Map;
-using InfraReportingSystem.Persistence.Repositories.PublicUser.MarkerPopup;
-using InfraReportingSystem.Persistence.Repositories.PublicUser.NearbyReports;
-using InfraReportingSystem.Persistence.Repositories.Worker.CurrentTaskScreen;
-using InfraReportingSystem.Persistence.Repositories.Worker.TasksHistoryScreen;
-using InfraReportingSystem.Persistence.Repositories.Worker.TasksScreen;
+using InfraReportingSystem.Persistence.Repositories.Shared.Auth;
+using InfraReportingSystem.Persistence.Repositories.Shared.Profile;
+using InfraReportingSystem.Persistence.Repositories.Shared.Profile.ProfileManagement;
+using InfraReportingSystem.Persistence.Repositories.Users.Admin.AuditLogsScreen;
+using InfraReportingSystem.Persistence.Repositories.Users.Admin.UsersManagementScreen;
+using InfraReportingSystem.Persistence.Repositories.Users.Authority.AssignWorker;
+using InfraReportingSystem.Persistence.Repositories.Users.Authority.IncomingReports;
+using InfraReportingSystem.Persistence.Repositories.Users.Authority.Map;
+using InfraReportingSystem.Persistence.Repositories.Users.Authority.MarkerPopup;
+using InfraReportingSystem.Persistence.Repositories.Users.Authority.Workers;
+using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.AlsoSuffer;
+using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.Map;
+using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.MarkerPopup;
+using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.NearbyReports;
+using InfraReportingSystem.Persistence.Repositories.Users.Worker.CurrentTaskScreen;
+using InfraReportingSystem.Persistence.Repositories.Users.Worker.TasksHistoryScreen;
+using InfraReportingSystem.Persistence.Repositories.Users.Worker.TasksScreen;
 using InfraReportingSystem.Persistence.Seed;
-using InfraReportingSystem.ServiceAbstractions.Admin.AuditLogsScreen;
-using InfraReportingSystem.ServiceAbstractions.Admin.UserCreationScreen;
-using InfraReportingSystem.ServiceAbstractions.Admin.UsersManagementScreen;
-using InfraReportingSystem.ServiceAbstractions.Auth;
-using InfraReportingSystem.ServiceAbstractions.Authority;
-using InfraReportingSystem.ServiceAbstractions.Authority.AssignWorker;
-using InfraReportingSystem.ServiceAbstractions.Authority.IncomingReports;
-using InfraReportingSystem.ServiceAbstractions.Authority.Map;
-using InfraReportingSystem.ServiceAbstractions.Authority.MarkerPopup;
-using InfraReportingSystem.ServiceAbstractions.Email;
-using InfraReportingSystem.ServiceAbstractions.PublicUser.AlsoSuffer;
-using InfraReportingSystem.ServiceAbstractions.PublicUser.Map;
-using InfraReportingSystem.ServiceAbstractions.PublicUser.MarkerPopup;
-using InfraReportingSystem.ServiceAbstractions.PublicUser.NearbyReports;
-using InfraReportingSystem.ServiceAbstractions.Repositories;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.AuditLogsScreen;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Admin.UsersManagementScreen;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Auth;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.AssignWorker;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Map;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.MarkerPopup;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
-using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.AlsoSuffer;
-using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.Map;
-using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.MarkerPopup;
-using InfraReportingSystem.ServiceAbstractions.Repositories.PublicUser.NearbyReports;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.CurrentTaskScreen;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksHistoryScreen;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Worker.TasksScreen;
-using InfraReportingSystem.ServiceAbstractions.Worker.CurrentTaskScreen;
-using InfraReportingSystem.ServiceAbstractions.Worker.TasksHistoryScreen;
-using InfraReportingSystem.ServiceAbstractions.Worker.TasksScreen;
-using InfraReportingSystem.Services.Admin.AuditLogsScreen;
-using InfraReportingSystem.Services.Admin.UserCreationScreen;
-using InfraReportingSystem.Services.Admin.UsersManagementScreen;
-using InfraReportingSystem.Services.Auth;
-using InfraReportingSystem.Services.Authority;
-using InfraReportingSystem.Services.Authority.AssignWorker;
-using InfraReportingSystem.Services.Authority.IncomingReports;
-using InfraReportingSystem.Services.Authority.Map;
-using InfraReportingSystem.Services.Authority.MarkerPopup;
-using InfraReportingSystem.Services.Email;
-using InfraReportingSystem.Services.PublicUser.AlsoSuffer;
-using InfraReportingSystem.Services.PublicUser.Map;
-using InfraReportingSystem.Services.PublicUser.MarkerPopup;
-using InfraReportingSystem.Services.PublicUser.NearbyReports;
-using InfraReportingSystem.Services.Worker.CurrentTaskScreen;
-using InfraReportingSystem.Services.Worker.TasksHistoryScreen;
-using InfraReportingSystem.Services.Worker.TasksScreen;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Shared;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Shared.Auth;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Shared.Profile;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Shared.Profile.ProfileManagement;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Admin.AuditLogsScreen;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Admin.UsersManagementScreen;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Authority.AssignWorker;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Authority.IncomingReports;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Authority.Map;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Authority.MarkerPopup;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Authority.Workers;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.AlsoSuffer;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.Map;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.MarkerPopup;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.NearbyReports;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.CurrentTaskScreen;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.TasksHistoryScreen;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.TasksScreen;
+using InfraReportingSystem.ServiceAbstractions.Shared.Auth;
+using InfraReportingSystem.ServiceAbstractions.Shared.Email;
+using InfraReportingSystem.ServiceAbstractions.Shared.Images;
+using InfraReportingSystem.ServiceAbstractions.Profile;
+using InfraReportingSystem.ServiceAbstractions.Shared.Profile.ProfileManagement;
+using InfraReportingSystem.ServiceAbstractions.Users.Admin.AuditLogsScreen;
+using InfraReportingSystem.ServiceAbstractions.Users.Admin.UserCreationScreen;
+using InfraReportingSystem.ServiceAbstractions.Users.Admin.UsersManagementScreen;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.AssignWorker;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.IncomingReports;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.Map;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.MarkerPopup;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.Workers;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.AlsoSuffer;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.Map;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.MarkerPopup;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.NearbyReports;
+using InfraReportingSystem.ServiceAbstractions.Users.Worker.CurrentTaskScreen;
+using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksHistoryScreen;
+using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksScreen;
+using InfraReportingSystem.Services.Shared.Auth;
+using InfraReportingSystem.Services.Shared.Email;
+using InfraReportingSystem.Services.Shared.Images;
+using InfraReportingSystem.Services.Profile;
+using InfraReportingSystem.Services.Shared.Profile.ProfileManagement;
+using InfraReportingSystem.Services.Users.Admin.AuditLogsScreen;
+using InfraReportingSystem.Services.Users.Admin.UserCreationScreen;
+using InfraReportingSystem.Services.Users.Admin.UsersManagementScreen;
+using InfraReportingSystem.Services.Users.Authority.AssignWorker;
+using InfraReportingSystem.Services.Users.Authority.IncomingReports;
+using InfraReportingSystem.Services.Users.Authority.Map;
+using InfraReportingSystem.Services.Users.Authority.MarkerPopup;
+using InfraReportingSystem.Services.Users.Authority.Workers;
+using InfraReportingSystem.Services.Users.PublicUser.AlsoSuffer;
+using InfraReportingSystem.Services.Users.PublicUser.Map;
+using InfraReportingSystem.Services.Users.PublicUser.MarkerPopup;
+using InfraReportingSystem.Services.Users.PublicUser.NearbyReports;
+using InfraReportingSystem.Services.Users.Worker.CurrentTaskScreen;
+using InfraReportingSystem.Services.Users.Worker.TasksHistoryScreen;
+using InfraReportingSystem.Services.Users.Worker.TasksScreen;
+using InfraReportingSystem.Shared.Settings;
+using InfrastructureReportingSystem.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace InfrastructureReportingSystem
 {
@@ -80,14 +94,31 @@ namespace InfrastructureReportingSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.Limits.MaxRequestBodySize = 10 * 1024 * 1024;
+            });
+
+
             // Add services to the container.
             builder.Services.AddControllers();
+
+            builder.Services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 10485760;
+            });
+
 
             // add mybelove swagger
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Infra Reporting API", Version = "v1" });
-                c.AddServer(new OpenApiServer { Url = "http://localhost:5000" });
+                var xmlFile = $"{typeof(Program).Assembly.GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+                c.OperationFilter<AuthResponseExamplesOperationFilter>();
+            
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -130,6 +161,9 @@ namespace InfrastructureReportingSystem
                 options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = false;
                 options.SignIn.RequireConfirmedEmail = true;
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                options.Lockout.AllowedForNewUsers = true;
             })
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
@@ -161,6 +195,11 @@ namespace InfrastructureReportingSystem
             });
 
             // Dependency Injection Registration
+            builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+            builder.Services.AddScoped<IImageService, ImageService>();
+            builder.Services.AddScoped<IProfileManagementRepository, ProfileManagementRepository>();
+            builder.Services.AddScoped<IProfileManagementService, ProfileManagementService>();
+
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IWorkerTasksRepository, WorkerTasksRepository>();
@@ -195,6 +234,11 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IPublicNearbyReportsService, PublicNearbyReportsService>();
             builder.Services.AddScoped<IPublicAlsoSufferRepository, PublicAlsoSufferRepository>();
             builder.Services.AddScoped<IPublicAlsoSufferService, PublicAlsoSufferService>();
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+
+            
             builder.Services.AddScoped<IAuthorityMapRepository, AuthorityMapRepository>();
             builder.Services.AddScoped<IAuthorityMapService, AuthorityMapService>();
             builder.Services.AddScoped<IAuthorityMarkerPopupRepository, AuthorityMarkerPopupRepository>();
@@ -211,7 +255,8 @@ namespace InfrastructureReportingSystem
                 {
                     policy.WithOrigins("http://localhost:4200")
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                 });
             });
 

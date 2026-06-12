@@ -1,5 +1,5 @@
 ﻿using InfraReportingSystem.Domain.Enums;
-using InfraReportingSystem.ServiceAbstractions.Authority.Map;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.Map;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,8 +18,10 @@ namespace InfrastructureReportingSystem.Controllers.Authority.Map
         }
 
         [HttpGet]
+        [Tags("Authority")]
+        [EndpointSummary("GetAuthorityMapReports")]
         public async Task<IActionResult> GetMapReports(
-            [FromQuery] int? categoryId,
+             [FromQuery] int? categoryId,
             [FromQuery] string? status)
         {
             ReportStatus? parsedStatus = null;

@@ -1,5 +1,5 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Admin.AuditLogsScreen;
-using InfraReportingSystem.Shared.DTOs.Admin.AuditLogsScreen;
+﻿using InfraReportingSystem.ServiceAbstractions.Users.Admin.AuditLogsScreen;
+using InfraReportingSystem.Shared.DTOs.UserServices.Admin.AuditLogsScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

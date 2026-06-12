@@ -1,5 +1,5 @@
 ﻿using InfraReportingSystem.Domain.Entities;
-using InfraReportingSystem.ServiceAbstractions.Worker.TasksHistoryScreen;
+using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksHistoryScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

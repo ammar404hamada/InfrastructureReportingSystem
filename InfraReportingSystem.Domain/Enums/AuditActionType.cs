@@ -14,6 +14,7 @@ namespace InfraReportingSystem.Domain.Enums
         LoginFailed = 2,
         Logout = 3,
         PasswordReset = 4,
+        PasswordChanged = 23,
 
         // Account actions
         AccountCreated = 5,

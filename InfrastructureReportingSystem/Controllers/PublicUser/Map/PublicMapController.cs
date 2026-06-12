@@ -1,5 +1,5 @@
 ﻿using InfraReportingSystem.Domain.Enums;
-using InfraReportingSystem.ServiceAbstractions.PublicUser.Map;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.Map;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InfrastructureReportingSystem.Controllers.PublicUser.Map
@@ -16,6 +16,8 @@ namespace InfrastructureReportingSystem.Controllers.PublicUser.Map
         }
 
         [HttpGet]
+        [Tags("PublicUser")]
+        [EndpointSummary("GetPublicMapReports")]
         public async Task<IActionResult> GetMapReports(
             [FromQuery] int? categoryId,
             [FromQuery] string? status)

@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using InfraReportingSystem.Domain.Entities;
-using InfraReportingSystem.ServiceAbstractions.Authority.AssignWorker;
-using InfraReportingSystem.Shared.DTOs.Authority.AssignWorker;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.AssignWorker;
+using InfraReportingSystem.Shared.DTOs.UserServices.Authority.AssignWorker;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +20,8 @@ namespace InfrastructureReportingSystem.Controllers.Authority.AssignWorker
         }
 
         [HttpPost("{reportId:int}/assign-worker")]
+        [Tags("Authority")]
+        [EndpointSummary("AssignWorkerToReport")]
         public async Task<IActionResult> AssignWorker(
             int reportId,
             [FromBody] AssignWorkerDto dto)

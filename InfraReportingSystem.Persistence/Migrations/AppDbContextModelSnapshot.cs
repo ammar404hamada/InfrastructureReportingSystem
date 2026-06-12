@@ -133,6 +133,39 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.ToTable("OtpVerifications");
                 });
 
+            modelBuilder.Entity("InfraReportingSystem.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RevokedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.Report", b =>
                 {
                     b.Property<int>("Id")
@@ -531,6 +564,17 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("InfraReportingSystem.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("InfraReportingSystem.Domain.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("InfraReportingSystem.Domain.Entities.Report", b =>
                 {
                     b.HasOne("InfraReportingSystem.Domain.Entities.Authority", "AssignedByAuthority")
@@ -664,6 +708,8 @@ namespace InfraReportingSystem.Persistence.Migrations
                     b.Navigation("AuditLogs");
 
                     b.Navigation("OtpVerifications");
+
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("SubmittedReports");
                 });

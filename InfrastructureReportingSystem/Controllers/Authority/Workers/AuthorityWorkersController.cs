@@ -1,5 +1,4 @@
-﻿using InfraReportingSystem.ServiceAbstractions.Authority;
-using InfraReportingSystem.ServiceAbstractions.Repositories.Authority.Workers;
+using InfraReportingSystem.ServiceAbstractions.Users.Authority.Workers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,13 +20,12 @@ namespace InfrastructureReportingSystem.Controllers.Authority.Workers
             _logger = logger;
         }
 
-        /// <summary>
-        /// Returns a paginated list of active workers for use in assignment dropdowns.
-        /// </summary>
         /// <param name="search">Optional search across name, email, and phone number.</param>
         /// <param name="pageNumber">1-based page index. Defaults to 1.</param>
         /// <param name="pageSize">Items per page (1–100). Defaults to 50.</param>
         [HttpGet("workers")]
+        [Tags("Authority")]
+        [EndpointSummary("GetWorkersList")]
         public async Task<IActionResult> GetWorkers(
             [FromQuery] string? search,
             [FromQuery] int pageNumber = 1,

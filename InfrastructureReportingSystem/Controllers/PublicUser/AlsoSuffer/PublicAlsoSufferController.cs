@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using InfraReportingSystem.Domain.Entities;
-using InfraReportingSystem.ServiceAbstractions.PublicUser.AlsoSuffer;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.AlsoSuffer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +19,8 @@ namespace InfrastructureReportingSystem.Controllers.PublicUser.AlsoSuffer
         }
 
         [HttpPost("{reportId:int}/also-suffer")]
+        [Tags("PublicUser")]
+        [EndpointSummary("ConfirmAlsoSuffering")]
         public async Task<IActionResult> ConfirmAlsoSuffer(int reportId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
