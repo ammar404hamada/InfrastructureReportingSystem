@@ -62,7 +62,8 @@ namespace InfrastructureReportingSystem.Tests.Unit.Shared.Email
                 ["EmailSettings:Host"] = host,
                 ["EmailSettings:Port"] = port,
                 ["EmailSettings:UserName"] = user,
-                ["EmailSettings:Password"] = pass
+                ["EmailSettings:Password"] = pass,
+                ["EmailSettings:FromEmail"] = "sender@example.com"
             };
             var config = new ConfigurationBuilder().AddInMemoryCollection(configValues).Build();
             var service = new EmailService(config, _loggerMock.Object);
@@ -82,7 +83,8 @@ namespace InfrastructureReportingSystem.Tests.Unit.Shared.Email
                 ["EmailSettings:Host"] = "localhost",
                 ["EmailSettings:Port"] = "25",
                 ["EmailSettings:UserName"] = "test",
-                ["EmailSettings:Password"] = "test"
+                ["EmailSettings:Password"] = "test",
+                ["EmailSettings:FromEmail"] = "sender@example.com"
             };
             var config = new ConfigurationBuilder().AddInMemoryCollection(configValues).Build();
             var service = new EmailService(config, _loggerMock.Object);
@@ -103,7 +105,8 @@ namespace InfrastructureReportingSystem.Tests.Unit.Shared.Email
                 ["EmailSettings:Host"] = "127.0.0.1",
                 ["EmailSettings:Port"] = "54321", 
                 ["EmailSettings:UserName"] = "user",
-                ["EmailSettings:Password"] = "pass"
+                ["EmailSettings:Password"] = "pass",
+                ["EmailSettings:FromEmail"] = "sender@example.com"
             };
             var config = new ConfigurationBuilder().AddInMemoryCollection(configValues).Build();
             var service = new EmailService(config, _loggerMock.Object);
