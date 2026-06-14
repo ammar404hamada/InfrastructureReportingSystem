@@ -22,9 +22,7 @@ namespace InfraReportingSystem.Services.AI
         public async Task<string> GenerateDescriptionAsync(Stream imageStream, string fileName)
         {
             using var content = new MultipartFormDataContent();
-
             var fileContent = new StreamContent(imageStream);
-
             fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
             content.Add(fileContent, "file", fileName);
 
@@ -35,15 +33,13 @@ namespace InfraReportingSystem.Services.AI
             using var document = JsonDocument.Parse(responseBody);
             var root = document.RootElement;
 
-            if (!root.TryGetProperty("description", out var descriptionElement))
+            if (!root.TryGetProperty("image_description", out var descriptionElement))
                 throw new InvalidOperationException(
-                    $"Description AI response did not contain 'description' field. Response: {responseBody}");
+                    $"Description AI unexpected response: {responseBody}");
 
             return descriptionElement.GetString()
-
                 ?? throw new InvalidOperationException(
                     "Description AI returned a null description value.");
-
         }
     }
 }

@@ -22,7 +22,6 @@ namespace InfraReportingSystem.Services.AI
         public async Task<string> SuggestCategoryAsync(Stream imageStream, string fileName)
         {
             using var content = new MultipartFormDataContent();
-
             var fileContent = new StreamContent(imageStream);
             fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
             content.Add(fileContent, "file", fileName);
@@ -31,17 +30,16 @@ namespace InfraReportingSystem.Services.AI
             response.EnsureSuccessStatusCode();
 
             var responseBody = await response.Content.ReadAsStringAsync();
-
             using var document = JsonDocument.Parse(responseBody);
             var root = document.RootElement;
 
-            if (!root.TryGetProperty("category", out var categoryElement))
+            if (!root.TryGetProperty("prediction", out var predictionElement))
                 throw new InvalidOperationException(
-                    $"Category AI response did not contain 'category' field. Response: {responseBody}");
+                    $"Category AI unexpected response: {responseBody}");
 
-            return categoryElement.GetString()
+            return predictionElement.GetString()
                 ?? throw new InvalidOperationException(
-                    "Category AI returned a null category value.");
+                    "Category AI returned a null prediction value.");
         }
     }
 }
