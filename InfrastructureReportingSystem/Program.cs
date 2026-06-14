@@ -132,7 +132,8 @@ namespace InfrastructureReportingSystem
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
                 c.OperationFilter<AuthResponseExamplesOperationFilter>();
-            
+                
+
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
