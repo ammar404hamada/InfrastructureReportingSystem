@@ -1,3 +1,5 @@
+using System.Text;
+using InfraReportingSystem.Domain.AI;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.Persistence.Repositories.Shared.Auth;
@@ -38,6 +40,7 @@ using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.Map
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.MarkerPopup;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.MyReports;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.NearbyReports;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.SubmitReport;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.TasksScreen;
@@ -59,9 +62,11 @@ using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.Map;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.MarkerPopup;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.MyReports;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.NearbyReports;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.SubmitReport;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksScreen;
+using InfraReportingSystem.Services.AI;
 using InfraReportingSystem.Services.Profile;
 using InfraReportingSystem.Services.Shared.Auth;
 using InfraReportingSystem.Services.Shared.Email;
@@ -92,7 +97,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 namespace InfrastructureReportingSystem
 {
@@ -126,7 +130,8 @@ namespace InfrastructureReportingSystem
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
                 c.OperationFilter<AuthResponseExamplesOperationFilter>();
-            
+                
+
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -255,6 +260,21 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IAuthorityMarkerPopupService, AuthorityMarkerPopupService>();
             builder.Services.AddScoped<IPublicUserReportsRepository, PublicUserReportsRepository>();
             builder.Services.AddScoped<IPublicUserReportsService, PublicUserReportsService>();
+
+            builder.Services.AddScoped<IPublicSubmitReportRepository, PublicSubmitReportRepository>();
+            builder.Services.AddScoped<IPublicSubmitReportService, PublicSubmitReportService>();
+
+            builder.Services.AddHttpClient<ICategoryAIClient, CategoryAIClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://ashraf101-image-classifier.hf.space");
+                client.Timeout = TimeSpan.FromSeconds(60);
+            });
+
+            builder.Services.AddHttpClient<IDescriptionAIClient, DescriptionAIClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://ashraf101-image-analyzer-api.hf.space");
+                client.Timeout = TimeSpan.FromSeconds(60);
+            });
 
 
 
