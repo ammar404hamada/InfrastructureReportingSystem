@@ -1,3 +1,5 @@
+using System.Text;
+using InfraReportingSystem.Domain.AI;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.Persistence.Repositories.Shared.Auth;
@@ -16,6 +18,7 @@ using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.Map;
 using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.MarkerPopup;
 using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.MyReports;
 using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.NearbyReports;
+using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.SubmitReport;
 using InfraReportingSystem.Persistence.Repositories.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Persistence.Repositories.Users.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Persistence.Repositories.Users.Worker.TasksScreen;
@@ -38,6 +41,7 @@ using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.Map
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.MarkerPopup;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.MyReports;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.NearbyReports;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.SubmitReport;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.TasksScreen;
@@ -59,9 +63,11 @@ using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.Map;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.MarkerPopup;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.MyReports;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.NearbyReports;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.SubmitReport;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksScreen;
+using InfraReportingSystem.Services.AI;
 using InfraReportingSystem.Services.Profile;
 using InfraReportingSystem.Services.Shared.Auth;
 using InfraReportingSystem.Services.Shared.Email;
@@ -81,6 +87,7 @@ using InfraReportingSystem.Services.Users.PublicUser.Map;
 using InfraReportingSystem.Services.Users.PublicUser.MarkerPopup;
 using InfraReportingSystem.Services.Users.PublicUser.MyReports;
 using InfraReportingSystem.Services.Users.PublicUser.NearbyReports;
+using InfraReportingSystem.Services.Users.PublicUser.SubmitReport;
 using InfraReportingSystem.Services.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Services.Users.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Services.Users.Worker.TasksScreen;
@@ -92,7 +99,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 namespace InfrastructureReportingSystem
 {
@@ -255,6 +261,21 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IAuthorityMarkerPopupService, AuthorityMarkerPopupService>();
             builder.Services.AddScoped<IPublicUserReportsRepository, PublicUserReportsRepository>();
             builder.Services.AddScoped<IPublicUserReportsService, PublicUserReportsService>();
+
+            builder.Services.AddScoped<IPublicSubmitReportRepository, PublicSubmitReportRepository>();
+            builder.Services.AddScoped<IPublicSubmitReportService, PublicSubmitReportService>();
+
+            builder.Services.AddHttpClient<ICategoryAIClient, CategoryAIClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://ashraf101-image-classifier.hf.space");
+                client.Timeout = TimeSpan.FromSeconds(60);
+            });
+
+            builder.Services.AddHttpClient<IDescriptionAIClient, DescriptionAIClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://ashraf101-image-analyzer-api.hf.space");
+                client.Timeout = TimeSpan.FromSeconds(60);
+            });
 
 
 
