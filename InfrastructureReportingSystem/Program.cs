@@ -62,6 +62,12 @@ using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.NearbyReports;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksScreen;
+using InfraReportingSystem.Domain.AI;
+using InfraReportingSystem.Services.AI;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.SubmitReport;
+using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.SubmitReport;
+using InfraReportingSystem.Persistence.Repositories.Users.PublicUser.SubmitReport;
+using InfraReportingSystem.Services.Users.PublicUser.SubmitReport;
 using InfraReportingSystem.Services.Profile;
 using InfraReportingSystem.Services.Shared.Auth;
 using InfraReportingSystem.Services.Shared.Email;
@@ -255,6 +261,21 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IAuthorityMarkerPopupService, AuthorityMarkerPopupService>();
             builder.Services.AddScoped<IPublicUserReportsRepository, PublicUserReportsRepository>();
             builder.Services.AddScoped<IPublicUserReportsService, PublicUserReportsService>();
+
+            builder.Services.AddScoped<IPublicSubmitReportRepository, PublicSubmitReportRepository>();
+            builder.Services.AddScoped<IPublicSubmitReportService, PublicSubmitReportService>();
+
+            builder.Services.AddHttpClient<ICategoryAIClient, CategoryAIClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://ashraf101-image-classifier.hf.space");
+                client.Timeout = TimeSpan.FromSeconds(60);
+            });
+
+            builder.Services.AddHttpClient<IDescriptionAIClient, DescriptionAIClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://ashraf101-image-analyzer-api.hf.space");
+                client.Timeout = TimeSpan.FromSeconds(60);
+            });
 
 
 
