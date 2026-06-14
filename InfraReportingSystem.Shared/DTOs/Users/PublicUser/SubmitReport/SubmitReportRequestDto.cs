@@ -8,10 +8,6 @@ namespace InfraReportingSystem.Shared.DTOs.Users.PublicUser.SubmitReport
 {
     public class SubmitReportRequestDto
     {
-<<<<<<< HEAD
-=======
-        public IFormFile Image { get; set; } = null!;
->>>>>>> 63ae425cacb8f085d875228d89a74a932d83f2df
         public int CategoryId { get; set; }
         public string Description { get; set; } = string.Empty;
         public double Latitude { get; set; }
