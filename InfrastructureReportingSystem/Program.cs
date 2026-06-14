@@ -67,7 +67,6 @@ using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.SubmitReport;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksHistoryScreen;
 using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksScreen;
-using InfraReportingSystem.Services.AI;
 using InfraReportingSystem.Services.Profile;
 using InfraReportingSystem.Services.Shared.Auth;
 using InfraReportingSystem.Services.Shared.Email;

@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+<<<<<<< HEAD
 using Microsoft.EntityFrameworkCore;
+=======
+>>>>>>> 63ae425cacb8f085d875228d89a74a932d83f2df
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Persistence.Data;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.SubmitReport;
@@ -38,7 +41,11 @@ namespace InfraReportingSystem.Persistence.Repositories.Users.PublicUser.SubmitR
 
         public async Task AddAuditLogAsync(AuditLog auditLog)
         {
+<<<<<<< HEAD
             await _context.AuditLog.AddAsync(auditLog);
+=======
+            await _context.AuditLogs.AddAsync(auditLog);
+>>>>>>> 63ae425cacb8f085d875228d89a74a932d83f2df
         }
 
         public async Task SaveChangesAsync()
