@@ -1,4 +1,4 @@
-﻿using InfraReportingSystem.Domain.AI;
+using InfraReportingSystem.Domain.AI;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.SubmitReport;
@@ -10,49 +10,37 @@ public class PublicSubmitReportService : IPublicSubmitReportService
 {
     private readonly IPublicSubmitReportRepository _repository;
     private readonly IImageService _imageService;
-    private readonly ICategoryAIClient _categoryAIClient;
-    private readonly IDescriptionAIClient _descriptionAIClient;
+    private readonly IAnalyzeImageAIClient _analyzeImageAIClient;
 
     public PublicSubmitReportService(
         IPublicSubmitReportRepository repository,
         IImageService imageService,
-        ICategoryAIClient categoryAIClient,
-        IDescriptionAIClient descriptionAIClient)
+        IAnalyzeImageAIClient analyzeImageAIClient)
     {
         _repository = repository;
         _imageService = imageService;
-        _categoryAIClient = categoryAIClient;
-        _descriptionAIClient = descriptionAIClient;
+        _analyzeImageAIClient = analyzeImageAIClient;
     }
 
-    public async Task<CategorySuggestionDto> GenerateCategoryAsync(
-        Stream imageStream, string fileName)
+    public async Task<List<AISuggestionDto>> AnalyzeImagesAsync(IEnumerable<(Stream Stream, string FileName)> images)
     {
-        var suggestedCategory = await _categoryAIClient
-            .SuggestCategoryAsync(imageStream, fileName);
-
-        return new CategorySuggestionDto
+        var tasks = images.Select(async img => 
         {
-            SuggestedCategory = suggestedCategory
-        };
-    }
+            var result = await _analyzeImageAIClient.AnalyzeImageAsync(img.Stream, img.FileName);
+            return new AISuggestionDto
+            {
+                SuggestedCategory = result.Prediction,
+                SuggestedDescription = result.ImageDescription
+            };
+        });
 
-    public async Task<DescriptionSuggestionDto> GenerateDescriptionAsync(
-        Stream imageStream, string fileName)
-    {
-        var generatedDescription = await _descriptionAIClient
-            .GenerateDescriptionAsync(imageStream, fileName);
-
-        return new DescriptionSuggestionDto
-        {
-            SuggestedDescription = generatedDescription
-        };
+        var results = await Task.WhenAll(tasks);
+        return results.ToList();
     }
 
     public async Task<SubmitReportResponseDto> SubmitReportAsync(
         SubmitReportRequestDto request,
-        Stream imageStream,
-        string fileName,
+        IEnumerable<(Stream Stream, string FileName)> images,
         string userId)
     {
         // 1. Validate category exists
@@ -61,17 +49,7 @@ public class PublicSubmitReportService : IPublicSubmitReportService
             throw new KeyNotFoundException(
                 $"Category with ID {request.CategoryId} was not found.");
 
-        // 2. Upload image to Cloudinary
-        var cloudinaryUrl = await _imageService.UploadImageAsync(
-            imageStream,
-            fileName,
-            folderPath: "reports");
-
-        if (string.IsNullOrWhiteSpace(cloudinaryUrl))
-            throw new InvalidOperationException(
-                "Image upload failed. Please try again.");
-
-        // 3. Create Report
+        // 2. Create Report
         var report = new Report
         {
             Description = request.Description,
@@ -84,29 +62,38 @@ public class PublicSubmitReportService : IPublicSubmitReportService
 
         await _repository.AddReportAsync(report);
 
-        // 4. Create ReportPic
-        var reportPic = new ReportPic
+        // 3. Upload images to Cloudinary and Create ReportPics
+        var uploadTasks = images.Select(img => _imageService.UploadImageAsync(img.Stream, img.FileName, "reports"));
+        var cloudinaryUrls = await Task.WhenAll(uploadTasks);
+
+        foreach (var url in cloudinaryUrls)
         {
-            PicUrl = cloudinaryUrl,
-            Report = report
-        };
+            if (string.IsNullOrWhiteSpace(url))
+                throw new InvalidOperationException("One or more image uploads failed. Please try again.");
 
-        await _repository.AddReportPicAsync(reportPic);
+            var reportPic = new ReportPic
+            {
+                PicUrl = url,
+                Report = report
+            };
 
-        // 5. Create AuditLog
+            await _repository.AddReportPicAsync(reportPic);
+        }
+
+        // 4. Create AuditLog
         var auditLog = new AuditLog
         {
             UserId = userId,
             ActionType = AuditActionType.ReportCreated,
             EntityName = nameof(Report),
             EntityId = report.Id.ToString(),
-            Details = $"Report submitted by user {userId}.",
+            Details = $"Report submitted by user {userId} with {cloudinaryUrls.Length} image(s).",
             Timestamp = DateTime.UtcNow
         };
 
         await _repository.AddAuditLogAsync(auditLog);
 
-        // 6. Save everything
+        // 5. Save everything
         await _repository.SaveChangesAsync();
 
         return new SubmitReportResponseDto

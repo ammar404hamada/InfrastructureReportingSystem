@@ -1,4 +1,4 @@
-﻿using InfraReportingSystem.Domain.Entities;
+using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.ServiceAbstractions.Users.PublicUser.SubmitReport;
 using InfraReportingSystem.Shared.DTOs.Users.PublicUser.SubmitReport;
 using Microsoft.AspNetCore.Authorization;
@@ -18,47 +18,62 @@ public class PublicSubmitReportController : ControllerBase
     }
 
     /// <summary>
-    /// Sends the image to the AI service and returns a suggested category.
+    /// Sends the images to the AI service and returns a list of suggested categories and descriptions.
     /// Nothing is saved to the database.
     /// </summary>
-    [HttpPost("generate-category")]
+    [HttpPost("analyze-image")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> GenerateCategory([FromForm] IFormFile image)
+    public async Task<IActionResult> AnalyzeImage([FromForm] List<IFormFile> images)
     {
-        await using var stream = image.OpenReadStream();
-        var result = await _service.GenerateCategoryAsync(stream, image.FileName);
-        return Ok(result);
+        if (images == null || images.Count == 0)
+            return BadRequest("No images provided.");
+
+        var imageStreams = images.Select(img => (img.OpenReadStream(), img.FileName)).ToList();
+        
+        try
+        {
+            var result = await _service.AnalyzeImagesAsync(imageStreams);
+            return Ok(result);
+        }
+        finally
+        {
+            foreach (var stream in imageStreams)
+            {
+                stream.Item1.Dispose();
+            }
+        }
     }
 
     /// <summary>
-    /// Sends the image to the AI service and returns a generated description.
-    /// Nothing is saved to the database.
-    /// </summary>
-    [HttpPost("generate-description")]
-    [Consumes("multipart/form-data")]
-    public async Task<IActionResult> GenerateDescription([FromForm] IFormFile image)
-    {
-        await using var stream = image.OpenReadStream();
-        var result = await _service.GenerateDescriptionAsync(stream, image.FileName);
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Final submission. Uploads image to Cloudinary, creates Report,
-    /// ReportPic, and AuditLog. Only persistence step in the entire flow.
+    /// Final submission. Uploads multiple images to Cloudinary, creates Report,
+    /// ReportPics, and AuditLog. Only persistence step in the entire flow.
     /// </summary>
     [HttpPost("submit")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> SubmitReport(
         [FromForm] SubmitReportRequestDto request,
-        [FromForm] IFormFile image)
+        [FromForm] List<IFormFile> images)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrWhiteSpace(userId))
             return Unauthorized();
 
-        await using var stream = image.OpenReadStream();
-        var result = await _service.SubmitReportAsync(request, stream, image.FileName, userId);
-        return Ok(result);
+        if (images == null || images.Count == 0)
+            return BadRequest("At least one image is required to submit a report.");
+
+        var imageStreams = images.Select(img => (img.OpenReadStream(), img.FileName)).ToList();
+
+        try
+        {
+            var result = await _service.SubmitReportAsync(request, imageStreams, userId);
+            return Ok(result);
+        }
+        finally
+        {
+            foreach (var stream in imageStreams)
+            {
+                stream.Item1.Dispose();
+            }
+        }
     }
 }

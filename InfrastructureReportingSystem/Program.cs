@@ -264,15 +264,9 @@ namespace InfrastructureReportingSystem
             builder.Services.AddScoped<IPublicSubmitReportRepository, PublicSubmitReportRepository>();
             builder.Services.AddScoped<IPublicSubmitReportService, PublicSubmitReportService>();
 
-            builder.Services.AddHttpClient<ICategoryAIClient, CategoryAIClient>(client =>
+            builder.Services.AddHttpClient<IAnalyzeImageAIClient, AnalyzeImageAIClient>(client =>
             {
-                client.BaseAddress = new Uri("https://ashraf101-image-classifier.hf.space");
-                client.Timeout = TimeSpan.FromSeconds(60);
-            });
-
-            builder.Services.AddHttpClient<IDescriptionAIClient, DescriptionAIClient>(client =>
-            {
-                client.BaseAddress = new Uri("https://ashraf101-image-analyzer-api.hf.space");
+                client.BaseAddress = new Uri("https://mostafa-abuhamed-irs-ai.hf.space");
                 client.Timeout = TimeSpan.FromSeconds(60);
             });
 
