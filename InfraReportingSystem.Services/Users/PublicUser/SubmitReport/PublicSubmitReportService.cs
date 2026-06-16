@@ -22,20 +22,14 @@ public class PublicSubmitReportService : IPublicSubmitReportService
         _analyzeImageAIClient = analyzeImageAIClient;
     }
 
-    public async Task<List<AISuggestionDto>> AnalyzeImagesAsync(IEnumerable<(Stream Stream, string FileName)> images)
+    public async Task<AISuggestionDto> AnalyzeImagesAsync(IEnumerable<(Stream Stream, string FileName)> images)
     {
-        var tasks = images.Select(async img => 
+        var result = await _analyzeImageAIClient.AnalyzeImagesAsync(images);
+        return new AISuggestionDto
         {
-            var result = await _analyzeImageAIClient.AnalyzeImageAsync(img.Stream, img.FileName);
-            return new AISuggestionDto
-            {
-                SuggestedCategory = result.Prediction,
-                SuggestedDescription = result.ImageDescription
-            };
-        });
-
-        var results = await Task.WhenAll(tasks);
-        return results.ToList();
+            SuggestedCategory = result.Prediction,
+            SuggestedDescription = result.ImageDescription
+        };
     }
 
     public async Task<SubmitReportResponseDto> SubmitReportAsync(

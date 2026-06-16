@@ -13,12 +13,15 @@ namespace InfraReportingSystem.Services.AI
             _httpClient = httpClient;
         }
 
-        public async Task<AnalyzeImageResult> AnalyzeImageAsync(Stream imageStream, string fileName)
+        public async Task<AnalyzeImageResult> AnalyzeImagesAsync(IEnumerable<(Stream Stream, string FileName)> images)
         {
             using var content = new MultipartFormDataContent();
-            var fileContent = new StreamContent(imageStream);
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-            content.Add(fileContent, "files", fileName);
+            foreach (var img in images)
+            {
+                var fileContent = new StreamContent(img.Stream);
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+                content.Add(fileContent, "files", img.FileName);
+            }
 
             var response = await _httpClient.PostAsync("/classify-image", content);
             response.EnsureSuccessStatusCode();
