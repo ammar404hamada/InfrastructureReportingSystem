@@ -1,5 +1,6 @@
-﻿using InfraReportingSystem.Domain.Entities;
-using InfraReportingSystem.ServiceAbstractions.Users.Worker.CurrentTaskScreen;
+﻿using InfraReportingSystem.ServiceAbstractions.Users.Worker.CurrentTaskScreen;
+using InfraReportingSystem.Shared.DTOs.Common;
+using InfraReportingSystem.Shared.DTOs.UserServices.Worker.CurrentTaskScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -22,7 +23,19 @@ namespace InfrastructureReportingSystem.Controllers.Worker.CurrentTaskScreen
             _logger = logger;
         }
 
+        /// <summary>
+        /// Returns the current active task for the authenticated worker, including details, actions taken, and blockage info if applicable.
+        /// </summary>
+        /// <remarks>
+        /// A worker can only have one active task at a time. Returns null if no active task is assigned.
+        /// </remarks>
+        /// <response code="200">Returns the current task details for the worker, or null if none exists.</response>
+        /// <response code="401">The request does not contain a valid JWT access token.</response>
+        /// <response code="403">The authenticated user does not have the Worker role.</response>
         [HttpGet]
+        [ProducesResponseType(typeof(PaginatedResult<CurrentTaskDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetCurrentTask()
         {
             var workerId = User.FindFirstValue(ClaimTypes.NameIdentifier);

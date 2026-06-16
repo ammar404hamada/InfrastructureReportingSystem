@@ -1,5 +1,6 @@
-﻿using InfraReportingSystem.Domain.Entities;
-using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksHistoryScreen;
+﻿using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksHistoryScreen;
+using InfraReportingSystem.Shared.DTOs.Common;
+using InfraReportingSystem.Shared.DTOs.UserServices.Worker.TasksHistoryScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -20,7 +21,23 @@ namespace InfrastructureReportingSystem.Controllers.Worker.TasksHistoryScreen
             _logger = logger;
         }
 
+        /// <summary>
+        /// Returns a paginated list of historical completed tasks for the currently authenticated worker.
+        /// </summary>
+        /// <remarks>
+        /// Supports optional filtering by search term and status, and pagination via page number and page size.
+        /// </remarks>
+        /// <param name="searchTerm">Optional keyword to filter tasks by description or category.</param>
+        /// <param name="status">Optional status filter (e.g., Resolved, Rejected).</param>
+        /// <param name="pageNumber">1-based page index. Defaults to 1.</param>
+        /// <param name="pageSize">Items per page (1–50). Defaults to 10.</param>
+        /// <response code="200">Returns the paginated task history matching the filters.</response>
+        /// <response code="401">The request does not contain a valid JWT access token.</response>
+        /// <response code="403">The authenticated user does not have the Worker role.</response>
         [HttpGet]
+        [ProducesResponseType(typeof(PaginatedResult<HistoryTaskDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetHistory(
             [FromQuery] string? searchTerm,
             [FromQuery] string? status,
