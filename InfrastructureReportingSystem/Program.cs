@@ -209,6 +209,7 @@ namespace InfrastructureReportingSystem
 
             // Dependency Injection Registration
             builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+            builder.Services.AddScoped<ICloudinaryClient, CloudinaryClient>();
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddScoped<IProfileManagementRepository, ProfileManagementRepository>();
             builder.Services.AddScoped<IProfileManagementService, ProfileManagementService>();

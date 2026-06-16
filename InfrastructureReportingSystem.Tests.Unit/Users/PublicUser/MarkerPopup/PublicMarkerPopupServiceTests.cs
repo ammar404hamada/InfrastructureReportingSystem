@@ -156,7 +156,7 @@ namespace InfrastructureReportingSystem.Tests.Unit.Users.PublicUser.MarkerPopup
         [InlineData(null, "")]
         [InlineData("", "")]
         [InlineData("   ", "")]
-        [InlineData("12345678901234567890123456789012345678901234567890123456789012345678901234567890", "12345678901234567890123456789012345678901234567890123456789012345678901234567890")]
+        [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
         [InlineData("123456789012345678901234567890123456789012345678901234567890123456789012345678901", "12345678901234567890123456789012345678901234567890123456789012345678901234567890…")]
         public async Task GetReportDetailsAsync_ChecksTitleEllipsisTruncation(string? description, string expectedTitle)
         {
