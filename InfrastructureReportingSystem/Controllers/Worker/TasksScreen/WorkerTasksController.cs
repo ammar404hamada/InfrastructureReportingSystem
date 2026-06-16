@@ -1,4 +1,6 @@
 ﻿using InfraReportingSystem.ServiceAbstractions.Users.Worker.TasksScreen;
+using InfraReportingSystem.Shared.DTOs.Common;
+using InfraReportingSystem.Shared.DTOs.UserServices.Worker.TasksScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -21,7 +23,22 @@ public class WorkerTasksController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>
+    /// Returns a paginated list of tasks assigned to the currently authenticated worker.
+    /// </summary>
+    /// <remarks>
+    /// Supports optional search across report and location details. Pagination is available via page number and page size (max 50).
+    /// </remarks>
+    /// <param name="searchTerm">Optional keyword to filter tasks by report or location details.</param>
+    /// <param name="pageNumber">1-based page index. Defaults to 1.</param>
+    /// <param name="pageSize">Items per page (1–50). Defaults to 10.</param>
+    /// <response code="200">Returns the paginated list of tasks for the worker.</response>
+    /// <response code="401">The request does not contain a valid JWT access token.</response>
+    /// <response code="403">The authenticated user does not have the Worker role.</response>
     [HttpGet("my-tasks")]
+    [ProducesResponseType(typeof(PaginatedResult<WorkerTaskDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetMyTasks(
         [FromQuery] string? searchTerm,
         [FromQuery] int pageNumber = 1,

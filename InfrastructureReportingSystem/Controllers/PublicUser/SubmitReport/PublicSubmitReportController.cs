@@ -21,8 +21,17 @@ public class PublicSubmitReportController : ControllerBase
     /// Sends the images to the AI service and returns a list of suggested categories and descriptions.
     /// Nothing is saved to the database.
     /// </summary>
+    /// <param name="images">A list of image files to analyze.</param>
+    /// <response code="200">Returns the AI-generated category and description suggestions.</response>
+    /// <response code="400">No images were provided.</response>
+    /// <response code="401">The request does not contain a valid JWT access token.</response>
+    /// <response code="403">The authenticated user does not have the PublicUser role.</response>
     [HttpPost("analyze-image")]
     [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(List<AISuggestionDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> AnalyzeImage([FromForm] List<IFormFile> images)
     {
         if (images == null || images.Count == 0)
@@ -48,8 +57,18 @@ public class PublicSubmitReportController : ControllerBase
     /// Final submission. Uploads multiple images to Cloudinary, creates Report,
     /// ReportPics, and AuditLog. Only persistence step in the entire flow.
     /// </summary>
+    /// <param name="request">The report details including description, category, and location.</param>
+    /// <param name="images">A list of image files to upload as evidence.</param>
+    /// <response code="200">The report was submitted successfully. Returns the submission result with report ID.</response>
+    /// <response code="400">No images were provided or the request is invalid.</response>
+    /// <response code="401">The request does not contain a valid JWT access token.</response>
+    /// <response code="403">The authenticated user does not have the PublicUser role.</response>
     [HttpPost("submit")]
     [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(SubmitReportResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> SubmitReport(
         [FromForm] SubmitReportRequestDto request,
         [FromForm] List<IFormFile> images)

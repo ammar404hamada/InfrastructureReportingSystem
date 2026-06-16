@@ -1,27 +1,19 @@
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using InfraReportingSystem.ServiceAbstractions.Shared.Images;
-using InfraReportingSystem.Shared.Settings;
-using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace InfraReportingSystem.Services.Shared.Images
 {
     public class ImageService : IImageService
     {
-        private readonly Cloudinary _cloudinary;
+        private readonly ICloudinaryClient _cloudinaryClient;
 
-        public ImageService(IOptions<CloudinarySettings> config)
+        public ImageService(ICloudinaryClient cloudinaryClient)
         {
-            var account = new Account(
-                config.Value.CloudName,
-                config.Value.ApiKey,
-                config.Value.ApiSecret
-            );
-            _cloudinary = new Cloudinary(account);
+            _cloudinaryClient = cloudinaryClient;
         }
 
         public async Task<string?> UploadImageAsync(Stream fileStream, string fileName, string folderPath)
@@ -43,7 +35,7 @@ namespace InfraReportingSystem.Services.Shared.Images
                 Overwrite = false
             };
 
-            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+            var uploadResult = await _cloudinaryClient.UploadImageAsync(uploadParams);
 
             if (uploadResult.Error != null)
             {

@@ -144,7 +144,8 @@ namespace InfrastructureReportingSystem.Tests.Unit.Users.Authority.IncomingRepor
 
         [Theory]
         [InlineData("A short description of the issue.", "A short description of the issue.")]
-        [InlineData("This description is longer than eighty characters to check if ellipsis is appended correctly in the mapped title.","This description is longer than eighty characters to check if ellipsis is appendâ€¦")]        [InlineData(null, "")]
+        [InlineData("This description is longer than eighty characters to check if ellipsis is appended correctly in the mapped title.", "This description is longer than eighty characters to check if ellipsis is append\u2026")]
+        [InlineData(null, "")]
         [InlineData("", "")]
         public async Task GetIncomingReportsAsync_ChecksTitleEllipsisTruncation(string? description, string expectedTitle)
         {
@@ -152,7 +153,9 @@ namespace InfrastructureReportingSystem.Tests.Unit.Users.Authority.IncomingRepor
             var report = new Report
             {
                 Id = 1,
-                Description = description!,
+                Description = description ?? "",
+                Latitude = 30.0,
+                Longitude = 31.0,
                 UploadedAt = DateTime.UtcNow,
                 Status = ReportStatus.Submitted
             };

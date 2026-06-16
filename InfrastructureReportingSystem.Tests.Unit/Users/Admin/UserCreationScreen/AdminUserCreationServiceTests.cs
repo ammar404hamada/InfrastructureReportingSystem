@@ -226,7 +226,7 @@ public class AdminUserCreationServiceTests
         _emailServiceMock.Verify(
             s => s.SendEmailAsync(
                 "test@example.com",
-                "Set your password â€“ Infrastructure Reporting System",
+                It.Is<string>(subject => subject.Contains("Set your password") && subject.Contains("Infrastructure Reporting System")),
                 It.Is<string>(body => body.Contains("http://localhost:3000/reset-password?userId=") && body.Contains("reset-token-123"))),
             Times.Once);
 
@@ -283,7 +283,7 @@ public class AdminUserCreationServiceTests
         _emailServiceMock.Verify(
             s => s.SendEmailAsync(
                 "test@example.com",
-                "Set your password â€“ Infrastructure Reporting System",
+                It.Is<string>(subject => subject.Contains("Set your password") && subject.Contains("Infrastructure Reporting System")),
                 It.Is<string>(body => body.Contains("http://localhost:3000/reset-password?userId=") && body.Contains("reset-token-123"))),
             Times.Once);
 

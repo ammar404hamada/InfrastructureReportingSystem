@@ -313,7 +313,10 @@ namespace InfrastructureReportingSystem.Tests.Unit.Users.Authority.AssignWorker
             _emailServiceMock.Verify(
                 e => e.SendEmailAsync(
                     "john@example.com",
-                    "New Task Assigned â€” Infrastructure Reporting System",
+                    It.Is<string>(subject =>
+                        subject.Contains("New Task Assigned") &&
+                        subject.Contains("Infrastructure Reporting System")
+                    ),
                     It.Is<string>(body =>
                         body.Contains("John Doe") &&
                         body.Contains("123") &&

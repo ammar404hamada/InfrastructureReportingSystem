@@ -22,7 +22,7 @@ using InfraReportingSystem.Persistence.Repositories.Users.Worker.CurrentTaskScre
 using InfraReportingSystem.Persistence.Repositories.Users.Worker.TasksHistoryScreen;
 using InfraReportingSystem.Persistence.Repositories.Users.Worker.TasksScreen;
 using InfraReportingSystem.Persistence.Seed;
-using InfraReportingSystem.ServiceAbstractions.Profile;
+using InfraReportingSystem.ServiceAbstractions.Profile; 
 using InfraReportingSystem.ServiceAbstractions.Repositories.Shared;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Shared.Auth;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Shared.Profile;
@@ -209,6 +209,7 @@ namespace InfrastructureReportingSystem
 
             // Dependency Injection Registration
             builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+            builder.Services.AddScoped<ICloudinaryClient, CloudinaryClient>();
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddScoped<IProfileManagementRepository, ProfileManagementRepository>();
             builder.Services.AddScoped<IProfileManagementService, ProfileManagementService>();
