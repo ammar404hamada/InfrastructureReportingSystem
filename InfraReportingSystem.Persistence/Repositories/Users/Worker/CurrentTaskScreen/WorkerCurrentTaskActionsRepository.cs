@@ -23,6 +23,9 @@ namespace InfraReportingSystem.Persistence.Repositories.Users.Worker.CurrentTask
         public async Task<Report?> GetCurrentTaskAsync(string workerId)
         {
             return await _context.Reports
+                .Include(r => r.SubmittedBy)
+                .Include(r => r.AssignedWorker)
+                .Include(r => r.Category)
                 .FirstOrDefaultAsync(r =>
                     r.AssignedWorkerId == workerId &&
                     r.Status == ReportStatus.InProgress);
