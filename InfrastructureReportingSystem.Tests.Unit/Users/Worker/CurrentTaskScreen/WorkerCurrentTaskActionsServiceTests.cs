@@ -3,8 +3,10 @@ using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Shared;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Worker.CurrentTaskScreen;
+using InfraReportingSystem.ServiceAbstractions.Shared.Email;
 using InfraReportingSystem.Services.Users.Worker.CurrentTaskScreen;
 using InfraReportingSystem.Shared.DTOs.UserServices.Worker.CurrentTaskScreen;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -14,6 +16,8 @@ public class WorkerCurrentTaskActionsServiceTests
 {
     private readonly Mock<IWorkerCurrentTaskActionsRepository> _repositoryMock = new();
     private readonly Mock<IAuditLogRepository> _auditLogRepositoryMock = new();
+    private readonly Mock<IEmailService> _emailServiceMock = new();
+    private readonly Mock<ILogger<WorkerCurrentTaskActionsService>> _loggerMock = new();
 
     [Fact]
     public async Task MarkAsFixedAsync_WhenNoActiveTaskFound_ReturnsFailureAndNoStateChanges()
@@ -151,7 +155,9 @@ public class WorkerCurrentTaskActionsServiceTests
     {
         return new WorkerCurrentTaskActionsService(
             _repositoryMock.Object,
-            _auditLogRepositoryMock.Object);
+            _auditLogRepositoryMock.Object,
+            _emailServiceMock.Object,
+            _loggerMock.Object);
     }
 
     private static Report CreateReport(int id, string workerId, ReportStatus status)
