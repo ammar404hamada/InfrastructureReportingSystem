@@ -29,6 +29,7 @@ namespace InfraReportingSystem.Persistence.Repositories.Users.Authority.Incoming
         {
             var query = _context.Reports
                 .AsNoTracking()
+                .Include(r => r.Category)
                 .Include(r => r.SubmittedBy)
                 .Include(r => r.ReportPics)
                 .Where(r => r.Status == ReportStatus.Submitted);

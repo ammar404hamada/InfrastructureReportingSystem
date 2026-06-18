@@ -91,7 +91,7 @@ namespace InfraReportingSystem.Services.Users.Authority.IncomingReports
             return new IncomingReportDto
             {
                 ReportId = report.Id,
-                Title = BuildTitle(report.Description),
+                Title = report.Category?.Name ?? string.Empty,
                 Description = report.Description,
                 Location = BuildLocation(report.Latitude, report.Longitude),
                 UpdatedAt = report.UpdatedAt ?? report.UploadedAt,
@@ -102,15 +102,6 @@ namespace InfraReportingSystem.Services.Users.Authority.IncomingReports
                 PhotosCount = photos.Count,
                 PhotosPreview = photos.Take(PhotoPreviewLimit).ToList()
             };
-        }
-
-        private static string BuildTitle(string description)
-        {
-            const int maxLength = 80;
-            if (string.IsNullOrWhiteSpace(description)) return string.Empty;
-            return description.Length <= maxLength
-                ? description
-                : string.Concat(description.AsSpan(0, maxLength), "…");
         }
 
         private static string BuildLocation(double latitude, double longitude)
