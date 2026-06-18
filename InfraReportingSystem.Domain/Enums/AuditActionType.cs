@@ -26,6 +26,7 @@ namespace InfraReportingSystem.Domain.Enums
         AccountLocked = 20,
         AccountUpdated = 21,
         AccountVerified = 22,
+        AccountDeactivated = 24,
 
         // Report actions
         ReportCreated = 9,
