@@ -2,7 +2,9 @@ using FluentAssertions;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.PublicUser.MyReports;
+using InfraReportingSystem.ServiceAbstractions.Shared.Email;
 using InfraReportingSystem.Services.Users.PublicUser.MyReports;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace InfrastructureReportingSystem.Tests.Unit.Users.PublicUser.MyReports
@@ -10,6 +12,8 @@ namespace InfrastructureReportingSystem.Tests.Unit.Users.PublicUser.MyReports
     public class PublicUserReportsServiceTests
     {
         private readonly Mock<IPublicUserReportsRepository> _repositoryMock = new();
+        private readonly Mock<IEmailService> _emailServiceMock = new();
+        private readonly Mock<ILogger<PublicUserReportsService>> _loggerMock = new();
 
         [Fact]
         public async Task UpdateFixConfirmationStatusAsync_WhenReportNotFound_ReturnsErrorAndDoesNotUpdate()
@@ -138,7 +142,10 @@ namespace InfrastructureReportingSystem.Tests.Unit.Users.PublicUser.MyReports
 
         private PublicUserReportsService CreateService()
         {
-            return new PublicUserReportsService(_repositoryMock.Object);
+            return new PublicUserReportsService(
+                _repositoryMock.Object,
+                _emailServiceMock.Object,
+                _loggerMock.Object);
         }
     }
 }

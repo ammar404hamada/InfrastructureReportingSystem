@@ -93,6 +93,42 @@ namespace InfrastructureReportingSystem.Tests.Unit.Users.PublicUser.Map
         }
 
         [Fact]
+        public async Task GetMapReportsAsync_WhenRepositoryReturnsEmptyList_ReturnsEmptyResult()
+        {
+            // Arrange
+            _repositoryMock
+                .Setup(r => r.GetMapReportsAsync(It.IsAny<int?>(), It.IsAny<ReportStatus?>()))
+                .ReturnsAsync(new List<Report>());
+
+            var service = CreateService();
+
+            // Action
+            var result = await service.GetMapReportsAsync(null, null);
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetMapReportsAsync_WithCategoryIdOnly_FiltersCorrectly()
+        {
+            // Arrange
+            int categoryId = 3;
+            _repositoryMock
+                .Setup(r => r.GetMapReportsAsync(categoryId, null))
+                .ReturnsAsync(new List<Report>());
+
+            var service = CreateService();
+
+            // Action
+            var result = await service.GetMapReportsAsync(categoryId, null);
+
+            // Assert
+            result.Should().BeEmpty();
+            _repositoryMock.Verify(r => r.GetMapReportsAsync(categoryId, null), Times.Once);
+        }
+
+        [Fact]
         public async Task GetMapReportsAsync_WhenRepositoryThrows_PropagatesException()
         {
             // Arrange

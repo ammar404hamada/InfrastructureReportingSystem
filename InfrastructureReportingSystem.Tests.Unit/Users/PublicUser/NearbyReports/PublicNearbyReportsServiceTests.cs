@@ -77,6 +77,45 @@ namespace InfrastructureReportingSystem.Tests.Unit.Users.PublicUser.NearbyReport
         }
 
         [Fact]
+        public async Task GetNearbyReportsAsync_WhenRepositoryReturnsEmptyList_ReturnsEmptyResult()
+        {
+            // Arrange
+            _repositoryMock
+                .Setup(r => r.GetNearbyReportsAsync(It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>()))
+                .ReturnsAsync(new List<NearbyReportDto>());
+
+            var service = CreateService();
+
+            // Action
+            var result = await service.GetNearbyReportsAsync(30.0, 31.0, 3.0);
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetNearbyReportsAsync_WithDefaultRadius_DoesNotClamp()
+        {
+            // Arrange
+            double latitude = 30.0;
+            double longitude = 31.0;
+            double defaultRadius = 3.0;
+
+            _repositoryMock
+                .Setup(r => r.GetNearbyReportsAsync(latitude, longitude, defaultRadius))
+                .ReturnsAsync(new List<NearbyReportDto>());
+
+            var service = CreateService();
+
+            // Action
+            var result = await service.GetNearbyReportsAsync(latitude, longitude);
+
+            // Assert
+            result.Should().BeEmpty();
+            _repositoryMock.Verify(r => r.GetNearbyReportsAsync(latitude, longitude, defaultRadius), Times.Once);
+        }
+
+        [Fact]
         public async Task GetNearbyReportsAsync_WhenRepositoryThrows_PropagatesException()
         {
             // Arrange
