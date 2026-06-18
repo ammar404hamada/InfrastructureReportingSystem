@@ -72,12 +72,7 @@ namespace InfraReportingSystem.Services.Users.Admin.UsersManagementScreen
                 Name = user.Name,
                 PhoneNumber = user.PhoneNumber,
                 Email = user.Email,
-                Role = user switch
-                {
-                    InfraReportingSystem.Domain.Entities.Worker => "Worker",
-                    InfraReportingSystem.Domain.Entities.Authority => "Authority",
-                    _ => "Public User"
-                },
+                Role = GetRoleName(user),
                 Status = user.Status.ToString(),
                 JoinDate = user.CreatedAt
             }).ToList();
@@ -93,5 +88,51 @@ namespace InfraReportingSystem.Services.Users.Admin.UsersManagementScreen
                     : string.Empty
             };
         }
+
+        public async Task<AdminUserProfileResponseDto> GetUserProfileByIdAsync(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return NotFoundProfileResponse();
+            }
+
+            var (user, role) = await _repository.GetUserProfileByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFoundProfileResponse();
+            }
+
+            return new AdminUserProfileResponseDto
+            {
+                Success = true,
+                Message = "Profile retrieved successfully.",
+                Profile = new AdminUserProfileDto
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Role = string.IsNullOrWhiteSpace(role) ? GetRoleName(user) : role,
+                    Status = user.Status.ToString(),
+                    ProfilePictureUrl = user.ProfilePictureUrl,
+                    JoinDate = user.CreatedAt,
+                    Specialization = (user as InfraReportingSystem.Domain.Entities.Worker)?.Specialization
+                }
+            };
+        }
+
+        private static AdminUserProfileResponseDto NotFoundProfileResponse() => new()
+        {
+            Success = false,
+            Message = "User not found."
+        };
+
+        private static string GetRoleName(User user) => user switch
+        {
+            InfraReportingSystem.Domain.Entities.Worker => "Worker",
+            InfraReportingSystem.Domain.Entities.Authority => "Authority",
+            _ => "Public User"
+        };
     }
 }

@@ -18,5 +18,7 @@ namespace InfraReportingSystem.ServiceAbstractions.Repositories.Users.Admin.User
             string? sortDirection,
             int pageNumber,
             int pageSize);
+
+        Task<(User? User, string? Role)> GetUserProfileByIdAsync(string userId);
     }
 }

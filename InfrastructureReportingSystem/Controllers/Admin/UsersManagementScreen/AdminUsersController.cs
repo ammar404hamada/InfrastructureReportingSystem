@@ -52,5 +52,33 @@ namespace InfrastructureReportingSystem.Controllers.Admin.UsersManagementScreen
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Returns the full profile for a non-deleted user by ID.
+        /// </summary>
+        /// <remarks>
+        /// Includes basic profile information, role, status, profile picture, join date, and worker specialization when applicable. Restricted to Admin users.
+        /// </remarks>
+        /// <param name="userId">The ID of the user profile to retrieve.</param>
+        /// <response code="200">Returns the requested user profile.</response>
+        /// <response code="401">The request does not contain a valid JWT access token.</response>
+        /// <response code="403">The authenticated user does not have the Admin role.</response>
+        /// <response code="404">The user does not exist or has been deleted.</response>
+        [HttpGet("{userId}")]
+        [ProducesResponseType(typeof(AdminUserProfileResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(AdminUserProfileResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetUserProfile(string userId)
+        {
+            var response = await _adminUsersService.GetUserProfileByIdAsync(userId);
+
+            if (!response.Success && response.Message == "User not found.")
+            {
+                return NotFound(response);
+            }
+
+            return Ok(response);
+        }
     }
 }

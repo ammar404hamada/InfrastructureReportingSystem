@@ -3,6 +3,7 @@ using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Admin.UsersManagementScreen;
 using InfraReportingSystem.Services.Users.Admin.UsersManagementScreen;
+using InfraReportingSystem.Shared.DTOs.UserServices.Admin.UsersManagementScreen;
 using Moq;
 using Xunit;
 
@@ -238,6 +239,128 @@ public class AdminUsersServiceTests
         _repositoryMock.Verify(
             repo => repo.GetUsersAsync(null, null, expectedStatusForRepo, "joindate", "desc", 1, 10),
             Times.Once);
+    }
+
+    [Fact]
+    public async Task GetUserProfileByIdAsync_WhenUserNotFound_ReturnsFailureResponse()
+    {
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("missing-id"))
+            .ReturnsAsync((null, null));
+
+        var service = CreateService();
+
+        var result = await service.GetUserProfileByIdAsync("missing-id");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("User not found.");
+        result.Profile.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetUserProfileByIdAsync_WhenAdminUserFound_ReturnsProfileWithAdminRole()
+    {
+        var user = new User
+        {
+            Id = "admin-1",
+            Name = "Admin User",
+            Email = "admin@example.com",
+            PhoneNumber = "01011111111",
+            ProfilePictureUrl = "https://example.com/admin.jpg",
+            Status = UserStatus.Active,
+            CreatedAt = DateTime.UtcNow.AddYears(-1)
+        };
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("admin-1"))
+            .ReturnsAsync((user, "Admin"));
+
+        var service = CreateService();
+
+        var result = await service.GetUserProfileByIdAsync("admin-1");
+
+        result.Success.Should().BeTrue();
+        result.Message.Should().Be("Profile retrieved successfully.");
+        result.Profile.Should().NotBeNull();
+        result.Profile!.Id.Should().Be("admin-1");
+        result.Profile.Name.Should().Be("Admin User");
+        result.Profile.Email.Should().Be("admin@example.com");
+        result.Profile.PhoneNumber.Should().Be("01011111111");
+        result.Profile.ProfilePictureUrl.Should().Be("https://example.com/admin.jpg");
+        result.Profile.Role.Should().Be("Admin");
+        result.Profile.Status.Should().Be("Active");
+        result.Profile.JoinDate.Should().Be(user.CreatedAt);
+        result.Profile.Specialization.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetUserProfileByIdAsync_WhenWorkerFound_ReturnsSpecialization()
+    {
+        var user = new InfraReportingSystem.Domain.Entities.Worker
+        {
+            Id = "worker-1",
+            Name = "Worker User",
+            Email = "worker@example.com",
+            PhoneNumber = "01022222222",
+            ProfilePictureUrl = "https://example.com/worker.jpg",
+            Status = UserStatus.Inactive,
+            CreatedAt = DateTime.UtcNow.AddMonths(-6),
+            Specialization = "Electrical"
+        };
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("worker-1"))
+            .ReturnsAsync((user, "Worker"));
+
+        var service = CreateService();
+
+        var result = await service.GetUserProfileByIdAsync("worker-1");
+
+        result.Success.Should().BeTrue();
+        result.Profile.Should().NotBeNull();
+        result.Profile!.Role.Should().Be("Worker");
+        result.Profile.Specialization.Should().Be("Electrical");
+    }
+
+    [Theory]
+    [InlineData("Authority")]
+    [InlineData("PublicUser")]
+    public async Task GetUserProfileByIdAsync_WhenNonWorkerFound_ReturnsNullSpecialization(string role)
+    {
+        User user = role == "Authority"
+            ? new InfraReportingSystem.Domain.Entities.Authority()
+            : new User();
+
+        user.Id = "user-1";
+        user.Name = "Non Worker User";
+        user.Email = "user@example.com";
+        user.Status = UserStatus.Active;
+        user.CreatedAt = DateTime.UtcNow;
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("user-1"))
+            .ReturnsAsync((user, role));
+
+        var service = CreateService();
+
+        var result = await service.GetUserProfileByIdAsync("user-1");
+
+        result.Success.Should().BeTrue();
+        result.Profile.Should().NotBeNull();
+        result.Profile!.Role.Should().Be(role);
+        result.Profile.Specialization.Should().BeNull();
+    }
+
+    [Fact]
+    public void AdminUserProfileDto_ShouldNotExposeReportRelatedProperties()
+    {
+        var propertyNames = typeof(AdminUserProfileDto)
+            .GetProperties()
+            .Select(property => property.Name);
+
+        propertyNames.Should().NotContain(propertyName =>
+            propertyName.Contains("Report", StringComparison.OrdinalIgnoreCase) ||
+            propertyName.Contains("Task", StringComparison.OrdinalIgnoreCase));
     }
 
     private AdminUsersService CreateService()

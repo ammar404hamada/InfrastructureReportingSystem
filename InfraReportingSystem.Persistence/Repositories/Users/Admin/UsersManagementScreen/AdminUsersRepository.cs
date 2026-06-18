@@ -100,5 +100,27 @@ namespace InfraReportingSystem.Persistence.Repositories.Users.Admin.UsersManagem
 
             return (items, totalCount);
         }
+
+        public async Task<(User? User, string? Role)> GetUserProfileByIdAsync(string userId)
+        {
+            var user = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == userId && u.Status != UserStatus.Deleted)
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return (null, null);
+            }
+
+            var role = await (
+                from ur in _context.UserRoles
+                join r in _context.Roles on ur.RoleId equals r.Id
+                where ur.UserId == userId
+                select r.Name)
+                .FirstOrDefaultAsync();
+
+            return (user, role);
+        }
     }
 }
