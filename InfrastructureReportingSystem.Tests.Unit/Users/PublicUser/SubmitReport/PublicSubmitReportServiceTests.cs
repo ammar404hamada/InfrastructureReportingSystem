@@ -17,7 +17,7 @@ public class PublicSubmitReportServiceTests
     private readonly Mock<IAnalyzeImageAIClient> _aiClientMock = new();
 
     [Fact]
-    public async Task AnalyzeImagesAsync_WhenImagesProvided_ReturnsMappedSuggestions()
+    public async Task AnalyzeImagesAsync_WhenImagesProvided_ReturnsOneMappedSuggestion()
     {
         using var stream1 = new MemoryStream([1, 2, 3]);
         using var stream2 = new MemoryStream([4, 5, 6]);
@@ -28,33 +28,33 @@ public class PublicSubmitReportServiceTests
         };
 
         _aiClientMock
-            .Setup(c => c.AnalyzeImageAsync(stream1, "photo1.jpg"))
-            .ReturnsAsync(new AnalyzeImageResult { Prediction = "Roads", ImageDescription = "Pothole" });
-        _aiClientMock
-            .Setup(c => c.AnalyzeImageAsync(stream2, "photo2.jpg"))
-            .ReturnsAsync(new AnalyzeImageResult { Prediction = "Lighting", ImageDescription = "Broken lamp" });
+            .Setup(c => c.AnalyzeImagesAsync(images))
+            .ReturnsAsync(new AnalyzeImageResult { Prediction = "Roads", ImageDescription = "Pothole on a busy road" });
 
         var service = CreateService();
 
         var result = await service.AnalyzeImagesAsync(images);
 
-        result.Should().HaveCount(2);
-        result[0].SuggestedCategory.Should().Be("Roads");
-        result[0].SuggestedDescription.Should().Be("Pothole");
-        result[1].SuggestedCategory.Should().Be("Lighting");
-        result[1].SuggestedDescription.Should().Be("Broken lamp");
+        result.Should().NotBeNull();
+        result.SuggestedCategory.Should().Be("Roads");
+        result.SuggestedDescription.Should().Be("Pothole on a busy road");
     }
 
     [Fact]
-    public async Task AnalyzeImagesAsync_WhenNoImages_ReturnsEmptyList()
+    public async Task AnalyzeImagesAsync_WhenNoImages_StillCallsAIAndReturnsSingleResult()
     {
         var images = Enumerable.Empty<(Stream Stream, string FileName)>();
+
+        _aiClientMock
+            .Setup(c => c.AnalyzeImagesAsync(images))
+            .ReturnsAsync(new AnalyzeImageResult { Prediction = "Unknown", ImageDescription = "No images provided" });
 
         var service = CreateService();
 
         var result = await service.AnalyzeImagesAsync(images);
 
-        result.Should().BeEmpty();
+        result.Should().NotBeNull();
+        result.SuggestedCategory.Should().Be("Unknown");
     }
 
     [Fact]
