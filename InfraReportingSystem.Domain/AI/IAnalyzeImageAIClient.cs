@@ -2,6 +2,6 @@ namespace InfraReportingSystem.Domain.AI
 {
     public interface IAnalyzeImageAIClient
     {
-        Task<AnalyzeImageResult> AnalyzeImageAsync(Stream imageStream, string fileName);
+        Task<AnalyzeImageResult> AnalyzeImagesAsync(IEnumerable<(Stream Stream, string FileName)> images);
     }
 }
