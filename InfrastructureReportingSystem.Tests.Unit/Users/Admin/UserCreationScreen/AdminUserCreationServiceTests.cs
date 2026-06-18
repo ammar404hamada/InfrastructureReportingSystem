@@ -198,16 +198,13 @@ public class AdminUserCreationServiceTests
         _userManagerMock
             .Setup(m => m.AddToRoleAsync(It.IsAny<User>(), "Worker"))
             .ReturnsAsync(IdentityResult.Success);
-        _userManagerMock
-            .Setup(m => m.GeneratePasswordResetTokenAsync(It.IsAny<User>()))
-            .ReturnsAsync("reset-token-123");
 
         var service = CreateService();
 
         var result = await service.CreateUserAsync(request, "admin-1");
 
         result.UserId.Should().NotBeNullOrWhiteSpace();
-        result.Message.Should().Be("Account created. The user will receive an email to set their password.");
+        result.Message.Should().Be("Account created. The user will receive an email with their login credentials.");
 
         createdUser.Should().NotBeNull();
         createdUser.Should().BeOfType<InfraReportingSystem.Domain.Entities.Worker>();
@@ -219,15 +216,14 @@ public class AdminUserCreationServiceTests
         worker.Status.Should().Be(UserStatus.Inactive);
         worker.Specialization.Should().Be("Plumbing");
 
-        _userManagerMock.Verify(m => m.CreateAsync(worker, It.Is<string>(p => p.Length == 16 && p.EndsWith("Aa1!"))), Times.Once);
+        _userManagerMock.Verify(m => m.CreateAsync(worker, It.Is<string>(p => p.Length == 16)), Times.Once);
         _userManagerMock.Verify(m => m.AddToRoleAsync(worker, "Worker"), Times.Once);
-        _userManagerMock.Verify(m => m.GeneratePasswordResetTokenAsync(worker), Times.Once);
 
         _emailServiceMock.Verify(
             s => s.SendEmailAsync(
                 "test@example.com",
-                It.Is<string>(subject => subject.Contains("Set your password") && subject.Contains("Infrastructure Reporting System")),
-                It.Is<string>(body => body.Contains("http://localhost:3000/reset-password?userId=") && body.Contains("reset-token-123"))),
+                "Your Account Has Been Created",
+                It.Is<string>(body => body.Contains("https://graduation-ptoject.vercel.app/auth/login"))),
             Times.Once);
 
         _auditLogRepositoryMock.Verify(
@@ -256,16 +252,13 @@ public class AdminUserCreationServiceTests
         _userManagerMock
             .Setup(m => m.AddToRoleAsync(It.IsAny<User>(), "Authority"))
             .ReturnsAsync(IdentityResult.Success);
-        _userManagerMock
-            .Setup(m => m.GeneratePasswordResetTokenAsync(It.IsAny<User>()))
-            .ReturnsAsync("reset-token-123");
 
         var service = CreateService();
 
         var result = await service.CreateUserAsync(request, "admin-1");
 
         result.UserId.Should().NotBeNullOrWhiteSpace();
-        result.Message.Should().Be("Account created. The user will receive an email to set their password.");
+        result.Message.Should().Be("Account created. The user will receive an email with their login credentials.");
 
         createdUser.Should().NotBeNull();
         createdUser.Should().BeOfType<InfraReportingSystem.Domain.Entities.Authority>();
@@ -278,13 +271,12 @@ public class AdminUserCreationServiceTests
 
         _userManagerMock.Verify(m => m.CreateAsync(authority, It.IsAny<string>()), Times.Once);
         _userManagerMock.Verify(m => m.AddToRoleAsync(authority, "Authority"), Times.Once);
-        _userManagerMock.Verify(m => m.GeneratePasswordResetTokenAsync(authority), Times.Once);
 
         _emailServiceMock.Verify(
             s => s.SendEmailAsync(
                 "test@example.com",
-                It.Is<string>(subject => subject.Contains("Set your password") && subject.Contains("Infrastructure Reporting System")),
-                It.Is<string>(body => body.Contains("http://localhost:3000/reset-password?userId=") && body.Contains("reset-token-123"))),
+                "Your Account Has Been Created",
+                It.Is<string>(body => body.Contains("https://graduation-ptoject.vercel.app/auth/login"))),
             Times.Once);
 
         _auditLogRepositoryMock.Verify(
@@ -328,7 +320,7 @@ public class AdminUserCreationServiceTests
     {
         var configurationValues = new Dictionary<string, string?>
         {
-            ["FrontendUrl"] = "http://localhost:3000"
+            ["FrontendUrl"] = "https://graduation-ptoject.vercel.app"
         };
 
         return new ConfigurationBuilder()

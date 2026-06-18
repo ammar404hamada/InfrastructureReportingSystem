@@ -123,5 +123,47 @@ namespace InfrastructureReportingSystem.Controllers.Admin.UsersManagementScreen
 
             return Ok(response);
         }
+
+        /// <summary>
+        /// Soft-deletes a user by changing their status to Deleted.
+        /// </summary>
+        /// <remarks>
+        /// Prevents the current admin from deleting their own account. Validates that the user exists and is not already deleted. Restricted to Admin users.
+        /// </remarks>
+        /// <param name="userId">The ID of the user to delete.</param>
+        /// <response code="200">The user was deleted successfully.</response>
+        /// <response code="400">The request was invalid (self-deletion or already deleted).</response>
+        /// <response code="401">The request does not contain a valid JWT access token.</response>
+        /// <response code="403">The authenticated user does not have the Admin role.</response>
+        /// <response code="404">The target user does not exist.</response>
+        [HttpDelete("{userId}")]
+        [ProducesResponseType(typeof(AdminDeleteUserResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AdminDeleteUserResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(AdminDeleteUserResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var adminUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(adminUserId))
+            {
+                return Unauthorized();
+            }
+
+            var response = await _adminUsersService.DeleteUserAsync(userId, adminUserId);
+
+            if (!response.Success)
+            {
+                if (response.Message == "User not found.")
+                {
+                    return NotFound(response);
+                }
+
+                return BadRequest(response);
+            }
+
+            return Ok(response);
+        }
     }
 }

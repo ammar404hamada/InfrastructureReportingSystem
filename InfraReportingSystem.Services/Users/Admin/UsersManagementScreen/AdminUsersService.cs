@@ -194,6 +194,70 @@ namespace InfraReportingSystem.Services.Users.Admin.UsersManagementScreen
             };
         }
 
+        public async Task<AdminDeleteUserResponseDto> DeleteUserAsync(string userId, string adminUserId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return new AdminDeleteUserResponseDto
+                {
+                    Success = false,
+                    Message = "User ID is required."
+                };
+            }
+
+            if (string.Equals(userId, adminUserId, StringComparison.OrdinalIgnoreCase))
+            {
+                return new AdminDeleteUserResponseDto
+                {
+                    Success = false,
+                    Message = "You cannot delete your own account."
+                };
+            }
+
+            var (user, _) = await _repository.GetUserProfileByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new AdminDeleteUserResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            if (user.Status == UserStatus.Deleted)
+            {
+                return new AdminDeleteUserResponseDto
+                {
+                    Success = false,
+                    Message = "User is already deleted."
+                };
+            }
+
+            user.Status = UserStatus.Deleted;
+
+            await _repository.UpdateAsync(user);
+
+            var auditLog = new AuditLog
+            {
+                UserId = adminUserId,
+                ActionType = AuditActionType.AccountDeleted,
+                EntityName = "User",
+                EntityId = user.Id,
+                Details = user.Email != null
+                    ? $"Admin deleted user {user.Name} ({user.Email})."
+                    : $"Admin deleted user {user.Name}.",
+                Timestamp = DateTime.UtcNow
+            };
+            await _auditLogRepository.AddAsync(auditLog);
+
+            return new AdminDeleteUserResponseDto
+            {
+                Success = true,
+                Message = "User deleted successfully."
+            };
+        }
+
         private static AuditActionType ToAuditActionType(UserStatus status) => status switch
         {
             UserStatus.Active => AuditActionType.AccountActivated,

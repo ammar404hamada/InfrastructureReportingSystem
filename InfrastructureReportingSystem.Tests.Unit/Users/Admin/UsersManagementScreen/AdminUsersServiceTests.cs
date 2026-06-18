@@ -594,6 +594,188 @@ public class AdminUsersServiceTests
         result.Profile.Specialization.Should().Be("Electrical");
     }
 
+    [Fact]
+    public async Task DeleteUserAsync_WhenUserIdIsBlank_ReturnsFailure()
+    {
+        var service = CreateService();
+
+        var result = await service.DeleteUserAsync("", "admin-1");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("User ID is required.");
+        _repositoryMock.Verify(repo => repo.GetUserProfileByIdAsync(It.IsAny<string>()), Times.Never);
+        _auditLogRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<AuditLog>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteUserAsync_WhenAdminDeletesOwnAccount_ReturnsFailure()
+    {
+        var service = CreateService();
+
+        var result = await service.DeleteUserAsync("admin-1", "admin-1");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("You cannot delete your own account.");
+        _repositoryMock.Verify(repo => repo.GetUserProfileByIdAsync(It.IsAny<string>()), Times.Never);
+        _auditLogRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<AuditLog>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteUserAsync_WhenUserNotFound_ReturnsFailure()
+    {
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("missing-id"))
+            .ReturnsAsync((null, null));
+
+        var service = CreateService();
+
+        var result = await service.DeleteUserAsync("missing-id", "admin-1");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("User not found.");
+        _repositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<User>()), Times.Never);
+        _auditLogRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<AuditLog>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteUserAsync_WhenUserAlreadyDeleted_ReturnsFailure()
+    {
+        var user = new User
+        {
+            Id = "deleted-1",
+            Name = "Deleted User",
+            Email = "deleted@example.com",
+            Status = UserStatus.Deleted,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("deleted-1"))
+            .ReturnsAsync((user, "Public User"));
+
+        var service = CreateService();
+
+        var result = await service.DeleteUserAsync("deleted-1", "admin-1");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("User is already deleted.");
+        _repositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<User>()), Times.Never);
+        _auditLogRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<AuditLog>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteUserAsync_WhenValidRequest_SetsStatusToDeletedLogsAuditAndReturnsSuccess()
+    {
+        var user = new User
+        {
+            Id = "target-1",
+            Name = "Target User",
+            Email = "target@example.com",
+            Status = UserStatus.Active,
+            CreatedAt = DateTime.UtcNow.AddMonths(-3)
+        };
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("target-1"))
+            .ReturnsAsync((user, "Public User"));
+
+        User? updatedUser = null;
+        _repositoryMock
+            .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
+            .Callback<User>(u => updatedUser = u)
+            .Returns(Task.CompletedTask);
+
+        AuditLog? capturedAuditLog = null;
+        _auditLogRepositoryMock
+            .Setup(repo => repo.AddAsync(It.IsAny<AuditLog>()))
+            .Callback<AuditLog>(log => capturedAuditLog = log)
+            .Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        var result = await service.DeleteUserAsync("target-1", "admin-1");
+
+        result.Success.Should().BeTrue();
+        result.Message.Should().Be("User deleted successfully.");
+
+        updatedUser.Should().NotBeNull();
+        updatedUser!.Status.Should().Be(UserStatus.Deleted);
+
+        capturedAuditLog.Should().NotBeNull();
+        capturedAuditLog!.UserId.Should().Be("admin-1");
+        capturedAuditLog.ActionType.Should().Be(AuditActionType.AccountDeleted);
+        capturedAuditLog.EntityName.Should().Be("User");
+        capturedAuditLog.EntityId.Should().Be("target-1");
+        capturedAuditLog.Details.Should().Be("Admin deleted user Target User (target@example.com).");
+    }
+
+    [Fact]
+    public async Task DeleteUserAsync_WhenTargetIsAnotherAdmin_DeletesSuccessfully()
+    {
+        var user = new User
+        {
+            Id = "other-admin-1",
+            Name = "Other Admin",
+            Email = "otheradmin@example.com",
+            Status = UserStatus.Active,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("other-admin-1"))
+            .ReturnsAsync((user, "Admin"));
+
+        _repositoryMock
+            .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
+            .Returns(Task.CompletedTask);
+
+        _auditLogRepositoryMock
+            .Setup(repo => repo.AddAsync(It.IsAny<AuditLog>()))
+            .Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        var result = await service.DeleteUserAsync("other-admin-1", "current-admin-1");
+
+        result.Success.Should().BeTrue();
+        result.Message.Should().Be("User deleted successfully.");
+    }
+
+    [Fact]
+    public async Task DeleteUserAsync_WhenUserHasNoEmail_AuditLogOmitsEmail()
+    {
+        var user = new User
+        {
+            Id = "noemail-1",
+            Name = "No Email User",
+            Email = null,
+            Status = UserStatus.Active,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("noemail-1"))
+            .ReturnsAsync((user, "Public User"));
+
+        _repositoryMock
+            .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
+            .Returns(Task.CompletedTask);
+
+        AuditLog? capturedAuditLog = null;
+        _auditLogRepositoryMock
+            .Setup(repo => repo.AddAsync(It.IsAny<AuditLog>()))
+            .Callback<AuditLog>(log => capturedAuditLog = log)
+            .Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        var result = await service.DeleteUserAsync("noemail-1", "admin-1");
+
+        result.Success.Should().BeTrue();
+        capturedAuditLog.Should().NotBeNull();
+        capturedAuditLog!.Details.Should().Be("Admin deleted user No Email User.");
+    }
+
     private AdminUsersService CreateService()
     {
         return new AdminUsersService(_repositoryMock.Object, _auditLogRepositoryMock.Object);

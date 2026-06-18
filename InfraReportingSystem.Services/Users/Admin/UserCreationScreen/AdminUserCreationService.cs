@@ -4,6 +4,7 @@ using InfraReportingSystem.ServiceAbstractions.Repositories.Shared;
 using InfraReportingSystem.ServiceAbstractions.Shared.Email;
 using InfraReportingSystem.ServiceAbstractions.Users.Admin.UserCreationScreen;
 using InfraReportingSystem.Shared.DTOs.UserServices.Admin.UserCreationScreen;
+using InfrastructureReportingSystem.Shared.EmailTemplate;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -84,10 +85,10 @@ namespace InfraReportingSystem.Services.Users.Admin.UserCreationScreen
 
 
 
-            var placeholderPassword = Guid.NewGuid().ToString("N")[..12] + "Aa1!";
+            var password = GenerateRandomPassword();
 
 
-            var createResult = await _userManager.CreateAsync(newUser, placeholderPassword);
+            var createResult = await _userManager.CreateAsync(newUser, password);
             if (!createResult.Succeeded)
                 return Error(string.Join(", ", createResult.Errors.Select(e => e.Description)));
 
@@ -100,21 +101,9 @@ namespace InfraReportingSystem.Services.Users.Admin.UserCreationScreen
             }
 
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(newUser);
-            var encodedToken = Uri.EscapeDataString(token);
-            var resetLink = $"{_configuration["FrontendUrl"]}/reset-password?userId={newUser.Id}&token={encodedToken}";
-
-
-            var emailBody = $@"
-            <h2>Account created by admin</h2>
-            <p>Hi {newUser.Name},</p>
-            <p>An administrator has created an account for you. Please set your password by clicking the link below:</p>
-            <a href='{resetLink}' style='background:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
-                Set Password
-            </a>
-            <p>If you didn't expect this email, please ignore it.</p>
-        ";
-            await _emailService.SendEmailAsync(newUser.Email!, "Set your password – Infrastructure Reporting System", emailBody);
+            var loginLink = $"{_configuration["FrontendUrl"]}/auth/login";
+            var emailBody = EmailTemplates.AccountCreatedWithPasswordTemplate(newUser.Name, newUser.Email, password, loginLink);
+            await _emailService.SendEmailAsync(newUser.Email!, "Your Account Has Been Created", emailBody);
 
 
             var auditLog = new AuditLog
@@ -131,8 +120,30 @@ namespace InfraReportingSystem.Services.Users.Admin.UserCreationScreen
             return new CreateUserResponseDto
             {
                 UserId = newUser.Id,
-                Message = "Account created. The user will receive an email to set their password."
+                Message = "Account created. The user will receive an email with their login credentials."
             };
+        }
+
+        private static string GenerateRandomPassword()
+        {
+            const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lower = "abcdefghijklmnopqrstuvwxyz";
+            const string digits = "0123456789";
+            const string nonAlpha = "!@#$%^&*()-_=+";
+
+            var random = new Random();
+            var password = new char[16];
+
+            password[0] = upper[random.Next(upper.Length)];
+            password[1] = lower[random.Next(lower.Length)];
+            password[2] = digits[random.Next(digits.Length)];
+            password[3] = nonAlpha[random.Next(nonAlpha.Length)];
+
+            var allChars = upper + lower + digits + nonAlpha;
+            for (int i = 4; i < 16; i++)
+                password[i] = allChars[random.Next(allChars.Length)];
+
+            return new string(password.OrderBy(_ => random.Next()).ToArray());
         }
 
         private static CreateUserResponseDto Error(string message) => new() { Message = message };

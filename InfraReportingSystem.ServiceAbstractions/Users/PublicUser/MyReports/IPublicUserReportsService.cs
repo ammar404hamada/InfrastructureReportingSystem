@@ -15,6 +15,7 @@ namespace InfraReportingSystem.ServiceAbstractions.Users.PublicUser.MyReports
         Task<FixConfirmationResponseDto> UpdateFixConfirmationStatusAsync(
             string userId,
             int reportId,
-            ReportStatus newStatus);
+            ReportStatus newStatus,
+            string? reason = null);
     }
 }

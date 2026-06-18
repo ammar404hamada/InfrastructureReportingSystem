@@ -72,6 +72,7 @@ namespace InfrastructureReportingSystem.Controllers.PublicUser.MyReports
         /// </summary>
         /// <param name="userId">The ID of the public user rejecting the fix.</param>
         /// <param name="reportId">The ID of the report whose fix is being rejected.</param>
+        /// <param name="dto">Optional reason for the rejection.</param>
         /// <response code="200">The fix was rejected successfully.</response>
         /// <response code="400">The rejection could not be processed.</response>
         [HttpPost("{reportId:int}/reject-fix")]
@@ -79,7 +80,10 @@ namespace InfrastructureReportingSystem.Controllers.PublicUser.MyReports
         [EndpointSummary("RejectFix")]
         [ProducesResponseType(typeof(FixConfirmationResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(FixConfirmationResponseDto), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RejectFix([FromRoute] string userId, [FromRoute] int reportId)
+        public async Task<IActionResult> RejectFix(
+            [FromRoute] string userId,
+            [FromRoute] int reportId,
+            [FromBody] FixRejectRequestDto? dto = null)
         {
             if (string.IsNullOrWhiteSpace(userId))
                 return BadRequest(new FixConfirmationResponseDto { Success = false, Message = "userId is required." });
@@ -87,7 +91,8 @@ namespace InfrastructureReportingSystem.Controllers.PublicUser.MyReports
             var result = await _service.UpdateFixConfirmationStatusAsync(
                 userId,
                 reportId,
-                ReportStatus.FixRejected);
+                ReportStatus.FixRejected,
+                dto?.Reason);
 
             if (!result.Success)
                 return BadRequest(result);

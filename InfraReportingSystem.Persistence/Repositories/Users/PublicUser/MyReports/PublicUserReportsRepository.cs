@@ -85,6 +85,8 @@ namespace InfraReportingSystem.Persistence.Repositories.Users.PublicUser.MyRepor
         public async Task<Report?> GetUserReportByIdAsync(string userId, int reportId)
         {
             return await _context.Reports
+                .Include(r => r.AssignedWorker)
+                .Include(r => r.Category)
                 .FirstOrDefaultAsync(r => r.Id == reportId && r.SubmittedById == userId);
         }
 
