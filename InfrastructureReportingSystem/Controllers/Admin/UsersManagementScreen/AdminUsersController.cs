@@ -3,6 +3,7 @@ using InfraReportingSystem.Shared.DTOs.Common;
 using InfraReportingSystem.Shared.DTOs.UserServices.Admin.UsersManagementScreen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace InfrastructureReportingSystem.Controllers.Admin.UsersManagementScreen
 {
@@ -76,6 +77,48 @@ namespace InfrastructureReportingSystem.Controllers.Admin.UsersManagementScreen
             if (!response.Success && response.Message == "User not found.")
             {
                 return NotFound(response);
+            }
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Changes the status of a user (Active, Inactive, Suspended, Locked).
+        /// </summary>
+        /// <remarks>
+        /// Validates the status value and prevents the current admin from changing their own status. Restricted to Admin users.
+        /// </remarks>
+        /// <param name="request">The target user ID and the new status value.</param>
+        /// <response code="200">The user status was updated successfully. Returns the updated profile.</response>
+        /// <response code="400">The request was invalid (missing fields, invalid status, or self-status change).</response>
+        /// <response code="401">The request does not contain a valid JWT access token.</response>
+        /// <response code="403">The authenticated user does not have the Admin role.</response>
+        /// <response code="404">The target user does not exist or has been deleted.</response>
+        [HttpPatch("status")]
+        [ProducesResponseType(typeof(AdminUserProfileResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AdminUserProfileResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(AdminUserProfileResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ChangeUserStatus([FromBody] AdminChangeUserStatusRequestDto request)
+        {
+            var adminUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(adminUserId))
+            {
+                return Unauthorized();
+            }
+
+            var response = await _adminUsersService.ChangeUserStatusAsync(request, adminUserId);
+
+            if (!response.Success)
+            {
+                if (response.Message == "User not found.")
+                {
+                    return NotFound(response);
+                }
+
+                return BadRequest(response);
             }
 
             return Ok(response);

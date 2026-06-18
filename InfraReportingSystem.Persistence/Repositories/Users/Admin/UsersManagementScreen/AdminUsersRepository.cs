@@ -122,5 +122,12 @@ namespace InfraReportingSystem.Persistence.Repositories.Users.Admin.UsersManagem
 
             return (user, role);
         }
+
+        public async Task UpdateAsync(User user)
+        {
+            _context.Users.Attach(user);
+            _context.Entry(user).Property(u => u.Status).IsModified = true;
+            await _context.SaveChangesAsync();
+        }
     }
 }

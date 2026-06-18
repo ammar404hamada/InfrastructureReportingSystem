@@ -20,5 +20,7 @@ namespace InfraReportingSystem.ServiceAbstractions.Users.Admin.UsersManagementSc
             int pageSize);
 
         Task<AdminUserProfileResponseDto> GetUserProfileByIdAsync(string userId);
+
+        Task<AdminUserProfileResponseDto> ChangeUserStatusAsync(AdminChangeUserStatusRequestDto request, string adminUserId);
     }
 }

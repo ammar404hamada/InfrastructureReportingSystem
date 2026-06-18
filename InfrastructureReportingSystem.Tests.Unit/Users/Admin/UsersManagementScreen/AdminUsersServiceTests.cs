@@ -1,6 +1,7 @@
 using FluentAssertions;
 using InfraReportingSystem.Domain.Entities;
 using InfraReportingSystem.Domain.Enums;
+using InfraReportingSystem.ServiceAbstractions.Repositories.Shared;
 using InfraReportingSystem.ServiceAbstractions.Repositories.Users.Admin.UsersManagementScreen;
 using InfraReportingSystem.Services.Users.Admin.UsersManagementScreen;
 using InfraReportingSystem.Shared.DTOs.UserServices.Admin.UsersManagementScreen;
@@ -12,6 +13,7 @@ namespace InfrastructureReportingSystem.Tests.Unit.Users.Admin.UsersManagementSc
 public class AdminUsersServiceTests
 {
     private readonly Mock<IAdminUsersRepository> _repositoryMock = new();
+    private readonly Mock<IAuditLogRepository> _auditLogRepositoryMock = new();
 
     [Fact]
     public async Task GetUsersAsync_WhenNoUsersFound_ReturnsEmptyResultWithCustomMessage()
@@ -363,8 +365,237 @@ public class AdminUsersServiceTests
             propertyName.Contains("Task", StringComparison.OrdinalIgnoreCase));
     }
 
+    [Fact]
+    public async Task ChangeUserStatusAsync_WhenUserIdIsMissing_ReturnsFailure()
+    {
+        var request = new AdminChangeUserStatusRequestDto { UserId = "", Status = "Active" };
+
+        var service = CreateService();
+
+        var result = await service.ChangeUserStatusAsync(request, "admin-1");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("User ID is required.");
+        _repositoryMock.Verify(repo => repo.GetUserProfileByIdAsync(It.IsAny<string>()), Times.Never);
+        _auditLogRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<AuditLog>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ChangeUserStatusAsync_WhenStatusIsMissing_ReturnsFailure()
+    {
+        var request = new AdminChangeUserStatusRequestDto { UserId = "user-1", Status = "" };
+
+        var service = CreateService();
+
+        var result = await service.ChangeUserStatusAsync(request, "admin-1");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("Status is required.");
+        _repositoryMock.Verify(repo => repo.GetUserProfileByIdAsync(It.IsAny<string>()), Times.Never);
+        _auditLogRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<AuditLog>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ChangeUserStatusAsync_WhenStatusIsInvalid_ReturnsFailure()
+    {
+        var request = new AdminChangeUserStatusRequestDto { UserId = "user-1", Status = "Bogus" };
+
+        var service = CreateService();
+
+        var result = await service.ChangeUserStatusAsync(request, "admin-1");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("Invalid status value 'Bogus'. Valid values are Active, Inactive, Suspended, and Locked.");
+        _repositoryMock.Verify(repo => repo.GetUserProfileByIdAsync(It.IsAny<string>()), Times.Never);
+        _auditLogRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<AuditLog>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ChangeUserStatusAsync_WhenStatusIsDeleted_ReturnsFailure()
+    {
+        var request = new AdminChangeUserStatusRequestDto { UserId = "user-1", Status = "Deleted" };
+
+        var service = CreateService();
+
+        var result = await service.ChangeUserStatusAsync(request, "admin-1");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("Status cannot be set to Deleted.");
+        _repositoryMock.Verify(repo => repo.GetUserProfileByIdAsync(It.IsAny<string>()), Times.Never);
+        _auditLogRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<AuditLog>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ChangeUserStatusAsync_WhenAdminChangesOwnStatus_ReturnsFailure()
+    {
+        var request = new AdminChangeUserStatusRequestDto { UserId = "admin-1", Status = "Inactive" };
+
+        var service = CreateService();
+
+        var result = await service.ChangeUserStatusAsync(request, "admin-1");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("You cannot change your own status.");
+        _repositoryMock.Verify(repo => repo.GetUserProfileByIdAsync(It.IsAny<string>()), Times.Never);
+        _auditLogRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<AuditLog>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ChangeUserStatusAsync_WhenUserNotFound_ReturnsFailure()
+    {
+        var request = new AdminChangeUserStatusRequestDto { UserId = "missing-id", Status = "Suspended" };
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("missing-id"))
+            .ReturnsAsync((null, null));
+
+        var service = CreateService();
+
+        var result = await service.ChangeUserStatusAsync(request, "admin-1");
+
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("User not found.");
+        _repositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<User>()), Times.Never);
+        _auditLogRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<AuditLog>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData("Active", UserStatus.Active, AuditActionType.AccountActivated)]
+    [InlineData("Inactive", UserStatus.Inactive, AuditActionType.AccountDeactivated)]
+    [InlineData("Suspended", UserStatus.Suspended, AuditActionType.AccountSuspended)]
+    [InlineData("Locked", UserStatus.Locked, AuditActionType.AccountLocked)]
+    public async Task ChangeUserStatusAsync_WhenValidRequest_UpdatesStatusLogsAuditAndReturnsProfile(
+        string statusString, UserStatus expectedStatus, AuditActionType expectedAuditAction)
+    {
+        var user = new User
+        {
+            Id = "target-1",
+            Name = "Target User",
+            Email = "target@example.com",
+            PhoneNumber = "01099999999",
+            ProfilePictureUrl = "https://example.com/pic.jpg",
+            Status = UserStatus.Active,
+            CreatedAt = DateTime.UtcNow.AddMonths(-3)
+        };
+
+        var request = new AdminChangeUserStatusRequestDto { UserId = "target-1", Status = statusString };
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("target-1"))
+            .ReturnsAsync((user, "Worker"));
+
+        User? updatedUser = null;
+        _repositoryMock
+            .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
+            .Callback<User>(u => updatedUser = u)
+            .Returns(Task.CompletedTask);
+
+        AuditLog? capturedAuditLog = null;
+        _auditLogRepositoryMock
+            .Setup(repo => repo.AddAsync(It.IsAny<AuditLog>()))
+            .Callback<AuditLog>(log => capturedAuditLog = log)
+            .Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        var result = await service.ChangeUserStatusAsync(request, "admin-1");
+
+        result.Success.Should().BeTrue();
+        result.Message.Should().Be("User status updated successfully.");
+        result.Profile.Should().NotBeNull();
+        result.Profile!.Id.Should().Be("target-1");
+        result.Profile.Name.Should().Be("Target User");
+        result.Profile.Email.Should().Be("target@example.com");
+        result.Profile.PhoneNumber.Should().Be("01099999999");
+        result.Profile.ProfilePictureUrl.Should().Be("https://example.com/pic.jpg");
+        result.Profile.Status.Should().Be(statusString);
+        result.Profile.Specialization.Should().BeNull();
+
+        updatedUser.Should().NotBeNull();
+        updatedUser!.Status.Should().Be(expectedStatus);
+
+        capturedAuditLog.Should().NotBeNull();
+        capturedAuditLog!.UserId.Should().Be("admin-1");
+        capturedAuditLog.ActionType.Should().Be(expectedAuditAction);
+        capturedAuditLog.EntityName.Should().Be("User");
+        capturedAuditLog.EntityId.Should().Be("target-1");
+        capturedAuditLog.Details.Should().Be(
+            "Admin changed user status for Target User (target@example.com) from Active to " + statusString + ".");
+    }
+
+    [Fact]
+    public async Task ChangeUserStatusAsync_WhenTargetIsAnotherAdmin_UpdatesSuccessfully()
+    {
+        var user = new User
+        {
+            Id = "other-admin-1",
+            Name = "Other Admin",
+            Email = "otheradmin@example.com",
+            Status = UserStatus.Active,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var request = new AdminChangeUserStatusRequestDto { UserId = "other-admin-1", Status = "Inactive" };
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("other-admin-1"))
+            .ReturnsAsync((user, "Admin"));
+
+        _repositoryMock
+            .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
+            .Returns(Task.CompletedTask);
+
+        _auditLogRepositoryMock
+            .Setup(repo => repo.AddAsync(It.IsAny<AuditLog>()))
+            .Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        var result = await service.ChangeUserStatusAsync(request, "current-admin-1");
+
+        result.Success.Should().BeTrue();
+        result.Message.Should().Be("User status updated successfully.");
+    }
+
+    [Fact]
+    public async Task ChangeUserStatusAsync_WhenWorkerIsUpdated_ReturnsSpecializationInProfile()
+    {
+        var user = new InfraReportingSystem.Domain.Entities.Worker
+        {
+            Id = "worker-1",
+            Name = "Worker User",
+            Email = "worker@example.com",
+            Status = UserStatus.Active,
+            CreatedAt = DateTime.UtcNow,
+            Specialization = "Electrical"
+        };
+
+        var request = new AdminChangeUserStatusRequestDto { UserId = "worker-1", Status = "Suspended" };
+
+        _repositoryMock
+            .Setup(repo => repo.GetUserProfileByIdAsync("worker-1"))
+            .ReturnsAsync((user, "Worker"));
+
+        _repositoryMock
+            .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
+            .Returns(Task.CompletedTask);
+
+        _auditLogRepositoryMock
+            .Setup(repo => repo.AddAsync(It.IsAny<AuditLog>()))
+            .Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        var result = await service.ChangeUserStatusAsync(request, "admin-1");
+
+        result.Success.Should().BeTrue();
+        result.Profile.Should().NotBeNull();
+        result.Profile!.Role.Should().Be("Worker");
+        result.Profile.Specialization.Should().Be("Electrical");
+    }
+
     private AdminUsersService CreateService()
     {
-        return new AdminUsersService(_repositoryMock.Object);
+        return new AdminUsersService(_repositoryMock.Object, _auditLogRepositoryMock.Object);
     }
 }
