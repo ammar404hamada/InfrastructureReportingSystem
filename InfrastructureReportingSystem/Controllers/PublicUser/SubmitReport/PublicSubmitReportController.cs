@@ -28,7 +28,7 @@ public class PublicSubmitReportController : ControllerBase
     /// <response code="403">The authenticated user does not have the PublicUser role.</response>
     [HttpPost("analyze-image")]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(List<AISuggestionDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AISuggestionDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

@@ -12,7 +12,7 @@ namespace InfrastructureReportingSystem.Tests.Unit.AI;
 public class AnalyzeImageAIClientTests
 {
     [Fact]
-    public async Task AnalyzeImageAsync_WhenResponseIsSuccessful_ReturnsMappedResult()
+    public async Task AnalyzeImagesAsync_WhenResponseIsSuccessful_ReturnsMappedResult()
     {
         var json = JsonSerializer.Serialize(new
         {
@@ -23,30 +23,33 @@ public class AnalyzeImageAIClientTests
         using var httpClient = new HttpClient(handlerMock.Object) { BaseAddress = new Uri("http://localhost") };
 
         var client = new AnalyzeImageAIClient(httpClient);
-        using var stream = new MemoryStream([1, 2, 3]);
+        using var stream1 = new MemoryStream([1, 2, 3]);
+        using var stream2 = new MemoryStream([4, 5, 6]);
+        var images = new[] { (Stream: (Stream)stream1, FileName: "photo1.jpg"), (Stream: (Stream)stream2, FileName: "photo2.jpg") };
 
-        var result = await client.AnalyzeImageAsync(stream, "photo.jpg");
+        var result = await client.AnalyzeImagesAsync(images);
 
         result.Prediction.Should().Be("Roads");
         result.ImageDescription.Should().Be("Pothole on main road");
     }
 
     [Fact]
-    public async Task AnalyzeImageAsync_WhenHttpResponseFails_ThrowsHttpRequestException()
+    public async Task AnalyzeImagesAsync_WhenHttpResponseFails_ThrowsHttpRequestException()
     {
         var handlerMock = CreateHandlerMock(HttpStatusCode.InternalServerError, "Error");
         using var httpClient = new HttpClient(handlerMock.Object) { BaseAddress = new Uri("http://localhost") };
 
         var client = new AnalyzeImageAIClient(httpClient);
         using var stream = new MemoryStream([1, 2, 3]);
+        var images = new[] { (Stream: (Stream)stream, FileName: "photo.jpg") };
 
-        Func<Task> action = async () => await client.AnalyzeImageAsync(stream, "photo.jpg");
+        Func<Task> action = async () => await client.AnalyzeImagesAsync(images);
 
         await action.Should().ThrowAsync<HttpRequestException>();
     }
 
     [Fact]
-    public async Task AnalyzeImageAsync_WhenResponseMissingClassification_ThrowsInvalidOperationException()
+    public async Task AnalyzeImagesAsync_WhenResponseMissingClassification_ThrowsInvalidOperationException()
     {
         var json = JsonSerializer.Serialize(new { description = "Some description" });
         var handlerMock = CreateHandlerMock(HttpStatusCode.OK, json);
@@ -54,15 +57,16 @@ public class AnalyzeImageAIClientTests
 
         var client = new AnalyzeImageAIClient(httpClient);
         using var stream = new MemoryStream([1, 2, 3]);
+        var images = new[] { (Stream: (Stream)stream, FileName: "photo.jpg") };
 
-        Func<Task> action = async () => await client.AnalyzeImageAsync(stream, "photo.jpg");
+        Func<Task> action = async () => await client.AnalyzeImagesAsync(images);
 
         await action.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*missing*'prediction'*");
     }
 
     [Fact]
-    public async Task AnalyzeImageAsync_WhenResponseMissingDescription_ThrowsInvalidOperationException()
+    public async Task AnalyzeImagesAsync_WhenResponseMissingDescription_ThrowsInvalidOperationException()
     {
         var json = JsonSerializer.Serialize(new { classification = "Roads" });
         var handlerMock = CreateHandlerMock(HttpStatusCode.OK, json);
@@ -70,15 +74,16 @@ public class AnalyzeImageAIClientTests
 
         var client = new AnalyzeImageAIClient(httpClient);
         using var stream = new MemoryStream([1, 2, 3]);
+        var images = new[] { (Stream: (Stream)stream, FileName: "photo.jpg") };
 
-        Func<Task> action = async () => await client.AnalyzeImageAsync(stream, "photo.jpg");
+        Func<Task> action = async () => await client.AnalyzeImagesAsync(images);
 
         await action.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*missing*'image_description'*");
     }
 
     [Fact]
-    public async Task AnalyzeImageAsync_WhenPredictionIsNull_ThrowsInvalidOperationException()
+    public async Task AnalyzeImagesAsync_WhenPredictionIsNull_ThrowsInvalidOperationException()
     {
         var json = JsonSerializer.Serialize(new
         {
@@ -90,15 +95,16 @@ public class AnalyzeImageAIClientTests
 
         var client = new AnalyzeImageAIClient(httpClient);
         using var stream = new MemoryStream([1, 2, 3]);
+        var images = new[] { (Stream: (Stream)stream, FileName: "photo.jpg") };
 
-        Func<Task> action = async () => await client.AnalyzeImageAsync(stream, "photo.jpg");
+        Func<Task> action = async () => await client.AnalyzeImagesAsync(images);
 
         await action.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*null prediction*");
     }
 
     [Fact]
-    public async Task AnalyzeImageAsync_WhenDescriptionIsNull_ThrowsInvalidOperationException()
+    public async Task AnalyzeImagesAsync_WhenDescriptionIsNull_ThrowsInvalidOperationException()
     {
         var json = JsonSerializer.Serialize(new
         {
@@ -110,8 +116,9 @@ public class AnalyzeImageAIClientTests
 
         var client = new AnalyzeImageAIClient(httpClient);
         using var stream = new MemoryStream([1, 2, 3]);
+        var images = new[] { (Stream: (Stream)stream, FileName: "photo.jpg") };
 
-        Func<Task> action = async () => await client.AnalyzeImageAsync(stream, "photo.jpg");
+        Func<Task> action = async () => await client.AnalyzeImagesAsync(images);
 
         await action.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*null image_description*");
